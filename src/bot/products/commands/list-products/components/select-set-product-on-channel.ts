@@ -65,12 +65,12 @@ export class SelectSetProductOnChannel {
       });
     }
 
-    channel.send({
-      embeds: [
-        this.productCardComponent.createProductCard(product.data.product),
-      ],
-    });
+    this.productCardComponent.sendProductCardToChannel({
+      channel: channel as any,
+      product: product.data.product,
+    })
 
+ 
     interaction.reply({
       content: 'Produto setado no canal com sucesso!',
       flags: ['Ephemeral'],

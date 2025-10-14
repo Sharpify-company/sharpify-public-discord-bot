@@ -15,6 +15,7 @@ import {
   ModalActionRowComponentBuilder,
   ModalBuilder,
   ModalSubmitInteraction,
+  TextChannel,
   TextInputBuilder,
   TextInputStyle,
 } from 'discord.js';
@@ -22,17 +23,25 @@ import { BotConfig } from '@/config';
 import { ProductProps } from '@/@shared/sharpify/api';
 import { formatPrice } from '@/@shared/lib';
 import TurndownService from 'turndown';
+import { AddToCartButtonComponent } from './components/add-to-cart-button';
 
 @Injectable()
 export class ProductCardComponent {
-  createProductCard(product: ProductProps) {
-    return new EmbedBuilder()
+  constructor(
+    private readonly addToCartButtonComponent: AddToCartButtonComponent,
+  ) {}
+
+  getProductEmbed(product: ProductProps) {
+    const emmbed = new EmbedBuilder()
       .setColor(BotConfig.color)
       .setTitle('Sistema de compra')
       .setDescription(
-        new TurndownService().turndown(product.info.description || ''),
+        new TurndownService().turndown(product.info.description || 'Sem descrição'),
       )
-      .addFields(
+      .setImage(product.info.mainImage || '');
+
+    if (product.settings.viewType === 'NORMAL') {
+      emmbed.addFields(
         { name: '🌐 Produto', value: `\`\`\`${product.info.title}\`\`\`` },
         {
           name: '💵 Valor',
@@ -47,7 +56,28 @@ export class ProductCardComponent {
               : `\`\`\`${product.readonly.stockQuantityAvailable} Unidades\`\`\``,
           inline: true,
         },
-      )
-      .setImage(product.info.mainImage || '');
+      );
+    }
+
+    return emmbed;
+  }
+
+  sendProductCardToChannel({
+    channel,
+    product,
+  }: {
+    product: ProductProps;
+    channel: TextChannel;
+  }) {
+    const normalEmmbed = this.getProductEmbed(product);
+    const normalPurchaseButton =
+      product.settings.viewType === 'NORMAL'
+        ? this.addToCartButtonComponent.createCartButton(product)
+        : this.addToCartButtonComponent.createDynamicItemsSelect(product);
+
+    channel.send({
+      embeds: [normalEmmbed],
+      components: [normalPurchaseButton],
+    });
   }
 }

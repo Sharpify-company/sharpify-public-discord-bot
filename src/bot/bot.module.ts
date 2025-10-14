@@ -4,6 +4,7 @@ import { dotEnv } from '../@shared/lib';
 import { AppUpdate } from './bot.update';
 import { AppService } from './bot.service';
 import { ProductsModule } from './products/products.module';
+import { CheckoutModule } from './checkout/checkout.module';
 
 
 @Module({
@@ -13,7 +14,8 @@ import { ProductsModule } from './products/products.module';
       development: [dotEnv.DISCORD_GUILD_ID],
       intents: ['Guilds', 'GuildMessages'],
     }),
-    ProductsModule
+    ProductsModule,
+    CheckoutModule
   ],
   controllers: [],
   providers: [AppUpdate, AppService],

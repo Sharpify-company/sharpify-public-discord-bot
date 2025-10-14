@@ -25,27 +25,7 @@ import TurndownService from 'turndown';
 
 @Injectable()
 export class ProductEmmbed {
-  // 1️⃣ Modal com múltiplos inputs
-  @Modal('list-products-modal')
-  private handleModalSubmit(@Ctx() [interaction]: ModalContext) {
-    if (!interaction.isModalSubmit()) return;
 
-    const username = interaction.fields.getTextInputValue('username');
-    const bio =
-      interaction.fields.getTextInputValue('bio') || 'Nenhuma bio fornecida';
-
-    // 3️⃣ Respondendo com embed estilizado
-    const embed = new EmbedBuilder()
-      .setTitle('📝 Formulário Recebido!')
-      .setColor('Purple')
-      .addFields(
-        { name: 'Nome', value: username, inline: true },
-        { name: 'Bio', value: bio, inline: false },
-      )
-      .setTimestamp();
-
-    interaction.reply({ embeds: [embed], flags: ['Ephemeral'] });
-  }
 
   createEmbbed(product: ProductProps) {
     return new EmbedBuilder()

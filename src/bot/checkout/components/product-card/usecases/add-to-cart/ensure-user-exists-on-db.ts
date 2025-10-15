@@ -29,7 +29,7 @@ export async function EnsureUserExistsOnDb({
 
   let discordUserEntity = await discordUserRepository.findById(member.user.id);
   if (!discordUserEntity) {
-    discordUserEntity = new DiscordUserEntity({
+    discordUserEntity = DiscordUserEntity.create({
       id: member.user.id,
     });
 

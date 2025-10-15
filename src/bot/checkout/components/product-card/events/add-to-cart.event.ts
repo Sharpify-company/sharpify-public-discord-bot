@@ -30,6 +30,8 @@ import { BotConfig } from '@/config';
 import { ProductProps } from '@/@shared/sharpify/api';
 import { formatPrice } from '@/@shared/lib';
 import TurndownService from 'turndown';
+import { Sharpify } from '@/@shared/sharpify';
+import { AddToCartUsecase } from '../usecases';
 
 @Injectable()
 export class AddToCartEvent {
@@ -39,11 +41,7 @@ export class AddToCartEvent {
     @ComponentParam('productIdAndItemId') productIdAndItemId: string,
   ) {
     const [productId, productItemId] = productIdAndItemId.split(':');
-    console.log(
-      '🚀 ~ AddToCartEvent ~ handleChannelSelected ~ productId:',
-      productId,
-      productItemId,
-    );
+    await this.addToCart({ interaction, productId, productItemId });
   }
   @StringSelect('add_to_cart_:productId')
   private async handleDyamic(
@@ -52,10 +50,23 @@ export class AddToCartEvent {
     @SelectedStrings() selected: string[],
   ) {
     const [productItemId] = selected;
-    console.log(
-      '🚀 ~ AddToCartEvent ~ handleChannelSelected ~ productId 2:',
+
+    await this.addToCart({
+      interaction: interaction as any,
       productId,
       productItemId,
-    );
+    });
+  }
+
+  private async addToCart({
+    interaction,
+    productId,
+    productItemId,
+  }: {
+    interaction: ButtonInteraction<CacheType>;
+    productId: string;
+    productItemId: string;
+  }) {
+    await AddToCartUsecase.execute({ interaction, productId, productItemId });
   }
 }

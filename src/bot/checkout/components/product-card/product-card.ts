@@ -31,7 +31,7 @@ export class ProductCardComponent {
     private readonly addToCartButtonComponent: AddToCartButtonComponent,
   ) {}
 
-  getProductEmbed(product: ProductProps) {
+  private getProductEmbed(product: ProductProps) {
     const emmbed = new EmbedBuilder()
       .setColor(BotConfig.color)
       .setTitle('Sistema de compra')

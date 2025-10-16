@@ -47,6 +47,14 @@ class ProductRepository {
 		update.run(JSON.stringify(productEntity.productProps), JSON.stringify(productEntity.channelsLinked), productEntity.id);
 		return Promise.resolve();
 	}
+
+	async delete(id: string): Promise<void> {
+		const del = sqlite.prepare(`
+	  DELETE FROM ${tableName} WHERE id = ?
+	`);
+		del.run(id);
+		return Promise.resolve();
+	}
 }
 
 export async function getProductRepository(): Promise<ProductRepository> {

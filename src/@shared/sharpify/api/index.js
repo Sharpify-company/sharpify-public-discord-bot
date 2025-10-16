@@ -24,6 +24,7 @@ __export(index_exports, {
   CategoryProps: () => CategoryProps,
   CouponProps: () => CouponProps,
   CustomFieldsProps: () => CustomFieldsProps,
+  ExternalEventsProps: () => ExternalEventsProps,
   OrderProps: () => OrderProps,
   ProductProps: () => ProductProps,
   StoreProps: () => StoreProps,
@@ -83,7 +84,8 @@ var RequestHelper = class {
   }) {
     const baseURL = new URL(url, this.options.baseURL);
     const headers = {
-      "api-token": this.options.apiToken
+      "api-token": this.options.apiToken,
+      "Content-Type": "application/json"
     };
     if (!props.query) props.query = {
       ...props.query || {}
@@ -96,7 +98,7 @@ var RequestHelper = class {
     }
     try {
       const req = await fetch(baseURL, {
-        body: props.body ? props.body instanceof FormData || props.body instanceof File ? props.body : JSON.stringify(props.body) : void 0,
+        body: props.body ? JSON.stringify(props.body) : void 0,
         method: props.method,
         headers,
         credentials: "include"
@@ -188,6 +190,57 @@ var Catalog = class {
   }
 };
 
+// src/api/public-api/api/v1/commom-services/external-events.ts
+var ExternalEvents = class {
+  static {
+    __name(this, "ExternalEvents");
+  }
+  options;
+  constructor(options) {
+    this.options = options;
+  }
+  async listPendingEvents() {
+    const req = await this.options.requestHelper.execute("/commom-services/external-integration-events/list-all-pending-events", {
+      method: "GET"
+    });
+    if (req.isFailure()) return {
+      success: false,
+      errorName: req.value.errorName
+    };
+    return {
+      success: true,
+      data: req.value.data
+    };
+  }
+  async markAsReceived(input) {
+    const req = await this.options.requestHelper.execute("/commom-services/external-integration-events/mark-as-received", {
+      method: "POST",
+      body: input
+    });
+    if (req.isFailure()) return {
+      success: false,
+      errorName: req.value.errorName
+    };
+    return {
+      success: true,
+      data: req.value.data
+    };
+  }
+};
+
+// src/api/public-api/api/v1/commom-services/index.ts
+var CommomServices = class {
+  static {
+    __name(this, "CommomServices");
+  }
+  options;
+  externalEvents;
+  constructor(options) {
+    this.options = options;
+    this.externalEvents = new ExternalEvents(options);
+  }
+};
+
 // src/api/public-api/api/v1/index.ts
 var ApiV1 = class {
   static {
@@ -195,9 +248,11 @@ var ApiV1 = class {
   }
   options;
   catalog;
+  commomServices;
   constructor(options) {
     this.options = options;
     this.catalog = new Catalog(options);
+    this.commomServices = new CommomServices(options);
   }
 };
 
@@ -313,6 +368,19 @@ var CouponProps;
 })(CustomFieldsProps || (CustomFieldsProps = {}));
 var CustomFieldsProps;
 
+// src/api/public-api/types/v1/external-events.props.ts
+(function(ExternalEventsProps2) {
+  ExternalEventsProps2.EventNameEnum = {
+    PRODUCT_UPDATED: "PRODUCT_UPDATED",
+    PRODUCT_DELETED: "PRODUCT_DELETED"
+  };
+  ExternalEventsProps2.StatusEnum = {
+    PENDING: "PENDING",
+    RECEIVED: "RECEIVED"
+  };
+})(ExternalEventsProps || (ExternalEventsProps = {}));
+var ExternalEventsProps;
+
 // src/api/public-api/index.ts
 var index_default = Sharpify;
 // Annotate the CommonJS export names for ESM import in node:
@@ -320,6 +388,7 @@ var index_default = Sharpify;
   CategoryProps,
   CouponProps,
   CustomFieldsProps,
+  ExternalEventsProps,
   OrderProps,
   ProductProps,
   StoreProps

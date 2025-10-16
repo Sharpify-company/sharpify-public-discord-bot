@@ -330,6 +330,29 @@ declare namespace CouponProps {
     type DiscountType = keyof typeof DiscountType;
 }
 
+type ExternalEventsProps = {
+    id: string;
+    storeId: string;
+    status: ExternalEventsProps.StatusEnum;
+    eventName: ExternalEventsProps.EventNameEnum;
+    contextAggregateId: string;
+} & {
+    eventName: "PRODUCT_UPDATED" | "PRODUCT_DELETED";
+    payload: ProductProps;
+};
+declare namespace ExternalEventsProps {
+    const EventNameEnum: {
+        readonly PRODUCT_UPDATED: "PRODUCT_UPDATED";
+        readonly PRODUCT_DELETED: "PRODUCT_DELETED";
+    };
+    type EventNameEnum = keyof typeof EventNameEnum;
+    const StatusEnum: {
+        readonly PENDING: "PENDING";
+        readonly RECEIVED: "RECEIVED";
+    };
+    type StatusEnum = keyof typeof StatusEnum;
+}
+
 type ActionsOutput<T = Record<string, any>> = {
     success: true;
     data: T;
@@ -363,9 +386,27 @@ declare class Catalog {
     constructor(options: SharpifyOptions);
 }
 
+declare class ExternalEvents {
+    private options;
+    constructor(options: SharpifyOptions);
+    listPendingEvents(): Promise<ActionsOutput<{
+        events: ExternalEventsProps[];
+    }>>;
+    markAsReceived(input: {
+        ids: string[];
+    }): Promise<ActionsOutput>;
+}
+
+declare class CommomServices {
+    private options;
+    externalEvents: ExternalEvents;
+    constructor(options: SharpifyOptions);
+}
+
 declare class ApiV1 {
     private options;
     catalog: Catalog;
+    commomServices: CommomServices;
     constructor(options: SharpifyOptions);
 }
 
@@ -387,4 +428,4 @@ declare class Sharpify {
     constructor(options: Omit<SharpifyOptions, "requestHelper">);
 }
 
-export { CategoryProps, CouponProps, CustomFieldsProps, OrderProps, ProductProps, StoreProps, type UserProps, Sharpify as default };
+export { CategoryProps, CouponProps, CustomFieldsProps, ExternalEventsProps, OrderProps, ProductProps, StoreProps, type UserProps, Sharpify as default };

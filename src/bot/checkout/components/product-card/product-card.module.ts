@@ -8,6 +8,6 @@ import { AddToCartEvent } from './events';
   imports: [],
   controllers: [],
   providers: [ProductCardComponent, AddToCartButtonComponent, AddToCartEvent],
-  exports: [AddToCartButtonComponent],
+  exports: [AddToCartButtonComponent, ProductCardComponent],
 })
 export class ProductCardModule {}

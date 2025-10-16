@@ -29,7 +29,7 @@ class ProductRepository {
     `);
 		const row = select.get(id) as any;
 		if (!row) return null;
-		return new ProductEntity({
+		return ProductEntity.createFromDatabase({
 			id: row.id,
 			productProps: JSON.parse(row.productProps),
 			channelsLinked: JSON.parse(row.channelsLinked),

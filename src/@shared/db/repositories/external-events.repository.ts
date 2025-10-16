@@ -36,7 +36,7 @@ class ExternalEventsRepository {
     `);
 		const row = select.get(id) as any;
 		if (!row) return null;
-		return new ExternalEventsEntity({
+		return ExternalEventsEntity.createFromDatabase({
 			id: row.id,
 			eventName: row.eventName,
 			contextAggregateId: row.contextAggregateId,
@@ -51,7 +51,7 @@ class ExternalEventsRepository {
 		const rows = select.all() as any[];
 		return rows.map(
 			(row) =>
-				new ExternalEventsEntity({
+				ExternalEventsEntity.createFromDatabase({
 					id: row.id,
 					eventName: row.eventName,
 					contextAggregateId: row.contextAggregateId,

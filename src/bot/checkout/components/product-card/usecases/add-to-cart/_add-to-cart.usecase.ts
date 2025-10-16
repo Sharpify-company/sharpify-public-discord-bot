@@ -16,6 +16,7 @@ import { EnsureUserExistsOnDb } from './ensure-user-exists-on-db';
 import { getDiscordUserRepository } from '@/@shared/db/repositories';
 import { CheckoutCardComponent } from '../../../checkout-card/checkout-card';
 import { CreateReplyToGoToCheckout } from './create-reply-to-go-to-checkout';
+import { ValidateDatabaseCartItemsHelper } from '@/bot/checkout/helpers';
 
 export class AddToCartUsecase {
   static async execute(input: {
@@ -61,6 +62,13 @@ export class AddToCartUsecase {
 
     user.cartChannelId = channel.id;
 
+    user.addToCart({
+      productId: product.id,
+      productItemId: input.productItemId,
+      quantity: 1,
+    })
     await discordUserRepository.update(user);
+
+    await ValidateDatabaseCartItemsHelper({ discordUserId: user.id });
   }
 }

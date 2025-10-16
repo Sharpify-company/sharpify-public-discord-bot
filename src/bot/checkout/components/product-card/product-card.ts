@@ -51,12 +51,18 @@ export class ProductCardComponent {
 		return emmbed;
 	}
 
-	async sendProductCardToChannel({ channel, product }: { product: ProductProps; channel: TextChannel }) {
+	getProductCard(product: ProductProps) {
 		const normalEmmbed = this.getProductEmbed(product);
 		const normalPurchaseButton =
 			product.settings.viewType === "NORMAL"
 				? this.addToCartButtonComponent.createCartButton(product)
 				: this.addToCartButtonComponent.createDynamicItemsSelect(product);
+
+		return { normalEmmbed, normalPurchaseButton };
+	}
+
+	async sendProductCardToChannel({ channel, product }: { product: ProductProps; channel: TextChannel }) {
+		const { normalEmmbed, normalPurchaseButton } = this.getProductCard(product);
 
 		const reply = await channel.send({
 			embeds: [normalEmmbed],

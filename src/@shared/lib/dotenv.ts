@@ -13,6 +13,7 @@ const envSchema = z.object({
   DISCORD_GUILD_ID: z.string().min(1, 'DISCORD_GUILD_ID is required'),
   STORE_ID: z.string().min(1, 'STORE_ID is required'),
   CHECKOUT_CATEGORY_ID: z.string().min(1, 'CHECKOUT_CATEGORY_ID is required'),
+  API_TOKEN: z.string().min(1, 'API_TOKEN is required'),
 
   NODE_ENV: z.enum(['development', 'production', 'test']),
 });

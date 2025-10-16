@@ -82,7 +82,9 @@ var RequestHelper = class {
     method: "GET"
   }) {
     const baseURL = new URL(url, this.options.baseURL);
-    const headers = {};
+    const headers = {
+      "api-token": this.options.apiToken
+    };
     if (!props.query) props.query = {
       ...props.query || {}
     };
@@ -224,7 +226,8 @@ var Sharpify = class {
     const baseURL = options.baseUrl ?? "https://api.sharpify.com.br";
     const requestHelper = new RequestHelper({
       baseURL,
-      storeId: options.storeId
+      storeId: options.storeId,
+      apiToken: options.apiKey
     });
     this.api = new Api({
       ...options,

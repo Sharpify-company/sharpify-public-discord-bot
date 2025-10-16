@@ -43,22 +43,23 @@ export class AddToCartUsecase {
     });
     if (ensureCartResult.isFailure()) return;
 
-    const { channel } = ensureCartResult.value;
+    const { channel, same: sameChannel } = ensureCartResult.value;
 
     await CreateReplyToGoToCheckout({
       ...input,
-      channel
-    })
-   
-    const checkoutReply = await CheckoutCardComponent.sendCheckoutCardToChannel(
-      {
-        channel,
-        discordUser: user,
-      },
-    );
+      channel,
+    });
+
+    if (!sameChannel) {
+      const checkoutReply =
+        await CheckoutCardComponent.sendCheckoutCardToChannel({
+          channel,
+          discordUser: user,
+        });
+      user.cartMessageId = checkoutReply.id;
+    }
 
     user.cartChannelId = channel.id;
-    user.cartMessageId = checkoutReply.id;
 
     await discordUserRepository.update(user);
   }

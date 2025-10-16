@@ -16,7 +16,9 @@ export async function EnsureCartChannelCreated({
   user,
 }: Parameters<typeof AddToCartUsecase.execute>[0] & {
   user: DiscordUserEntity;
-}): Promise<Either<InteractionResponse, { channel: TextChannel }>> {
+}): Promise<
+  Either<InteractionResponse, { channel: TextChannel; same: boolean }>
+> {
   const member = interaction.member;
   if (!member?.user) {
     return failure(
@@ -61,7 +63,7 @@ export async function EnsureCartChannelCreated({
   if (user.cartChannelId) {
     const existingChannel = guild.channels.cache.get(user.cartChannelId);
     if (existingChannel)
-      return success({ channel: existingChannel as TextChannel });
+      return success({ channel: existingChannel as TextChannel, same: true });
   }
 
   // Create the channel
@@ -84,5 +86,5 @@ export async function EnsureCartChannelCreated({
     ],
   });
 
-  return success({ channel: textChannel });
+  return success({ channel: textChannel, same: false });
 }

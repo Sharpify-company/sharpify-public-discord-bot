@@ -10,7 +10,7 @@ import { AddToCartUsecase } from './_add-to-cart.usecase';
 export async function CreateReplyToGoToCheckout({
   interaction,
   channel
-}: Parameters<typeof AddToCartUsecase.execute>[0] & { channel: TextChannel }) {
+}: Parameters<typeof AddToCartUsecase.execute>[0] & { channel: TextChannel;  }) {
   const embed = new EmbedBuilder()
     .setDescription(
       `✅ **Carrinho de compra criado com sucesso em** ${channel} — ${interaction.user}`,

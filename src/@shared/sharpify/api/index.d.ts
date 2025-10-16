@@ -17,6 +17,7 @@ declare class RequestHelper {
     constructor(options: {
         baseURL: string;
         storeId: string;
+        apiToken: string;
     });
     execute(url: string, props?: RequestHelper.Props | never): Promise<RequestHelper.Output>;
 }

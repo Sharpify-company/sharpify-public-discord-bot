@@ -35,6 +35,11 @@ import { AddToCartUsecase } from '../usecases';
 
 @Injectable()
 export class AddToCartEvent {
+
+  constructor(
+    private readonly addToCartUsecase: AddToCartUsecase,
+  ) {}
+
   @Button('add_to_cart_:productIdAndItemId')
   private async handleButtonClicked(
     @Context() [interaction]: [ButtonInteraction],
@@ -67,6 +72,6 @@ export class AddToCartEvent {
     productId: string;
     productItemId: string;
   }) {
-    await AddToCartUsecase.execute({ interaction, productId, productItemId });
+    await this.addToCartUsecase.execute({ interaction, productId, productItemId });
   }
 }

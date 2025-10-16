@@ -1,5 +1,6 @@
 import { ProductEntity } from "@/@shared/db/entities";
 import { getDiscordUserRepository, getProductRepository } from "@/@shared/db/repositories";
+import { Either } from "@/@shared/lib";
 
 export async function ValidateDatabaseCartItemsHelper({ discordUserId }: { discordUserId: string }) {
 	const discordUserRepository = await getDiscordUserRepository();

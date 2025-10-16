@@ -12,7 +12,7 @@ import { getDiscordUserRepository } from '@/@shared/db/repositories';
 
 export async function EnsureUserExistsOnDb({
   interaction,
-}: Parameters<typeof AddToCartUsecase.execute>[0]): Promise<
+}: Parameters<typeof AddToCartUsecase.prototype.execute>[0]): Promise<
   Either<InteractionResponse, DiscordUserEntity>
 > {
   const member = interaction.member;

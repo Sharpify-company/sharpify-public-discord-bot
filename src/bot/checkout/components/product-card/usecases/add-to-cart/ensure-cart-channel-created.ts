@@ -14,7 +14,7 @@ import { getDiscordUserRepository } from '@/@shared/db/repositories';
 export async function EnsureCartChannelCreated({
   interaction,
   user,
-}: Parameters<typeof AddToCartUsecase.execute>[0] & {
+}: Parameters<typeof AddToCartUsecase.prototype.execute>[0] & {
   user: DiscordUserEntity;
 }): Promise<
   Either<InteractionResponse, { channel: TextChannel; same: boolean }>

@@ -8,7 +8,7 @@ export async function ValidateProduct({
 	interaction,
 	productId,
 	productItemId,
-}: Parameters<typeof AddToCartUsecase.execute>[0]): Promise<Either<InteractionResponse, ProductProps>> {
+}: Parameters<typeof AddToCartUsecase.prototype.execute>[0]): Promise<Either<InteractionResponse, ProductProps>> {
 	const req = await Sharpify.api.v1.catalog.product.get({
 		id: productId,
 	});

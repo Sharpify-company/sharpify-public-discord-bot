@@ -17,9 +17,16 @@ import { getDiscordUserRepository } from '@/@shared/db/repositories';
 import { CheckoutCardComponent } from '../../../checkout-card/checkout-card';
 import { CreateReplyToGoToCheckout } from './create-reply-to-go-to-checkout';
 import { ValidateDatabaseCartItemsHelper } from '@/bot/checkout/helpers';
+import { Injectable } from '@nestjs/common';
 
+@Injectable()
 export class AddToCartUsecase {
-  static async execute(input: {
+
+  constructor(
+    private readonly checkoutCardComponent: CheckoutCardComponent,
+  ) {}
+
+   async execute(input: {
     interaction: ButtonInteraction<CacheType>;
     productId: string;
     productItemId: string;
@@ -53,7 +60,7 @@ export class AddToCartUsecase {
 
     if (!sameChannel) {
       const checkoutReply =
-        await CheckoutCardComponent.sendCheckoutCardToChannel({
+        await this.checkoutCardComponent.sendCheckoutCardToChannel({
           channel,
           discordUser: user,
         });

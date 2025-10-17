@@ -57,17 +57,19 @@ export class RemoveFromCartButtonComponent {
 	) {
 		const [productId, productItemId] = productIdAndItemId.split(":");
 
-		await RemoveFromCartUsecase.execute({
+		const { cartIsEmpty } = await RemoveFromCartUsecase.execute({
 			discordUserId: interaction.user.id,
 			productId,
 			productItemId,
 		});
 
+		await interaction.deferUpdate();
+		if(cartIsEmpty) return interaction.channel?.delete()
+
 		const result = await this.sectionManagerHandler.setSection({
 			discordUserId: interaction.user.id,
 			section: "MAIN",
 		});
-		await interaction.deferUpdate();
 		await interaction.message.edit(result as any);
 	}
 

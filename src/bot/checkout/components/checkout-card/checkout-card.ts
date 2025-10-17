@@ -39,7 +39,7 @@ export class CheckoutCardComponent {
 		discordUser: DiscordUserEntity;
 		channel: TextChannel;
 	}): Promise<Message<true>> {
-		const result = await this.sectionManagerHandler.setSection({ discordUserId: discordUser.id, section: "MAIN", deleteChannelIfCartIsEmpty: false });
+		const result = await this.sectionManagerHandler.setSection({ discordUserId: discordUser.id, section: "MAIN" });
 		return channel.send(result);
 	}
 }

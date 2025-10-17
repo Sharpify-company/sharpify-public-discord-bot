@@ -6,6 +6,7 @@ import { SectionManagerHandler } from "./section-manager";
 import { SelectCartItemComponent } from "./components/select-cart-item";
 import { GoBackToMainSectionButionComponent } from "./components/go-back-to-main-section-button";
 import { RemoveFromCartButtonComponent } from "./components/remove-from-cart-button";
+import { UpdateQuantityButtonComponent } from "./components/update-quantity-button";
 
 @Global()
 @Module({
@@ -18,7 +19,8 @@ import { RemoveFromCartButtonComponent } from "./components/remove-from-cart-but
 		SectionManagerHandler,
 		SelectCartItemComponent,
 		GoBackToMainSectionButionComponent,
-		RemoveFromCartButtonComponent
+		RemoveFromCartButtonComponent,
+		UpdateQuantityButtonComponent
 	],
 	exports: [CheckoutCardComponent, CartEmmbedComponent, SectionManagerHandler],
 })

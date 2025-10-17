@@ -26,10 +26,10 @@ import { SelectCartItemComponent } from "./components/select-cart-item";
 import { GoBackToMainSectionButionComponent } from "./components/go-back-to-main-section-button";
 import { RemoveFromCartButtonComponent } from "./components/remove-from-cart-button";
 import { getDiscordUserRepository } from "@/@shared/db/repositories";
+import { UpdateQuantityButtonComponent } from "./components/update-quantity-button";
 
 type SetSectionProps = {
 	discordUserId: string;
-	deleteChannelIfCartIsEmpty?: boolean;
 } & (
 	| {
 			section: "MAIN";
@@ -49,25 +49,10 @@ export class SectionManagerHandler {
 		private readonly selectCartItemComponent: SelectCartItemComponent,
 		private readonly goBackToMainSectionButionComponent: GoBackToMainSectionButionComponent,
 		private readonly removeFromCartButtonComponent: RemoveFromCartButtonComponent,
+		private readonly updateQuantityButtonComponent: UpdateQuantityButtonComponent
 	) {}
 
-	async setSection({ discordUserId, deleteChannelIfCartIsEmpty = true, ...props }: SetSectionProps): Promise<string | MessagePayload | MessageCreateOptions> {
-		const discordUserRepository = await getDiscordUserRepository();
-
-		// const discordUserEntity = await discordUserRepository.findById(discordUserId);
-		// if (!discordUserEntity) return { embeds: [] };
-
-		// if (deleteChannelIfCartIsEmpty && discordUserEntity.cartItems.length === 0) {
-		// 	try {
-		// 		const cartChannel = (await this.client.channels.fetch(discordUserEntity.cartChannelId ?? "")) as TextChannel;
-		// 		if (!cartChannel) return { embeds: [] };
-
-		// 		await cartChannel.delete();
-		// 	} catch (err) {
-		// 		console.log("🚀 ~ SectionManagerHandler ~ setSection ~ err:", err);
-		// 		return { embeds: [] };
-		// 	}
-		// }
+	async setSection({ discordUserId, ...props }: SetSectionProps): Promise<string | MessagePayload | MessageCreateOptions> {
 
 		if (props.section === "MAIN") {
 			const { emmbed } = await this.cartEmmbedComponent.makeCartEmmbed({ discordUserId });
@@ -93,10 +78,14 @@ export class SectionManagerHandler {
 			productId: props.productId,
 			productItemId: props.itemId,
 		});
+		 const { UpdateQuantityCartButton } = await this.updateQuantityButtonComponent.createButton({
+			productId: props.productId,
+			productItemId: props.itemId,
+		});
 
 		return {
 			embeds: [emmbed],
-			components: [{ type: 1, components: [removeFromCartButton] }, row, { type: 1, components: [backToSummaryButton] }],
+			components: [{ type: 1, components: [UpdateQuantityCartButton, removeFromCartButton] }, row, { type: 1, components: [backToSummaryButton] }],
 			options: {
 				withResponse: true,
 			},

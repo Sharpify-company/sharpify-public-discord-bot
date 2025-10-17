@@ -24,16 +24,18 @@ export class RemoveFromCartUsecase {
 		productId: string;
 		productItemId: string;
 		discordUserId: string;
-	}) {
+	}): Promise<{ cartIsEmpty: boolean }> {
 		const discordUserRepository = await getDiscordUserRepository();
 
 		const userEntity = await discordUserRepository.findById(discordUserId);
-		if (!userEntity) return;
+		if (!userEntity) return { cartIsEmpty: true };
 
 		userEntity.removeFromCart({
 			productId,
 			productItemId,
 		});
 		await discordUserRepository.update(userEntity);
+
+		return { cartIsEmpty: userEntity.cartItems.length === 0 };
 	}
 }

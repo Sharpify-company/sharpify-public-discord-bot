@@ -48,6 +48,8 @@ export class CartEmmbedComponent {
 			)
 			.join("\n");
 
+		const totalPrice = checkoutCartItems.reduce((acc, item) => acc + item.item.pricing.price * item.quantity, 0);
+
 		const emmbed = new EmbedBuilder()
 			.setColor(BotConfig.color)
 			.setTitle(`🛒 Carrinho de compras de ${discordMember.displayName}`)
@@ -59,7 +61,7 @@ export class CartEmmbedComponent {
 				},
 				{
 					name: "🧾 **Subtotal**",
-					value: "``R$ 150,00``",
+					value: "``" + formatPrice(totalPrice) + "``",
 					inline: true,
 				},
 				{
@@ -69,7 +71,7 @@ export class CartEmmbedComponent {
 				},
 				{
 					name: "💰 **Valor total**",
-					value: "``R$ 150,00``",
+					value: "``" + formatPrice(totalPrice) + "``",
 					inline: true,
 				},
 			)

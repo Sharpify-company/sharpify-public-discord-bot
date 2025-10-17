@@ -431,12 +431,54 @@ declare class Management {
     constructor(options: SharpifyOptions);
 }
 
+type PlaceOrderInput = {
+    storeId: string;
+    couponCode: string | null;
+    payment: {
+        gatewayMethod: StoreProps.GatewayMethodsEnum;
+    };
+    products: {
+        productId: string;
+        productItemId: string;
+        quantity: number;
+        customFields?: Record<string, any>;
+    }[];
+    customer: {
+        email: string;
+        firstName?: string;
+        lastName?: string;
+        sessionId?: string;
+        customerId?: string;
+    };
+    affiliateCode: string | null;
+};
+type PlaceOrderOutput = {
+    orderId: string;
+    isApproved: boolean;
+    order: OrderProps;
+};
+declare class Order {
+    private options;
+    constructor(options: SharpifyOptions);
+    placeOrder(input: PlaceOrderInput): Promise<ActionsOutput<PlaceOrderOutput>>;
+    getOrder(input: {
+        orderId: string;
+    }): Promise<ActionsOutput<OrderProps>>;
+}
+
+declare class Checkout {
+    private options;
+    order: Order;
+    constructor(options: SharpifyOptions);
+}
+
 declare class ApiV1 {
     private options;
     catalog: Catalog;
     commomServices: CommomServices;
     pricing: Pricing;
     management: Management;
+    checkout: Checkout;
     constructor(options: SharpifyOptions);
 }
 

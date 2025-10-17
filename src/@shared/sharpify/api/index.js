@@ -319,6 +319,61 @@ var Management = class {
   }
 };
 
+// src/api/public-api/api/v1/checkout/order.ts
+var Order = class {
+  static {
+    __name(this, "Order");
+  }
+  options;
+  constructor(options) {
+    this.options = options;
+  }
+  async placeOrder(input) {
+    const req = await this.options.requestHelper.execute("/checkout/order/place-order", {
+      method: "POST",
+      body: {
+        ...input,
+        storeId: this.options.storeId
+      }
+    });
+    if (req.isFailure()) return {
+      success: false,
+      errorName: req.value.errorName
+    };
+    return {
+      success: true,
+      data: req.value.data
+    };
+  }
+  async getOrder(input) {
+    const req = await this.options.requestHelper.execute("/api/v1/checkout/order/get-order", {
+      method: "GET",
+      query: input
+    });
+    if (req.isFailure()) return {
+      success: false,
+      errorName: req.value.errorName
+    };
+    return {
+      success: true,
+      data: req.value.data
+    };
+  }
+};
+
+// src/api/public-api/api/v1/checkout/index.ts
+var Checkout = class {
+  static {
+    __name(this, "Checkout");
+  }
+  options;
+  order;
+  constructor(options) {
+    this.options = options;
+    this.order = new Order(options);
+  }
+};
+
 // src/api/public-api/api/v1/index.ts
 var ApiV1 = class {
   static {
@@ -329,12 +384,14 @@ var ApiV1 = class {
   commomServices;
   pricing;
   management;
+  checkout;
   constructor(options) {
     this.options = options;
     this.catalog = new Catalog(options);
     this.commomServices = new CommomServices(options);
     this.pricing = new Pricing(options);
     this.management = new Management(options);
+    this.checkout = new Checkout(options);
   }
 };
 

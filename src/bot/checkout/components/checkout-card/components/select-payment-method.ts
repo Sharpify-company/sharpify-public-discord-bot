@@ -47,7 +47,6 @@ export class SelectPaymentMethodComponent {
 
 	@StringSelect("gateway_method_selected")
 	private async handleItemSelected(@Context() [interaction]: StringSelectContext, @SelectedStrings() selected: string[]) {
-
 		const discordUserRepository = await getDiscordUserRepository();
 		const discordUser = await discordUserRepository.findById(interaction.user.id);
 		if (discordUser) {
@@ -79,7 +78,7 @@ export class SelectPaymentMethodComponent {
 
 		const defaultGatewayMethod = discordUser?.gatewayMethod || store.data.paymentConfigs.at(0)?.gatewayMethod || null;
 
-		if (discordUser) {
+		if (discordUser && defaultGatewayMethod) {
 			discordUser.gatewayMethod = defaultGatewayMethod;
 			await discordUserRepository.update(discordUser);
 		}

@@ -11,6 +11,7 @@ import { CancelOrderButtonComponent } from "./components/cancell-order-button";
 import { ApplyCouponButtonComponent } from "./components/apply-coupon-button";
 import { PlaceOrderButtonComponent } from "./components/place-order-button";
 import { SelectPaymentMethodComponent } from "./components/select-payment-method";
+import { HandleOrderApprovedUsecase } from "./usecases";
 
 @Global()
 @Module({
@@ -28,8 +29,9 @@ import { SelectPaymentMethodComponent } from "./components/select-payment-method
 		CancelOrderButtonComponent,
 		ApplyCouponButtonComponent,
 		PlaceOrderButtonComponent,
-		SelectPaymentMethodComponent
+		SelectPaymentMethodComponent,
+		HandleOrderApprovedUsecase
 	],
-	exports: [CheckoutCardComponent, CartEmmbedComponent, SectionManagerHandler],
+	exports: [CheckoutCardComponent, CartEmmbedComponent, SectionManagerHandler, HandleOrderApprovedUsecase],
 })
 export class CheckoutCardModule {}

@@ -2,6 +2,7 @@ import { Inject, Injectable } from "@nestjs/common";
 import { Modal, Context, SlashCommand, SlashCommandContext, Ctx, ModalContext } from "necord";
 import {
 	ActionRowBuilder,
+	AttachmentBuilder,
 	CacheType,
 	ChatInputCommandInteraction,
 	Client,
@@ -20,7 +21,7 @@ import { BotConfig } from "@/config";
 import { ProductProps } from "@/@shared/sharpify/api";
 import { formatPrice } from "@/@shared/lib";
 import TurndownService from "turndown";
-import { DiscordUserEntity, ProductEntity } from "@/@shared/db/entities";
+import { DiscordUserEntity, OrderEntity, ProductEntity } from "@/@shared/db/entities";
 import { CartEmmbedComponent } from "./components/cart-emmbed";
 import { SelectCartItemComponent } from "./components/select-cart-item";
 import { GoBackToMainSectionButionComponent } from "./components/go-back-to-main-section-button";
@@ -31,6 +32,8 @@ import { CancelOrderButtonComponent } from "./components/cancell-order-button";
 import { ApplyCouponButtonComponent } from "./components/apply-coupon-button";
 import { PlaceOrderButtonComponent } from "./components/place-order-button";
 import { SelectPaymentMethodComponent } from "./components/select-payment-method";
+import * as QRCode from "qrcode";
+import * as qr from "qr-image";
 
 type SetSectionProps = {
 	discordUserId: string;
@@ -42,6 +45,10 @@ type SetSectionProps = {
 			section: "CART_ITEM";
 			productId: string;
 			itemId: string;
+	  }
+	| {
+			section: "CHECKOUT";
+			orderEntity: OrderEntity;
 	  }
 );
 
@@ -57,7 +64,7 @@ export class SectionManagerHandler {
 		private readonly cancelOrderButtonComponent: CancelOrderButtonComponent,
 		private readonly applyCouponButtonComponent: ApplyCouponButtonComponent,
 		private readonly placeOrderButtonComponent: PlaceOrderButtonComponent,
-		private readonly selectPaymentMethodComponent: SelectPaymentMethodComponent
+		private readonly selectPaymentMethodComponent: SelectPaymentMethodComponent,
 	) {}
 
 	async setSection({ discordUserId, ...props }: SetSectionProps): Promise<string | MessagePayload | MessageCreateOptions> {
@@ -66,44 +73,72 @@ export class SectionManagerHandler {
 			const { row } = await this.selectCartItemComponent.createSelect({ discordUserId });
 			const { CancelCartButton } = await this.cancelOrderButtonComponent.createButton();
 			const { ApplyCouponButton } = await this.applyCouponButtonComponent.createButton({ discordUserId });
-			const { PlaceOrderButton } = await this.placeOrderButtonComponent.createButton();
 			const { selectPaymentMethod } = await this.selectPaymentMethodComponent.createSelect({ discordUserId });
+			const { PlaceOrderButton } = await this.placeOrderButtonComponent.createButton({ discordUserId });
 
 			return {
 				embeds: [emmbed],
-				components: [{ type: 1, components: [PlaceOrderButton, ApplyCouponButton, CancelCartButton] }, selectPaymentMethod as any, row],
+				components: [
+					{ type: 1, components: [PlaceOrderButton, ApplyCouponButton, CancelCartButton] },
+					selectPaymentMethod as any,
+					row,
+				],
+				options: {
+					withResponse: true,
+				},
+			};
+		} else if (props.section === "CART_ITEM") {
+			const { emmbed } = await this.cartEmmbedComponent.makeSingleCartItemEmmbed({
+				discordUserId,
+				productId: props.productId,
+				itemId: props.itemId,
+			});
+			const { row } = await this.selectCartItemComponent.createSelect({ discordUserId, defaultItemId: props.itemId });
+			const { backToSummaryButton } = await this.goBackToMainSectionButionComponent.createButton();
+			const { removeFromCartButton } = await this.removeFromCartButtonComponent.createButton({
+				productId: props.productId,
+				productItemId: props.itemId,
+			});
+			const { UpdateQuantityCartButton } = await this.updateQuantityButtonComponent.createButton({
+				productId: props.productId,
+				productItemId: props.itemId,
+			});
+
+			return {
+				embeds: [emmbed],
+				components: [
+					{ type: 1, components: [UpdateQuantityCartButton, removeFromCartButton] },
+					row,
+					{ type: 1, components: [backToSummaryButton] },
+				],
 				options: {
 					withResponse: true,
 				},
 			};
 		}
 
-		const { emmbed } = await this.cartEmmbedComponent.makeSingleCartItemEmmbed({
+		const { emmbed } = await this.cartEmmbedComponent.makeCartEmmbed({
 			discordUserId,
-			productId: props.productId,
-			itemId: props.itemId,
-		});
-		const { row } = await this.selectCartItemComponent.createSelect({ discordUserId, defaultItemId: props.itemId });
-		const { backToSummaryButton } = await this.goBackToMainSectionButionComponent.createButton();
-		const { removeFromCartButton } = await this.removeFromCartButtonComponent.createButton({
-			productId: props.productId,
-			productItemId: props.itemId,
-		});
-		const { UpdateQuantityCartButton } = await this.updateQuantityButtonComponent.createButton({
-			productId: props.productId,
-			productItemId: props.itemId,
 		});
 
+		const qrCode = props.orderEntity.orderProps.payment.gateway.data.qrCode;
+
+		const qrBuffer = qr.imageSync(qrCode, { type: "png", size: 8 });
+		const attachment = new AttachmentBuilder(qrBuffer, { name: 'qrcode.png' });
+		const qrUrl = `attachment://qrcode.png`;
+
+		const Pixemmbed = new EmbedBuilder()
+			.setColor(BotConfig.color)
+			.setTitle(`Pagamento via Pix`)
+			.setDescription(
+				`Para pagar via Pix, utilize o código abaixo no seu aplicativo bancário:\n\n\`\`\`${props.orderEntity.orderProps.payment.gateway.data.code}\`\`\`\n\nApós realizar o pagamento, por favor, envie o comprovante para que possamos processar seu pedido o mais rápido possível.`,
+			)
+			.setImage(qrUrl);
+
 		return {
-			embeds: [emmbed],
-			components: [
-				{ type: 1, components: [UpdateQuantityCartButton, removeFromCartButton] },
-				row,
-				{ type: 1, components: [backToSummaryButton] },
-			],
-			options: {
-				withResponse: true,
-			},
+			embeds: [emmbed, Pixemmbed],
+			files: [attachment],
+			components: [],
 		};
 	}
 }

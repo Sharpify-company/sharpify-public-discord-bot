@@ -5,7 +5,7 @@ export class DiscordUserEntity {
 	cartChannelId!: string | null;
 	cartMessageId!: string | null;
 	cartItems!: DiscordUserEntity.CartItem[];
-	
+
 	couponCode!: string | null;
 	subTotalPrice!: number;
 	totalPrice!: number;
@@ -14,7 +14,7 @@ export class DiscordUserEntity {
 	lastName!: string | null;
 	email!: string | null;
 
-	gatewayMethod!: StoreProps.GatewayMethodsEnum | null
+	gatewayMethod!: StoreProps.GatewayMethodsEnum | null;
 
 	constructor(props: DiscordUserEntity.Props) {
 		Object.assign(this, props);
@@ -69,6 +69,16 @@ export class DiscordUserEntity {
 	}
 
 	cancelOrder() {
+		this.cartItems = [];
+		this.cartChannelId = null;
+		this.cartMessageId = null;
+		this.couponCode = null;
+		this.subTotalPrice = 0;
+		this.totalPrice = 0;
+		this.gatewayMethod = null;
+	}
+
+	clearOrderData() {
 		this.cartItems = [];
 		this.cartChannelId = null;
 		this.cartMessageId = null;

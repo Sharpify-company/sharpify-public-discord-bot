@@ -34,15 +34,15 @@ import {
 } from "discord.js";
 import { BotConfig } from "@/config";
 import { ProductProps } from "@/@shared/sharpify/api";
-import { formatPrice } from "@/@shared/lib";
+import { dotEnv, formatPrice } from "@/@shared/lib";
 import TurndownService from "turndown";
-import { DiscordUserEntity, ProductEntity } from "@/@shared/db/entities";
-import { getDiscordUserRepository, getProductRepository } from "@/@shared/db/repositories";
+import { DiscordUserEntity, OrderEntity, ProductEntity } from "@/@shared/db/entities";
+import { getDiscordUserRepository, getOrderRepository, getProductRepository } from "@/@shared/db/repositories";
 import { ValidateDatabaseCartItemsHelper } from "../../../helpers";
 import { formatCheckoutCartItemNameHelper, getCheckoutCartItemsHelper } from "../helper";
 import { SectionManagerHandler } from "../section-manager";
 import { WrapperType } from "@/@shared/types";
-import { RemoveFromCartUsecase } from "../usecases";
+import { HandleOrderApprovedUsecase, RemoveFromCartUsecase } from "../usecases";
 import { Sharpify } from "@/@shared/sharpify";
 
 function isValidEmail(email: string): boolean {
@@ -54,6 +54,7 @@ function isValidEmail(email: string): boolean {
 export class PlaceOrderButtonComponent {
 	constructor(
 		@Inject(Client) private readonly client: Client,
+		private readonly handleOrderApprovedUsecase: HandleOrderApprovedUsecase,
 		@Inject(forwardRef(() => SectionManagerHandler))
 		private readonly sectionManagerHandler: WrapperType<SectionManagerHandler>,
 	) {}
@@ -61,6 +62,7 @@ export class PlaceOrderButtonComponent {
 	@Modal("place_order_modal")
 	public async onModalSubmit(@Ctx() [interaction]: ModalContext) {
 		const discordUserRepository = await getDiscordUserRepository();
+		const orderRepository = await getOrderRepository();
 		const discordUser = await discordUserRepository.findById(interaction.user.id);
 		if (!discordUser) {
 			await interaction.reply({
@@ -88,13 +90,55 @@ export class PlaceOrderButtonComponent {
 		await discordUserRepository.update(discordUser);
 
 		interaction.deferUpdate();
-		// const result = await this.sectionManagerHandler.setSection({
-		// 	discordUserId: interaction.user.id,
-		// 	section: "CART_ITEM",
-		// 	productId,
-		// 	itemId: productItemId,
-		// });
-		// await interaction.message?.edit(result as any);
+
+		const placeOrderResult = await Sharpify.api.v1.checkout.order.placeOrder({
+			storeId: dotEnv.STORE_ID,
+			affiliateCode: null,
+			couponCode: discordUser.couponCode || null,
+			payment: {
+				gatewayMethod: discordUser.gatewayMethod!,
+			},
+			customer: {
+				firstName: discordUser.firstName!,
+				lastName: discordUser.lastName!,
+				email: discordUser.email!,
+			},
+			products: discordUser.cartItems.map((item) => ({
+				productId: item.productId,
+				productItemId: item.productItemId,
+				quantity: item.quantity,
+			})),
+		});
+		if (!placeOrderResult.success) {
+			await interaction.reply({
+				content: `❌ Não foi possível processar seu pedido: ${placeOrderResult.errorName}`,
+				flags: ["Ephemeral"],
+			});
+			return;
+		}
+
+		const orderEntity = OrderEntity.create({
+			id: placeOrderResult.data.orderId,
+			customerId: discordUser.id,
+			deliveryStatus: "PENDING",
+			orderProps: placeOrderResult.data.order,
+		});
+		await orderRepository.create(orderEntity);
+
+		if (placeOrderResult.data.isApproved) {
+			interaction.deferUpdate();
+			return await this.handleOrderApprovedUsecase.execute({
+				orderId: orderEntity.id,
+			});
+		}
+
+
+		const result = await this.sectionManagerHandler.setSection({
+			discordUserId: interaction.user.id,
+			section: "CHECKOUT",
+			orderEntity,
+		});
+		await interaction.message?.edit(result as any);
 	}
 
 	@Button("place_order")
@@ -109,12 +153,12 @@ export class PlaceOrderButtonComponent {
 			return;
 		}
 
-		const modal = new ModalBuilder().setCustomId(`place_order_modal`).setTitle(`Informações para gerar compra`);
+		const modal = new ModalBuilder().setCustomId(`place_order_modal`).setTitle(`Informações do pagador`);
 
 		const firstNameInput = new TextInputBuilder()
 			.setCustomId("firstNameInput")
 			.setLabel(`Nome`)
-            .setValue(discordUser.firstName ?? '')
+			.setValue(discordUser.firstName ?? "")
 			.setStyle(TextInputStyle.Short)
 			.setMinLength(1)
 			.setMaxLength(40)
@@ -123,7 +167,7 @@ export class PlaceOrderButtonComponent {
 		const lastNameInput = new TextInputBuilder()
 			.setCustomId("lastNameInput")
 			.setLabel(`Ultimo nome`)
-            .setValue(discordUser.lastName ?? '')
+			.setValue(discordUser.lastName ?? "")
 			.setStyle(TextInputStyle.Short)
 			.setMinLength(1)
 			.setMaxLength(40)
@@ -132,12 +176,11 @@ export class PlaceOrderButtonComponent {
 		const emailInput = new TextInputBuilder()
 			.setCustomId("emailInput")
 			.setLabel(`Email`)
-            .setValue(discordUser.email ?? '')
+			.setValue(discordUser.email ?? "")
 			.setStyle(TextInputStyle.Short)
 			.setMinLength(1)
 			.setMaxLength(150)
 			.setRequired(true);
-
 
 		modal.setComponents(
 			new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents([firstNameInput]),
@@ -148,12 +191,16 @@ export class PlaceOrderButtonComponent {
 		await interaction.showModal(modal);
 	}
 
-	async createButton() {
+	async createButton({ discordUserId }: { discordUserId: string }) {
+		const discordUserRepository = await getDiscordUserRepository();
+		const discordUser = await discordUserRepository.findById(discordUserId);
+
 		const PlaceOrderButton = new ButtonBuilder()
 			.setCustomId(`place_order`) // unique ID to handle clicks
 			.setLabel("Finalizar compra") // text on the button
 			.setStyle(ButtonStyle.Success) // gray button, like in the image
-			.setEmoji("☑️");
+			.setEmoji("☑️")
+			.setDisabled(!discordUser || !discordUser.gatewayMethod);
 		return { PlaceOrderButton };
 	}
 }

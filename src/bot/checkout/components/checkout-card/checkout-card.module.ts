@@ -10,6 +10,7 @@ import { UpdateQuantityButtonComponent } from "./components/update-quantity-butt
 import { CancelOrderButtonComponent } from "./components/cancell-order-button";
 import { ApplyCouponButtonComponent } from "./components/apply-coupon-button";
 import { PlaceOrderButtonComponent } from "./components/place-order-button";
+import { SelectPaymentMethodComponent } from "./components/select-payment-method";
 
 @Global()
 @Module({
@@ -26,7 +27,8 @@ import { PlaceOrderButtonComponent } from "./components/place-order-button";
 		UpdateQuantityButtonComponent,
 		CancelOrderButtonComponent,
 		ApplyCouponButtonComponent,
-		PlaceOrderButtonComponent
+		PlaceOrderButtonComponent,
+		SelectPaymentMethodComponent
 	],
 	exports: [CheckoutCardComponent, CartEmmbedComponent, SectionManagerHandler],
 })

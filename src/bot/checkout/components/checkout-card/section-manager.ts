@@ -30,6 +30,7 @@ import { UpdateQuantityButtonComponent } from "./components/update-quantity-butt
 import { CancelOrderButtonComponent } from "./components/cancell-order-button";
 import { ApplyCouponButtonComponent } from "./components/apply-coupon-button";
 import { PlaceOrderButtonComponent } from "./components/place-order-button";
+import { SelectPaymentMethodComponent } from "./components/select-payment-method";
 
 type SetSectionProps = {
 	discordUserId: string;
@@ -55,7 +56,8 @@ export class SectionManagerHandler {
 		private readonly updateQuantityButtonComponent: UpdateQuantityButtonComponent,
 		private readonly cancelOrderButtonComponent: CancelOrderButtonComponent,
 		private readonly applyCouponButtonComponent: ApplyCouponButtonComponent,
-		private readonly placeOrderButtonComponent: PlaceOrderButtonComponent
+		private readonly placeOrderButtonComponent: PlaceOrderButtonComponent,
+		private readonly selectPaymentMethodComponent: SelectPaymentMethodComponent
 	) {}
 
 	async setSection({ discordUserId, ...props }: SetSectionProps): Promise<string | MessagePayload | MessageCreateOptions> {
@@ -65,10 +67,11 @@ export class SectionManagerHandler {
 			const { CancelCartButton } = await this.cancelOrderButtonComponent.createButton();
 			const { ApplyCouponButton } = await this.applyCouponButtonComponent.createButton({ discordUserId });
 			const { PlaceOrderButton } = await this.placeOrderButtonComponent.createButton();
+			const { selectPaymentMethod } = await this.selectPaymentMethodComponent.createSelect({ discordUserId });
 
 			return {
 				embeds: [emmbed],
-				components: [{ type: 1, components: [PlaceOrderButton, ApplyCouponButton, CancelCartButton] }, row],
+				components: [{ type: 1, components: [PlaceOrderButton, ApplyCouponButton, CancelCartButton] }, selectPaymentMethod as any, row],
 				options: {
 					withResponse: true,
 				},

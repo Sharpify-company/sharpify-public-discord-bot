@@ -48,7 +48,6 @@ export class CartEmmbedComponent {
 			)
 			.join("\n");
 
-
 		const emmbed = new EmbedBuilder()
 			.setColor(BotConfig.color)
 			.setTitle(`🛒 Carrinho de compras de ${discordMember.displayName}`)
@@ -65,7 +64,7 @@ export class CartEmmbedComponent {
 				},
 				{
 					name: "🏷️ **Cupom de desconto**",
-					value: "``Sem cupom aplicado``",
+					value: "``" + (discordUserEntity.couponCode ? discordUserEntity.couponCode.toUpperCase() : "Sem cupom aplicado") + "``",
 					inline: true,
 				},
 				{

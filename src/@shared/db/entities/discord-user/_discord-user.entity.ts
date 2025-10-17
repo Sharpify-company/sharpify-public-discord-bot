@@ -1,3 +1,5 @@
+import { StoreProps } from "@/@shared/sharpify/api";
+
 export class DiscordUserEntity {
 	id!: string;
 	cartChannelId!: string | null;
@@ -11,6 +13,8 @@ export class DiscordUserEntity {
 	firstName!: string | null;
 	lastName!: string | null;
 	email!: string | null;
+
+	gatewayMethod!: StoreProps.GatewayMethodsEnum | null
 
 	constructor(props: DiscordUserEntity.Props) {
 		Object.assign(this, props);
@@ -28,6 +32,7 @@ export class DiscordUserEntity {
 			firstName: row.firstName || null,
 			lastName: row.lastName || null,
 			email: row.email || null,
+			gatewayMethod: row.gatewayMethod || null,
 		});
 	}
 
@@ -43,6 +48,7 @@ export class DiscordUserEntity {
 			firstName: null,
 			lastName: null,
 			email: null,
+			gatewayMethod: null,
 		};
 		return new DiscordUserEntity(defaultProps);
 	}
@@ -69,6 +75,7 @@ export class DiscordUserEntity {
 		this.couponCode = null;
 		this.subTotalPrice = 0;
 		this.totalPrice = 0;
+		this.gatewayMethod = null;
 	}
 }
 
@@ -96,5 +103,7 @@ export namespace DiscordUserEntity {
 		firstName: string | null;
 		lastName: string | null;
 		email: string | null;
+
+		gatewayMethod: StoreProps.GatewayMethodsEnum | null;
 	};
 }

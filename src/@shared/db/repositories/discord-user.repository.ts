@@ -20,11 +20,12 @@ const tableName = "discordUsers";
 class DiscordUserRepository {
 	async create(discordUserEntity: DiscordUserEntity): Promise<void> {
 		const insert = sqlite.prepare(`
-      INSERT INTO ${tableName} (id, cartChannelId, cartMessageId, cartItems, couponCode, subTotalPrice, totalPrice, firstName, lastName, email)
+      INSERT INTO ${tableName} (id, cartChannelId, cartMessageId, cartItems, couponCode, subTotalPrice, totalPrice, firstName, lastName, email, gatewayMethod)
         VALUES (
           ?,
           ?,
           ?,
+		  ?,
 		  ?,
 		  ?,
 		  ?,
@@ -44,7 +45,8 @@ class DiscordUserRepository {
 			discordUserEntity.totalPrice,
 			discordUserEntity.firstName,
 			discordUserEntity.lastName,
-			discordUserEntity.email
+			discordUserEntity.email,
+			discordUserEntity.gatewayMethod,
 		);
 	}
 
@@ -65,6 +67,7 @@ class DiscordUserRepository {
 			firstName: row.firstName,
 			lastName: row.lastName,
 			email: row.email,
+			gatewayMethod: row.gatewayMethod,
 		});
 	}
 
@@ -80,7 +83,8 @@ class DiscordUserRepository {
 				totalPrice = ?,
 				firstName = ?,
 				lastName = ?,
-				email = ?
+				email = ?,
+				gatewayMethod = ?
 			WHERE id = ?
     	`);
 		update.run(
@@ -93,6 +97,7 @@ class DiscordUserRepository {
 			discordUserEntity.firstName,
 			discordUserEntity.lastName,
 			discordUserEntity.email,
+			discordUserEntity.gatewayMethod,
 			discordUserEntity.id,
 		);
 	}

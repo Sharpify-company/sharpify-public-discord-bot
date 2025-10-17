@@ -43,6 +43,7 @@ import { formatCheckoutCartItemNameHelper, getCheckoutCartItemsHelper } from "..
 import { SectionManagerHandler } from "../section-manager";
 import { WrapperType } from "@/@shared/types";
 import { RemoveFromCartUsecase } from "../usecases";
+import { Sharpify } from "@/@shared/sharpify";
 
 function isValidEmail(email: string): boolean {
 	const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -107,6 +108,7 @@ export class PlaceOrderButtonComponent {
 			});
 			return;
 		}
+
 		const modal = new ModalBuilder().setCustomId(`place_order_modal`).setTitle(`Informações para gerar compra`);
 
 		const firstNameInput = new TextInputBuilder()
@@ -135,6 +137,7 @@ export class PlaceOrderButtonComponent {
 			.setMinLength(1)
 			.setMaxLength(150)
 			.setRequired(true);
+
 
 		modal.setComponents(
 			new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents([firstNameInput]),

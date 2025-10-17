@@ -419,11 +419,24 @@ declare class Pricing {
     constructor(options: SharpifyOptions);
 }
 
+declare class Store {
+    private options;
+    constructor(options: SharpifyOptions);
+    getStore(): Promise<ActionsOutput<StoreProps>>;
+}
+
+declare class Management {
+    private options;
+    store: Store;
+    constructor(options: SharpifyOptions);
+}
+
 declare class ApiV1 {
     private options;
     catalog: Catalog;
     commomServices: CommomServices;
     pricing: Pricing;
+    management: Management;
     constructor(options: SharpifyOptions);
 }
 

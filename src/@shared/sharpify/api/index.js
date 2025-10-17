@@ -282,6 +282,43 @@ var Pricing = class {
   }
 };
 
+// src/api/public-api/api/v1/management/store.ts
+var Store = class {
+  static {
+    __name(this, "Store");
+  }
+  options;
+  constructor(options) {
+    this.options = options;
+  }
+  async getStore() {
+    const req = await this.options.requestHelper.execute("/management/store/get-template-store", {
+      method: "GET"
+    });
+    if (req.isFailure()) return {
+      success: false,
+      errorName: req.value.errorName
+    };
+    return {
+      success: true,
+      data: req.value.data
+    };
+  }
+};
+
+// src/api/public-api/api/v1/management/index.ts
+var Management = class {
+  static {
+    __name(this, "Management");
+  }
+  options;
+  store;
+  constructor(options) {
+    this.options = options;
+    this.store = new Store(options);
+  }
+};
+
 // src/api/public-api/api/v1/index.ts
 var ApiV1 = class {
   static {
@@ -291,11 +328,13 @@ var ApiV1 = class {
   catalog;
   commomServices;
   pricing;
+  management;
   constructor(options) {
     this.options = options;
     this.catalog = new Catalog(options);
     this.commomServices = new CommomServices(options);
     this.pricing = new Pricing(options);
+    this.management = new Management(options);
   }
 };
 

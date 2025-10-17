@@ -42,4 +42,19 @@ export class CheckoutCardComponent {
 		const result = await this.sectionManagerHandler.setSection({ discordUserId: discordUser.id, section: "MAIN" });
 		return channel.send(result);
 	}
+
+	async editCheckoutCardToChannel({
+		channel,
+		discordUser,
+		messageId,
+	}: {
+		discordUser: DiscordUserEntity;
+		channel: TextChannel;
+		messageId: string;
+	}) {
+		const result = await this.sectionManagerHandler.setSection({ discordUserId: discordUser.id, section: "MAIN" });
+
+		const message = await channel.messages.fetch(messageId).catch(() => null);
+		await message?.edit(result as any);
+	}
 }

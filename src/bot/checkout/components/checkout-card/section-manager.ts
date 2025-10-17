@@ -118,6 +118,7 @@ export class SectionManagerHandler {
 		const { emmbed } = await this.cartEmmbedComponent.makeCartEmmbed({
 			discordUserId,
 		});
+		const { CancelCartButton } = await this.cancelOrderButtonComponent.createButton();
 
 		const qrCode = props.orderEntity.orderProps.payment.gateway.data.qrCode;
 
@@ -137,8 +138,8 @@ export class SectionManagerHandler {
 
 		return {
 			embeds: [emmbed, Pixemmbed],
+			components: [{ type: 1, components: [CancelCartButton] }],
 			files: [attachment],
-			components: [],
 		};
 	}
 }

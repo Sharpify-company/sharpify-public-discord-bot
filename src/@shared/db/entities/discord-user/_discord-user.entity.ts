@@ -15,6 +15,7 @@ export class DiscordUserEntity {
 	email!: string | null;
 
 	gatewayMethod!: StoreProps.GatewayMethodsEnum | null;
+	cartCreatedAt!: Date | null 
 
 	constructor(props: DiscordUserEntity.Props) {
 		Object.assign(this, props);
@@ -33,6 +34,7 @@ export class DiscordUserEntity {
 			lastName: row.lastName || null,
 			email: row.email || null,
 			gatewayMethod: row.gatewayMethod || null,
+			cartCreatedAt: row.cartCreatedAt || null,
 		});
 	}
 
@@ -49,6 +51,7 @@ export class DiscordUserEntity {
 			lastName: null,
 			email: null,
 			gatewayMethod: null,
+			cartCreatedAt: null,
 		};
 		return new DiscordUserEntity(defaultProps);
 	}
@@ -75,7 +78,7 @@ export class DiscordUserEntity {
 		this.couponCode = null;
 		this.subTotalPrice = 0;
 		this.totalPrice = 0;
-		this.gatewayMethod = null;
+		this.cartCreatedAt = null;
 	}
 
 	clearOrderData() {
@@ -85,7 +88,7 @@ export class DiscordUserEntity {
 		this.couponCode = null;
 		this.subTotalPrice = 0;
 		this.totalPrice = 0;
-		this.gatewayMethod = null;
+		this.cartCreatedAt = null;
 	}
 }
 
@@ -115,5 +118,6 @@ export namespace DiscordUserEntity {
 		email: string | null;
 
 		gatewayMethod: StoreProps.GatewayMethodsEnum | null;
+		cartCreatedAt: Date | null;
 	};
 }

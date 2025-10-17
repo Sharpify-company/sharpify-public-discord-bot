@@ -96,7 +96,7 @@ export class PlaceOrderButtonComponent {
 			affiliateCode: null,
 			couponCode: discordUser.couponCode || null,
 			payment: {
-				gatewayMethod: discordUser.gatewayMethod!,
+				gatewayMethod: discordUser.gatewayMethod || "PIX",
 			},
 			customer: {
 				firstName: discordUser.firstName!,
@@ -131,7 +131,6 @@ export class PlaceOrderButtonComponent {
 				orderId: orderEntity.id,
 			});
 		}
-
 
 		const result = await this.sectionManagerHandler.setSection({
 			discordUserId: interaction.user.id,

@@ -55,6 +55,8 @@ class OrdersRepository {
 		);
 	}
 
+
+
 	async update(orderEntity: OrderEntity): Promise<void> {
 		const update = sqlite.prepare(`
         UPDATE ${tableName}

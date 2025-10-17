@@ -12,6 +12,7 @@ import { sqlite } from "../sqlite";
 // 	"firstName"	TEXT,
 // 	"lastName"	TEXT,
 // 	"email"	TEXT,
+// cartCreatedAt	TEXT,
 // 	PRIMARY KEY("id")
 // );
 
@@ -20,11 +21,12 @@ const tableName = "discordUsers";
 class DiscordUserRepository {
 	async create(discordUserEntity: DiscordUserEntity): Promise<void> {
 		const insert = sqlite.prepare(`
-      INSERT INTO ${tableName} (id, cartChannelId, cartMessageId, cartItems, couponCode, subTotalPrice, totalPrice, firstName, lastName, email, gatewayMethod)
+      INSERT INTO ${tableName} (id, cartChannelId, cartMessageId, cartItems, couponCode, subTotalPrice, totalPrice, firstName, lastName, email, gatewayMethod, cartCreatedAt)
         VALUES (
           ?,
           ?,
           ?,
+		  ?,
 		  ?,
 		  ?,
 		  ?,
@@ -47,6 +49,7 @@ class DiscordUserRepository {
 			discordUserEntity.lastName,
 			discordUserEntity.email,
 			discordUserEntity.gatewayMethod,
+			discordUserEntity.cartCreatedAt ? discordUserEntity.cartCreatedAt.toISOString() : null,
 		);
 	}
 
@@ -68,7 +71,31 @@ class DiscordUserRepository {
 			lastName: row.lastName,
 			email: row.email,
 			gatewayMethod: row.gatewayMethod,
+			cartCreatedAt: row.cartCreatedAt ? new Date(row.cartCreatedAt) : null,
 		});
+	}
+
+	async listToExpireOrdersFromUser(): Promise<DiscordUserEntity[]> {
+		const select = sqlite.prepare(`
+		  SELECT * FROM ${tableName} WHERE cartCreatedAt IS NOT NULL AND datetime(cartCreatedAt, '+20 minutes') <= datetime('now')
+		`);
+		const rows = select.all() as any[];
+		return rows.map((row) =>
+			DiscordUserEntity.createFromDatabase({
+				id: row.id,
+				cartChannelId: row.cartChannelId,
+				cartMessageId: row.cartMessageId,
+				cartItems: row.cartItems ? JSON.parse(row.cartItems) : [],
+				couponCode: row.couponCode,
+				subTotalPrice: row.subTotalPrice,
+				totalPrice: row.totalPrice,
+				firstName: row.firstName,
+				lastName: row.lastName,
+				email: row.email,
+				gatewayMethod: row.gatewayMethod,
+				cartCreatedAt: row.cartCreatedAt ? new Date(row.cartCreatedAt) : null,
+			}),
+		);
 	}
 
 	async update(discordUserEntity: DiscordUserEntity): Promise<void> {
@@ -84,7 +111,8 @@ class DiscordUserRepository {
 				firstName = ?,
 				lastName = ?,
 				email = ?,
-				gatewayMethod = ?
+				gatewayMethod = ?,
+				cartCreatedAt = ?
 			WHERE id = ?
     	`);
 		update.run(
@@ -98,6 +126,7 @@ class DiscordUserRepository {
 			discordUserEntity.lastName,
 			discordUserEntity.email,
 			discordUserEntity.gatewayMethod,
+			discordUserEntity.cartCreatedAt ? discordUserEntity.cartCreatedAt.toISOString() : null,
 			discordUserEntity.id,
 		);
 	}

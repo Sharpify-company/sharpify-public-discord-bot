@@ -19,7 +19,7 @@ export class AddToCartButtonComponent {
 		const selectMenu = new StringSelectMenuBuilder()
 			.setCustomId(`add_to_cart_${product.id}`)
 			.setPlaceholder("Selecione um item...")
-			.addOptions(options);
+			.addOptions(options)
 
 		const row = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(selectMenu);
 

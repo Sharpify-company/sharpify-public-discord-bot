@@ -64,9 +64,16 @@ export class AddToCartUsecase {
 				discordUser: user,
 			});
 			user.cartMessageId = checkoutReply.id;
+		}else {
+			await this.checkoutCardComponent.editCheckoutCardToChannel({
+				channel,
+				discordUser: user,
+				messageId: user.cartMessageId!,
+			});
 		}
 
 		user.cartChannelId = channel.id;
+		if(user.cartItems.length === 1) user.cartCreatedAt = new Date();
 
 		await discordUserRepository.update(user);
 

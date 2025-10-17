@@ -169,6 +169,7 @@ type ProductProps = {
         images: string[];
         title: string;
         description?: string;
+        discordDescription?: string;
         youtubeLink?: string;
     };
     normalItem: ProductProps.ProductItem;

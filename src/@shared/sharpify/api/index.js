@@ -511,7 +511,8 @@ var CustomFieldsProps;
 (function(ExternalEventsProps2) {
   ExternalEventsProps2.EventNameEnum = {
     PRODUCT_UPDATED: "PRODUCT_UPDATED",
-    PRODUCT_DELETED: "PRODUCT_DELETED"
+    PRODUCT_DELETED: "PRODUCT_DELETED",
+    ORDER_APPROVED: "ORDER_APPROVED"
   };
   ExternalEventsProps2.StatusEnum = {
     PENDING: "PENDING",

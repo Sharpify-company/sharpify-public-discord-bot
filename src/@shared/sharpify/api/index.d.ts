@@ -336,14 +336,13 @@ type ExternalEventsProps = {
     status: ExternalEventsProps.StatusEnum;
     eventName: ExternalEventsProps.EventNameEnum;
     contextAggregateId: string;
-} & {
-    eventName: "PRODUCT_UPDATED" | "PRODUCT_DELETED";
-    payload: ProductProps;
+    payload: ProductProps | OrderProps;
 };
 declare namespace ExternalEventsProps {
     const EventNameEnum: {
         readonly PRODUCT_UPDATED: "PRODUCT_UPDATED";
         readonly PRODUCT_DELETED: "PRODUCT_DELETED";
+        readonly ORDER_APPROVED: "ORDER_APPROVED";
     };
     type EventNameEnum = keyof typeof EventNameEnum;
     const StatusEnum: {

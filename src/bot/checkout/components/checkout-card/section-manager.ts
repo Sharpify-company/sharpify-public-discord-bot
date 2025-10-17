@@ -32,8 +32,6 @@ import { CancelOrderButtonComponent } from "./components/cancell-order-button";
 import { ApplyCouponButtonComponent } from "./components/apply-coupon-button";
 import { PlaceOrderButtonComponent } from "./components/place-order-button";
 import { SelectPaymentMethodComponent } from "./components/select-payment-method";
-import * as QRCode from "qrcode";
-import * as qr from "qr-image";
 
 type SetSectionProps = {
 	discordUserId: string;
@@ -123,16 +121,18 @@ export class SectionManagerHandler {
 
 		const qrCode = props.orderEntity.orderProps.payment.gateway.data.qrCode;
 
-		const qrBuffer = qr.imageSync(qrCode, { type: "png", size: 8 });
-		const attachment = new AttachmentBuilder(qrBuffer, { name: 'qrcode.png' });
+		const base64Data = qrCode.replace(/^data:image\/png;base64,/, "");
+		const attachment = new AttachmentBuilder(Buffer.from(base64Data, "base64"), { name: "qrcode.png" });
 		const qrUrl = `attachment://qrcode.png`;
 
 		const Pixemmbed = new EmbedBuilder()
 			.setColor(BotConfig.color)
 			.setTitle(`Pagamento via Pix`)
-			.setDescription(
-				`Para pagar via Pix, utilize o código abaixo no seu aplicativo bancário:\n\n\`\`\`${props.orderEntity.orderProps.payment.gateway.data.code}\`\`\`\n\nApós realizar o pagamento, por favor, envie o comprovante para que possamos processar seu pedido o mais rápido possível.`,
-			)
+			.setDescription(`Para pagar via Pix, utilize o código abaixo no seu aplicativo bancário:`)
+			.addFields({
+				name: "🔑 **Código copia e cola**",
+				value: `\`\`\`${props.orderEntity.orderProps.payment.gateway.data.code}\`\`\``,
+			})
 			.setImage(qrUrl);
 
 		return {

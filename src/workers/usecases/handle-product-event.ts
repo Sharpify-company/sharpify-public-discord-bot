@@ -37,7 +37,7 @@ export class HandleProductEvent {
 			}
 
 			await productRepository.delete(productEntity.id);
-		} else {
+		} else if (externalEventEntity.eventName === "PRODUCT_UPDATED") {
 			for (const channelLiked of productEntity.channelsLinked) {
 				try {
 					const channel = (await this.client.channels.fetch(channelLiked.channelId)) as TextChannel;

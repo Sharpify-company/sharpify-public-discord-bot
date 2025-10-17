@@ -7,6 +7,9 @@ import { SelectCartItemComponent } from "./components/select-cart-item";
 import { GoBackToMainSectionButionComponent } from "./components/go-back-to-main-section-button";
 import { RemoveFromCartButtonComponent } from "./components/remove-from-cart-button";
 import { UpdateQuantityButtonComponent } from "./components/update-quantity-button";
+import { CancelOrderButtonComponent } from "./components/cancell-order-button";
+import { ApplyCouponButtonComponent } from "./components/apply-coupon-button";
+import { PlaceOrderButtonComponent } from "./components/place-order-button";
 
 @Global()
 @Module({
@@ -20,7 +23,10 @@ import { UpdateQuantityButtonComponent } from "./components/update-quantity-butt
 		SelectCartItemComponent,
 		GoBackToMainSectionButionComponent,
 		RemoveFromCartButtonComponent,
-		UpdateQuantityButtonComponent
+		UpdateQuantityButtonComponent,
+		CancelOrderButtonComponent,
+		ApplyCouponButtonComponent,
+		PlaceOrderButtonComponent
 	],
 	exports: [CheckoutCardComponent, CartEmmbedComponent, SectionManagerHandler],
 })

@@ -3,6 +3,14 @@ export class DiscordUserEntity {
 	cartChannelId!: string | null;
 	cartMessageId!: string | null;
 	cartItems!: DiscordUserEntity.CartItem[];
+	
+	couponCode!: string | null;
+	subTotalPrice!: number;
+	totalPrice!: number;
+
+	firstName!: string | null;
+	lastName!: string | null;
+	email!: string | null;
 
 	constructor(props: DiscordUserEntity.Props) {
 		Object.assign(this, props);
@@ -14,6 +22,12 @@ export class DiscordUserEntity {
 			cartChannelId: row.cartChannelId,
 			cartMessageId: row.cartMessageId,
 			cartItems: row.cartItems || [],
+			couponCode: row.couponCode || null,
+			subTotalPrice: row.subTotalPrice || 0,
+			totalPrice: row.totalPrice || 0,
+			firstName: row.firstName || null,
+			lastName: row.lastName || null,
+			email: row.email || null,
 		});
 	}
 
@@ -23,6 +37,12 @@ export class DiscordUserEntity {
 			cartChannelId: null,
 			cartMessageId: null,
 			cartItems: [],
+			couponCode: null,
+			subTotalPrice: 0,
+			totalPrice: 0,
+			firstName: null,
+			lastName: null,
+			email: null,
 		};
 		return new DiscordUserEntity(defaultProps);
 	}
@@ -40,6 +60,15 @@ export class DiscordUserEntity {
 		this.cartItems = this.cartItems.filter(
 			(cartItem) => !(cartItem.productId === productId && cartItem.productItemId === productItemId),
 		);
+	}
+
+	cancelOrder() {
+		this.cartItems = [];
+		this.cartChannelId = null;
+		this.cartMessageId = null;
+		this.couponCode = null;
+		this.subTotalPrice = 0;
+		this.totalPrice = 0;
 	}
 }
 
@@ -59,5 +88,13 @@ export namespace DiscordUserEntity {
 		cartChannelId: string | null;
 		cartMessageId: string | null;
 		cartItems: CartItem[];
+
+		couponCode: string | null;
+		subTotalPrice: number;
+		totalPrice: number;
+
+		firstName: string | null;
+		lastName: string | null;
+		email: string | null;
 	};
 }

@@ -241,6 +241,47 @@ var CommomServices = class {
   }
 };
 
+// src/api/public-api/api/v1/pricing/coupon.ts
+var Coupon = class {
+  static {
+    __name(this, "Coupon");
+  }
+  options;
+  constructor(options) {
+    this.options = options;
+  }
+  async validateCoupon(input) {
+    const req = await this.options.requestHelper.execute("/api/v1/pricing/coupon/validate-coupon", {
+      method: "POST",
+      body: {
+        ...input,
+        storeId: this.options.storeId
+      }
+    });
+    if (req.isFailure()) return {
+      success: false,
+      errorName: req.value.errorName
+    };
+    return {
+      success: true,
+      data: req.value.data
+    };
+  }
+};
+
+// src/api/public-api/api/v1/pricing/index.ts
+var Pricing = class {
+  static {
+    __name(this, "Pricing");
+  }
+  options;
+  coupon;
+  constructor(options) {
+    this.options = options;
+    this.coupon = new Coupon(options);
+  }
+};
+
 // src/api/public-api/api/v1/index.ts
 var ApiV1 = class {
   static {
@@ -249,10 +290,12 @@ var ApiV1 = class {
   options;
   catalog;
   commomServices;
+  pricing;
   constructor(options) {
     this.options = options;
     this.catalog = new Catalog(options);
     this.commomServices = new CommomServices(options);
+    this.pricing = new Pricing(options);
   }
 };
 

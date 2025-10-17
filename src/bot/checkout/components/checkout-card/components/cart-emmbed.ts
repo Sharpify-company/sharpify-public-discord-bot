@@ -48,7 +48,6 @@ export class CartEmmbedComponent {
 			)
 			.join("\n");
 
-		const totalPrice = checkoutCartItems.reduce((acc, item) => acc + item.item.pricing.price * item.quantity, 0);
 
 		const emmbed = new EmbedBuilder()
 			.setColor(BotConfig.color)
@@ -61,7 +60,7 @@ export class CartEmmbedComponent {
 				},
 				{
 					name: "🧾 **Subtotal**",
-					value: "``" + formatPrice(totalPrice) + "``",
+					value: "``" + formatPrice(discordUserEntity.subTotalPrice) + "``",
 					inline: true,
 				},
 				{
@@ -71,7 +70,7 @@ export class CartEmmbedComponent {
 				},
 				{
 					name: "💰 **Valor total**",
-					value: "``" + formatPrice(totalPrice) + "``",
+					value: "``" + formatPrice(discordUserEntity.totalPrice) + "``",
 					inline: true,
 				},
 			)

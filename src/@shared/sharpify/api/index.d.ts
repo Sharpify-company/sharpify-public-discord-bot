@@ -403,10 +403,27 @@ declare class CommomServices {
     constructor(options: SharpifyOptions);
 }
 
+declare class Coupon {
+    private options;
+    constructor(options: SharpifyOptions);
+    validateCoupon(input: {
+        code: string;
+    }): Promise<ActionsOutput<{
+        coupon: CouponProps;
+    }>>;
+}
+
+declare class Pricing {
+    private options;
+    coupon: Coupon;
+    constructor(options: SharpifyOptions);
+}
+
 declare class ApiV1 {
     private options;
     catalog: Catalog;
     commomServices: CommomServices;
+    pricing: Pricing;
     constructor(options: SharpifyOptions);
 }
 

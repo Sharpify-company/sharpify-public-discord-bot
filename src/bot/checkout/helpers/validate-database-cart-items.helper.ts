@@ -1,6 +1,7 @@
 import { ProductEntity } from "@/@shared/db/entities";
 import { getDiscordUserRepository, getProductRepository } from "@/@shared/db/repositories";
 import { Either } from "@/@shared/lib";
+import { Sharpify } from "@/@shared/sharpify";
 
 export async function ValidateDatabaseCartItemsHelper({ discordUserId }: { discordUserId: string }) {
 	const discordUserRepository = await getDiscordUserRepository();
@@ -51,5 +52,37 @@ export async function ValidateDatabaseCartItemsHelper({ discordUserId }: { disco
 			}
 		}
 	}
+
+	const subTotal = user.cartItems.reduce((acc, item) => {
+		const product = productEntities.find((p) => p.id === item.productId);
+		if (!product) return acc;
+		const productItem =
+			product.productProps.settings.viewType === "NORMAL"
+				? product.productProps.normalItem
+				: product.productProps.dynamicItems.find((v) => v.id === item.productItemId);
+		if (!productItem) return acc;
+		return acc + productItem.pricing.price * item.quantity;
+	}, 0);
+	let total = subTotal;
+
+	if (user.couponCode) {
+		const couponReq = await Sharpify.api.v1.pricing.coupon.validateCoupon({ code: user.couponCode });
+		if(!couponReq.success) {
+			user.couponCode = null;
+		}else {
+			const coupon = couponReq.data.coupon;
+			if(coupon.type === "PERCENTAGE") {
+				total = total - (total * coupon.amout) / 100;
+			}
+			if(coupon.type === "FIXED") {
+				total = total - coupon.amout;
+				if(total < 0) total = 0;
+			}
+		}
+	}
+
+	user.subTotalPrice = subTotal;
+	user.totalPrice = total;
+
 	await discordUserRepository.update(user);
 }

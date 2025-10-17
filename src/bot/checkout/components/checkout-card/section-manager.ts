@@ -27,6 +27,9 @@ import { GoBackToMainSectionButionComponent } from "./components/go-back-to-main
 import { RemoveFromCartButtonComponent } from "./components/remove-from-cart-button";
 import { getDiscordUserRepository } from "@/@shared/db/repositories";
 import { UpdateQuantityButtonComponent } from "./components/update-quantity-button";
+import { CancelOrderButtonComponent } from "./components/cancell-order-button";
+import { ApplyCouponButtonComponent } from "./components/apply-coupon-button";
+import { PlaceOrderButtonComponent } from "./components/place-order-button";
 
 type SetSectionProps = {
 	discordUserId: string;
@@ -49,18 +52,23 @@ export class SectionManagerHandler {
 		private readonly selectCartItemComponent: SelectCartItemComponent,
 		private readonly goBackToMainSectionButionComponent: GoBackToMainSectionButionComponent,
 		private readonly removeFromCartButtonComponent: RemoveFromCartButtonComponent,
-		private readonly updateQuantityButtonComponent: UpdateQuantityButtonComponent
+		private readonly updateQuantityButtonComponent: UpdateQuantityButtonComponent,
+		private readonly cancelOrderButtonComponent: CancelOrderButtonComponent,
+		private readonly applyCouponButtonComponent: ApplyCouponButtonComponent,
+		private readonly placeOrderButtonComponent: PlaceOrderButtonComponent
 	) {}
 
 	async setSection({ discordUserId, ...props }: SetSectionProps): Promise<string | MessagePayload | MessageCreateOptions> {
-
 		if (props.section === "MAIN") {
 			const { emmbed } = await this.cartEmmbedComponent.makeCartEmmbed({ discordUserId });
 			const { row } = await this.selectCartItemComponent.createSelect({ discordUserId });
+			const { CancelCartButton } = await this.cancelOrderButtonComponent.createButton();
+			const { ApplyCouponButton } = await this.applyCouponButtonComponent.createButton({ discordUserId });
+			const { PlaceOrderButton } = await this.placeOrderButtonComponent.createButton();
 
 			return {
 				embeds: [emmbed],
-				components: [row],
+				components: [{ type: 1, components: [PlaceOrderButton, ApplyCouponButton, CancelCartButton] }, row],
 				options: {
 					withResponse: true,
 				},
@@ -78,14 +86,18 @@ export class SectionManagerHandler {
 			productId: props.productId,
 			productItemId: props.itemId,
 		});
-		 const { UpdateQuantityCartButton } = await this.updateQuantityButtonComponent.createButton({
+		const { UpdateQuantityCartButton } = await this.updateQuantityButtonComponent.createButton({
 			productId: props.productId,
 			productItemId: props.itemId,
 		});
 
 		return {
 			embeds: [emmbed],
-			components: [{ type: 1, components: [UpdateQuantityCartButton, removeFromCartButton] }, row, { type: 1, components: [backToSummaryButton] }],
+			components: [
+				{ type: 1, components: [UpdateQuantityCartButton, removeFromCartButton] },
+				row,
+				{ type: 1, components: [backToSummaryButton] },
+			],
 			options: {
 				withResponse: true,
 			},

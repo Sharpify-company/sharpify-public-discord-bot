@@ -1,16 +1,36 @@
 import { DiscordUserEntity } from "../entities";
 import { sqlite } from "../sqlite";
 
+// CREATE TABLE "discordUsers" (
+// 	"id"	TEXT,
+// 	"cartChannelId"	TEXT,
+// 	"cartMessageId"	TEXT,
+// 	"cartItems"	TEXT,
+// 	"couponCode"	TEXT,
+// 	"subTotalPrice"	REAL,
+// 	"totalPrice"	REAL,
+// 	"firstName"	TEXT,
+// 	"lastName"	TEXT,
+// 	"email"	TEXT,
+// 	PRIMARY KEY("id")
+// );
+
 const tableName = "discordUsers";
 
 class DiscordUserRepository {
 	async create(discordUserEntity: DiscordUserEntity): Promise<void> {
 		const insert = sqlite.prepare(`
-      INSERT INTO ${tableName} (id, cartChannelId, cartMessageId, cartItems)
+      INSERT INTO ${tableName} (id, cartChannelId, cartMessageId, cartItems, couponCode, subTotalPrice, totalPrice, firstName, lastName, email)
         VALUES (
           ?,
           ?,
           ?,
+		  ?,
+		  ?,
+		  ?,
+		  ?,
+		  ?,
+		  ?,
 		  ?
         )     
       `);
@@ -19,6 +39,12 @@ class DiscordUserRepository {
 			discordUserEntity.cartChannelId,
 			discordUserEntity.cartMessageId,
 			JSON.stringify(discordUserEntity.cartItems),
+			discordUserEntity.couponCode,
+			discordUserEntity.subTotalPrice,
+			discordUserEntity.totalPrice,
+			discordUserEntity.firstName,
+			discordUserEntity.lastName,
+			discordUserEntity.email
 		);
 	}
 
@@ -33,6 +59,12 @@ class DiscordUserRepository {
 			cartChannelId: row.cartChannelId,
 			cartMessageId: row.cartMessageId,
 			cartItems: row.cartItems ? JSON.parse(row.cartItems) : [],
+			couponCode: row.couponCode,
+			subTotalPrice: row.subTotalPrice,
+			totalPrice: row.totalPrice,
+			firstName: row.firstName,
+			lastName: row.lastName,
+			email: row.email,
 		});
 	}
 
@@ -42,13 +74,25 @@ class DiscordUserRepository {
 			SET 
 				cartChannelId = ?,
 				cartMessageId = ?,
-				cartItems = ?
+				cartItems = ?,
+				couponCode = ?,
+				subTotalPrice = ?,
+				totalPrice = ?,
+				firstName = ?,
+				lastName = ?,
+				email = ?
 			WHERE id = ?
     	`);
 		update.run(
 			discordUserEntity.cartChannelId,
 			discordUserEntity.cartMessageId,
 			JSON.stringify(discordUserEntity.cartItems),
+			discordUserEntity.couponCode,
+			discordUserEntity.subTotalPrice,
+			discordUserEntity.totalPrice,
+			discordUserEntity.firstName,
+			discordUserEntity.lastName,
+			discordUserEntity.email,
 			discordUserEntity.id,
 		);
 	}

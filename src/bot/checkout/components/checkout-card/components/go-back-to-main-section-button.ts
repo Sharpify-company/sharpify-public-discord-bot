@@ -33,11 +33,12 @@ import { BotConfig } from "@/config";
 import { ProductProps } from "@/@shared/sharpify/api";
 import { formatPrice } from "@/@shared/lib";
 import TurndownService from "turndown";
-import { DiscordUserEntity, ProductEntity } from "@/@shared/db/entities";
+import { DiscordUserEntity, EmojiEntity, ProductEntity } from "@/@shared/db/entities";
 import { ValidateDatabaseCartItemsHelper } from "../../../helpers";
 import { formatCheckoutCartItemNameHelper, getCheckoutCartItemsHelper } from "../helper";
 import { SectionManagerHandler } from "../section-manager";
 import { WrapperType } from "@/@shared/types";
+import { FindEmojiHelper } from "@/@shared/helpers";
 
 @Injectable()
 export class GoBackToMainSectionButionComponent {
@@ -58,11 +59,13 @@ export class GoBackToMainSectionButionComponent {
 	}
 
 	async createButton() {
+		const backEmoji = await FindEmojiHelper({ client: this.client, name: "Sharpify_letsgo" });
+
 		const backToSummaryButton = new ButtonBuilder()
-			.setCustomId("go_back_to_checkout_main_section") // unique ID to handle clicks
+			.setCustomId("go_back_to_checkout_main_section")
 			.setLabel("Voltar ao resumo do pedido")
-			.setStyle(ButtonStyle.Secondary) // gray button, like in the image
-			.setEmoji("⬅");
+			.setStyle(ButtonStyle.Secondary);
+		backEmoji && backToSummaryButton.setEmoji({ id: backEmoji.id });
 		return { backToSummaryButton };
 	}
 }

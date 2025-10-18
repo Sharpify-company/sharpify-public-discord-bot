@@ -1,14 +1,17 @@
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import { Modal, Context, SlashCommand, SlashCommandContext, Ctx, ModalContext, Button, ComponentParam } from "necord";
-import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, StringSelectMenuBuilder } from "discord.js";
+import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, Client, StringSelectMenuBuilder } from "discord.js";
 import { BotConfig } from "@/config";
 import { ProductProps } from "@/@shared/sharpify/api";
 import { formatPrice } from "@/@shared/lib";
 import TurndownService from "turndown";
+import { EmojiEntity } from "@/@shared/db/entities";
 
 @Injectable()
 export class AddToCartButtonComponent {
-	createDynamicItemsSelect(product: ProductProps) {
+	constructor(@Inject(Client) private readonly client: Client) {}
+
+	async createDynamicItemsSelect(product: ProductProps) {
 		const options = product.dynamicItems.map((item) => ({
 			label: `${item.info.title}`,
 			description: `💸 Valor: ${formatPrice(item.pricing.price)} | 📦 Estoque ${item.inventory.stockQuantity === null ? "Ilimitado" : `${item.inventory.stockQuantity} unidades`}`,
@@ -16,10 +19,12 @@ export class AddToCartButtonComponent {
 			emoji: product.readonly.stockQuantityAvailable !== null && product.readonly.stockQuantityAvailable <= 0 ? "❌" : "🛒",
 		}));
 
+
+
 		const selectMenu = new StringSelectMenuBuilder()
 			.setCustomId(`add_to_cart_${product.id}`)
 			.setPlaceholder("Selecione um item...")
-			.addOptions(options)
+			.addOptions(options);
 
 		const row = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(selectMenu);
 

@@ -73,8 +73,8 @@ export class SelectCartItemComponent {
 
 		const selectMenu = new StringSelectMenuBuilder()
 			.setCustomId(`cart_item_select`)
-			.setPlaceholder("Edite a quantidade ou remova o item do carrinho")
-			.addOptions(options);
+			.setPlaceholder("📦 Edite a quantidade ou remova o item do carrinho")
+			.addOptions(options)
 
 		const row = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(selectMenu);
 

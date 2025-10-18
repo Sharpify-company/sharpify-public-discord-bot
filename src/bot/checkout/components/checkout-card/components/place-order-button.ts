@@ -36,7 +36,7 @@ import { BotConfig } from "@/config";
 import { ProductProps } from "@/@shared/sharpify/api";
 import { dotEnv, formatPrice } from "@/@shared/lib";
 import TurndownService from "turndown";
-import { DiscordUserEntity, OrderEntity, ProductEntity } from "@/@shared/db/entities";
+import { DiscordUserEntity, EmojiEntity, OrderEntity, ProductEntity } from "@/@shared/db/entities";
 import { ValidateDatabaseCartItemsHelper } from "../../../helpers";
 import { formatCheckoutCartItemNameHelper, getCheckoutCartItemsHelper } from "../helper";
 import { SectionManagerHandler } from "../section-manager";
@@ -44,6 +44,7 @@ import { WrapperType } from "@/@shared/types";
 import { HandleOrderApprovedUsecase, RemoveFromCartUsecase } from "../usecases";
 import { Sharpify } from "@/@shared/sharpify";
 import { HandleDiscordMemberNotFound } from "@/@shared/handlers";
+import { FindEmojiHelper } from "@/@shared/helpers";
 
 function isValidEmail(email: string): boolean {
 	const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -81,6 +82,12 @@ export class PlaceOrderButtonComponent {
 			email,
 		});
 
+		
+		const loadinEmoji = await FindEmojiHelper({ client: this.client, name: "Sharpify_carregando" });
+		await interaction.message?.edit({
+			embeds: [new EmbedBuilder().setDescription(`${loadinEmoji} Processando seu pedido...`).setColor(BotConfig.color)],
+			components: [],
+		});
 		await interaction.deferReply({ flags: ["Ephemeral"] });
 
 		const placeOrderResult = await Sharpify.api.v1.checkout.order.placeOrder({
@@ -102,6 +109,12 @@ export class PlaceOrderButtonComponent {
 			})),
 		});
 		if (!placeOrderResult.success) {
+			const result = await this.sectionManagerHandler.setSection({
+				discordUserId: interaction.user.id,
+				section: "MAIN",
+			});
+			await interaction.message?.edit(result as any);
+
 			await interaction.followUp({
 				content: `❌ Não foi possível processar seu pedido: ${placeOrderResult.errorName}`,
 				flags: ["Ephemeral"],
@@ -185,12 +198,14 @@ export class PlaceOrderButtonComponent {
 	async createButton({ discordUserId }: { discordUserId: string }) {
 		const discordUser = await DiscordUserEntity.findOneBy({ id: discordUserId });
 
+		const checkEmoji = await FindEmojiHelper({ client: this.client, name: "Sharpify_aceitar" });
+
 		const PlaceOrderButton = new ButtonBuilder()
 			.setCustomId(`place_order`) // unique ID to handle clicks
-			.setLabel("Finalizar compra") // text on the button
+			.setLabel(`Finalizar compra`) // text on the button
 			.setStyle(ButtonStyle.Success) // gray button, like in the image
-			.setEmoji("☑️")
 			.setDisabled(!discordUser || !discordUser.cart.gatewayMethod);
+		checkEmoji && PlaceOrderButton.setEmoji({ id: checkEmoji.id });
 		return { PlaceOrderButton };
 	}
 }

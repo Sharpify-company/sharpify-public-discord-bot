@@ -36,13 +36,14 @@ import { BotConfig } from "@/config";
 import { ProductProps } from "@/@shared/sharpify/api";
 import { formatPrice } from "@/@shared/lib";
 import TurndownService from "turndown";
-import { DiscordUserEntity, ProductEntity } from "@/@shared/db/entities";
+import { DiscordUserEntity, EmojiEntity, ProductEntity } from "@/@shared/db/entities";
 import { ValidateDatabaseCartItemsHelper } from "../../../helpers";
 import { formatCheckoutCartItemNameHelper, getCheckoutCartItemsHelper } from "../helper";
 import { SectionManagerHandler } from "../section-manager";
 import { WrapperType } from "@/@shared/types";
 import { RemoveFromCartUsecase } from "../usecases";
 import { HandleDiscordMemberNotFound } from "@/@shared/handlers";
+import { FindEmojiHelper } from "@/@shared/helpers";
 
 @Injectable()
 export class CancelOrderButtonComponent {
@@ -58,7 +59,7 @@ export class CancelOrderButtonComponent {
 
 		const discordUser = await DiscordUserEntity.findOneBy({ id: interaction.user.id });
 		if (!discordUser) return await HandleDiscordMemberNotFound({ interaction });
-	
+
 		await discordUser.cart.cancelOrder();
 
 		await interaction.editReply({
@@ -71,11 +72,13 @@ export class CancelOrderButtonComponent {
 	}
 
 	async createButton() {
+		const cancelEmoji = await FindEmojiHelper({ client: this.client, name: "Sharpify_recusar" });
+
 		const CancelCartButton = new ButtonBuilder()
-			.setCustomId(`cancel_order`) // unique ID to handle clicks
-			.setLabel("Cancelar compra") // text on the button
-			.setStyle(ButtonStyle.Danger) // gray button, like in the image
-			.setEmoji("❌");
+			.setCustomId(`cancel_order`)
+			.setLabel("Cancelar compra")
+			.setStyle(ButtonStyle.Secondary);
+		cancelEmoji && CancelCartButton.setEmoji({ id: cancelEmoji.id });
 		return { CancelCartButton };
 	}
 }

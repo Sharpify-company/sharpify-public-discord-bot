@@ -38,7 +38,7 @@ export class HandleProductEvent {
 				const message = await channel.messages.fetch(channelLiked.messageId).catch(() => null);
 				if (!message) continue;
 
-				const reply = this.productCardComponent.getProductCard(payloadProduct);
+				const reply = await this.productCardComponent.getProductCard(payloadProduct);
 
 				await message.edit({
 					embeds: [reply.normalEmmbed],

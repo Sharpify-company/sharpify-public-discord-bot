@@ -36,13 +36,14 @@ import { BotConfig } from "@/config";
 import { ProductProps } from "@/@shared/sharpify/api";
 import { formatPrice } from "@/@shared/lib";
 import TurndownService from "turndown";
-import { DiscordUserEntity, ProductEntity } from "@/@shared/db/entities";
+import { DiscordUserEntity, EmojiEntity, ProductEntity } from "@/@shared/db/entities";
 import { ValidateDatabaseCartItemsHelper } from "../../../helpers";
 import { formatCheckoutCartItemNameHelper, getCheckoutCartItemsHelper } from "../helper";
 import { SectionManagerHandler } from "../section-manager";
 import { WrapperType } from "@/@shared/types";
 import { RemoveFromCartUsecase } from "../usecases";
 import { HandleDiscordMemberNotFound } from "@/@shared/handlers";
+import { FindEmojiHelper } from "@/@shared/helpers";
 
 @Injectable()
 export class ApplyCouponButtonComponent {
@@ -110,20 +111,23 @@ export class ApplyCouponButtonComponent {
 
 	async createButton({ discordUserId }: { discordUserId: string }) {
 		const discordUser = await DiscordUserEntity.findOneBy({ id: discordUserId });
+
+		const ticketEmoji = await FindEmojiHelper({ client: this.client, name: "Sharpify_ticket" });
+
 		if (discordUser?.cart.couponCode) {
 			const RemoveCouponButton = new ButtonBuilder()
 				.setCustomId(`remove_coupon`) // unique ID to handle clicks
 				.setLabel("Remover cupom") // text on the button
-				.setStyle(ButtonStyle.Danger) // gray button, like in the image
-				.setEmoji("🎟️");
+				.setStyle(ButtonStyle.Danger); // gray button, like in the image
+			ticketEmoji && RemoveCouponButton.setEmoji({ id: ticketEmoji.id });
 			return { ApplyCouponButton: RemoveCouponButton };
 		}
 
 		const ApplyCouponButton = new ButtonBuilder()
 			.setCustomId(`apply_coupon`) // unique ID to handle clicks
 			.setLabel("Aplicar cupom") // text on the button
-			.setStyle(ButtonStyle.Primary) // gray button, like in the image
-			.setEmoji("🎟️");
+			.setStyle(ButtonStyle.Secondary); // gray button, like in the image
+		ticketEmoji && ApplyCouponButton.setEmoji({ id: ticketEmoji.id });
 		return { ApplyCouponButton };
 	}
 }

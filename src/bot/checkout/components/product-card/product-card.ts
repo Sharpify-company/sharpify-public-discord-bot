@@ -46,23 +46,22 @@ export class ProductCardComponent {
 					inline: true,
 				},
 			);
-		}
-
+		} 
 		return emmbed;
 	}
 
-	getProductCard(product: ProductProps) {
+	async getProductCard(product: ProductProps) {
 		const normalEmmbed = this.getProductEmbed(product);
 		const normalPurchaseButton =
 			product.settings.viewType === "NORMAL"
 				? this.addToCartButtonComponent.createCartButton(product)
-				: this.addToCartButtonComponent.createDynamicItemsSelect(product);
+				: await this.addToCartButtonComponent.createDynamicItemsSelect(product);
 
 		return { normalEmmbed, normalPurchaseButton };
 	}
 
 	async sendProductCardToChannel({ channel, product }: { product: ProductProps; channel: TextChannel }) {
-		const { normalEmmbed, normalPurchaseButton } = this.getProductCard(product);
+		const { normalEmmbed, normalPurchaseButton } = await this.getProductCard(product);
 
 		const reply = await channel.send({
 			embeds: [normalEmmbed],

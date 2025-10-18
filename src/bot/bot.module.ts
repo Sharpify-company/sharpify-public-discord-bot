@@ -5,6 +5,7 @@ import { AppUpdate } from './bot.update';
 import { AppService } from './bot.service';
 import { ProductsModule } from './products/products.module';
 import { CheckoutModule } from './checkout/checkout.module';
+import { EmojiService } from './emoji.service';
 
 
 @Module({
@@ -18,6 +19,6 @@ import { CheckoutModule } from './checkout/checkout.module';
     CheckoutModule
   ],
   controllers: [],
-  providers: [AppUpdate, AppService],
+  providers: [AppUpdate, AppService, EmojiService],
 })
 export class BotModule {}

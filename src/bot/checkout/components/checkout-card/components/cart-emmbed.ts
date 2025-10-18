@@ -18,10 +18,11 @@ import { BotConfig } from "@/config";
 import { ProductProps } from "@/@shared/sharpify/api";
 import { formatPrice } from "@/@shared/lib";
 import TurndownService from "turndown";
-import { DiscordUserEntity, ProductEntity } from "@/@shared/db/entities";
+import { DiscordUserEntity, EmojiEntity, ProductEntity } from "@/@shared/db/entities";
 import { ValidateDatabaseCartItemsHelper } from "../../../helpers";
 import { formatCheckoutCartItemNameHelper, getCheckoutCartItemsHelper } from "../helper";
 import { getLocalStoreConfig } from "@/@shared/sharpify";
+import { FindEmojiHelper } from "@/@shared/helpers";
 
 @Injectable()
 export class CartEmmbedComponent {
@@ -46,6 +47,10 @@ export class CartEmmbedComponent {
 			)
 			.join("\n");
 
+		const ticketEmoji = await FindEmojiHelper({ client: this.client, name: "Sharpify_ticket" });
+		const meneyEmoji = await FindEmojiHelper({ client: this.client, name: "Sharpify_money" });
+		const cartEmoji = await FindEmojiHelper({ client: this.client, name: "Sharpify_carrinho" });
+
 		const emmbed = new EmbedBuilder()
 			.setColor(BotConfig.color)
 			.setTitle(`🛒 Carrinho de compras de ${discordMember.displayName}`)
@@ -56,12 +61,12 @@ export class CartEmmbedComponent {
 					value: productList.length ? productList : "Seu carrinho está vazio.",
 				},
 				{
-					name: "🧾 **Subtotal**",
+					name: `${meneyEmoji} **Subtotal**`,
 					value: "``" + formatPrice(discordUserEntity.cart.subTotalPrice) + "``",
 					inline: true,
 				},
 				{
-					name: "🏷️ **Cupom de desconto**",
+					name: `${ticketEmoji} **Cupom de desconto**`,
 					value:
 						"``" +
 						(discordUserEntity.cart.couponCode
@@ -71,7 +76,7 @@ export class CartEmmbedComponent {
 					inline: true,
 				},
 				{
-					name: "💰 **Valor total**",
+					name: `${cartEmoji} **Valor total**`,
 					value: "``" + formatPrice(discordUserEntity.cart.totalPrice) + "``",
 					inline: true,
 				},

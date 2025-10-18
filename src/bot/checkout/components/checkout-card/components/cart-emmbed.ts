@@ -21,6 +21,7 @@ import TurndownService from "turndown";
 import { DiscordUserEntity, ProductEntity } from "@/@shared/db/entities";
 import { ValidateDatabaseCartItemsHelper } from "../../../helpers";
 import { formatCheckoutCartItemNameHelper, getCheckoutCartItemsHelper } from "../helper";
+import { getLocalStoreConfig } from "@/@shared/sharpify";
 
 @Injectable()
 export class CartEmmbedComponent {
@@ -28,6 +29,7 @@ export class CartEmmbedComponent {
 
 	async makeCartEmmbed({ discordUserId }: { discordUserId: string }) {
 		await ValidateDatabaseCartItemsHelper({ discordUserId });
+		const { name } = await getLocalStoreConfig();
 
 		const discordUserEntity = await DiscordUserEntity.findOneBy({ id: discordUserId });
 		if (!discordUserEntity) return { emmbed: new EmbedBuilder().setColor(BotConfig.color).setTitle("Compra") };
@@ -75,7 +77,7 @@ export class CartEmmbedComponent {
 				},
 			)
 			.setFooter({
-				text: "💼 Sistema de Compra - © Todos os direitos reservados",
+				text: `💼 Sistema de Compra - ©${name} Todos os direitos reservados`,
 			});
 		return { emmbed };
 	}
@@ -90,6 +92,7 @@ export class CartEmmbedComponent {
 		itemId: string;
 	}) {
 		const checkoutCartItems = await getCheckoutCartItemsHelper({ discordUserId });
+		const { name } = await getLocalStoreConfig();
 
 		const cartItem = checkoutCartItems.find((item) => item.item.id === itemId && item.product.id === productId);
 		if (!cartItem) return { emmbed: new EmbedBuilder().setColor(BotConfig.color).setTitle("Compra") };
@@ -119,7 +122,7 @@ export class CartEmmbedComponent {
 				},
 			)
 			.setFooter({
-				text: "💼 Sistema de Compra - © Todos os direitos reservados",
+				text: `💼 Sistema de Compra - ©${name} Todos os direitos reservados`,
 			});
 		return { emmbed };
 	}

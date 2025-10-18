@@ -102,7 +102,7 @@ export class PlaceOrderButtonComponent {
 			})),
 		});
 		if (!placeOrderResult.success) {
-			await interaction.reply({
+			await interaction.followUp({
 				content: `❌ Não foi possível processar seu pedido: ${placeOrderResult.errorName}`,
 				flags: ["Ephemeral"],
 			});
@@ -118,7 +118,7 @@ export class PlaceOrderButtonComponent {
 		await orderEntity.save();
 
 		if (placeOrderResult.data.isApproved) {
-			interaction.reply({
+			interaction.followUp({
 				content: `Pagamento aprovado! Seu pedido #${orderEntity.id} foi confirmado com sucesso.`,
 				flags: ["Ephemeral"],
 			});

@@ -18,8 +18,8 @@ export class StoreConfigEntity extends BaseEntity {
 	@Column({ name: "image", type: "text", nullable: false })
 	image!: string;
 
-	@Column({ name: "gatewayMethods", type: "json", nullable: false, default: "[]" })
-	gatewayMethods!: StoreProps.GatewayMethodsEnum[];
+	@Column({ name: "paymentGateways", type: "json", nullable: false, default: "[]" })
+	paymentGateways!: StoreProps.PaymentConfig[];
 
 	constructor() {
 		super();
@@ -27,7 +27,7 @@ export class StoreConfigEntity extends BaseEntity {
 
 	static createStore(props: StoreProps) {
 		const entity = new StoreConfigEntity();
-        entity.updateStoreProps(props);
+		entity.updateStoreProps(props);
 		return entity;
 	}
 
@@ -36,14 +36,13 @@ export class StoreConfigEntity extends BaseEntity {
 		this.description = props.info.description || "Sem descrição";
 		this.url = props.url || "https://example.com";
 		this.image = props.info.image ?? "https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg";
-		this.gatewayMethods = props.paymentConfigs.filter((pm) => pm.isEnabled).map((pm) => pm.gatewayMethod);
+		this.paymentGateways = props.paymentConfigs || [];
 	}
 
-    async updateProps(props: StoreProps) {
-        this.updateStoreProps(props);
-        await this.save();
-    }
-
+	async updateProps(props: StoreProps) {
+		this.updateStoreProps(props);
+		await this.save();
+	}
 }
 
 export namespace StoreConfigEntity {
@@ -53,6 +52,6 @@ export namespace StoreConfigEntity {
 		description: string;
 		url: string;
 		image: string;
-		gatewayMethods: StoreProps.GatewayMethodsEnum[];
+		paymentGateways: StoreProps.PaymentConfig[];
 	};
 }

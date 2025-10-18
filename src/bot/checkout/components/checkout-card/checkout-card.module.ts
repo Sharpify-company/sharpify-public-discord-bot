@@ -12,6 +12,7 @@ import { ApplyCouponButtonComponent } from "./components/apply-coupon-button";
 import { PlaceOrderButtonComponent } from "./components/place-order-button";
 import { SelectPaymentMethodComponent } from "./components/select-payment-method";
 import { HandleOrderApprovedUsecase } from "./usecases";
+import { ViewOnWebsiteButtonComponent } from "./components/view-on-website";
 
 @Global()
 @Module({
@@ -30,7 +31,8 @@ import { HandleOrderApprovedUsecase } from "./usecases";
 		ApplyCouponButtonComponent,
 		PlaceOrderButtonComponent,
 		SelectPaymentMethodComponent,
-		HandleOrderApprovedUsecase
+		HandleOrderApprovedUsecase,
+		ViewOnWebsiteButtonComponent
 	],
 	exports: [CheckoutCardComponent, CartEmmbedComponent, SectionManagerHandler, HandleOrderApprovedUsecase],
 })

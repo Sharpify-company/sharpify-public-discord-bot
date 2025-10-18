@@ -31,6 +31,7 @@ import { CancelOrderButtonComponent } from "./components/cancell-order-button";
 import { ApplyCouponButtonComponent } from "./components/apply-coupon-button";
 import { PlaceOrderButtonComponent } from "./components/place-order-button";
 import { SelectPaymentMethodComponent } from "./components/select-payment-method";
+import { ViewOnWebsiteButtonComponent } from "./components/view-on-website";
 
 type SetSectionProps = {
 	discordUserId: string;
@@ -62,6 +63,7 @@ export class SectionManagerHandler {
 		private readonly applyCouponButtonComponent: ApplyCouponButtonComponent,
 		private readonly placeOrderButtonComponent: PlaceOrderButtonComponent,
 		private readonly selectPaymentMethodComponent: SelectPaymentMethodComponent,
+		private readonly viewOnWebsiteButtonComponent: ViewOnWebsiteButtonComponent,
 	) {}
 
 	async setSection({ discordUserId, ...props }: SetSectionProps): Promise<string | MessagePayload | MessageCreateOptions> {
@@ -118,6 +120,9 @@ export class SectionManagerHandler {
 			discordUserId,
 		});
 		const { CancelCartButton } = await this.cancelOrderButtonComponent.createButton();
+		const { ViewOnWebsiteButton } = await this.viewOnWebsiteButtonComponent.createButton({
+			orderId: props.orderEntity.id,
+		});
 
 		const qrCode = props.orderEntity.orderProps.payment.gateway.data.qrCode;
 
@@ -137,7 +142,7 @@ export class SectionManagerHandler {
 
 		return {
 			embeds: [emmbed, Pixemmbed],
-			components: [{ type: 1, components: [CancelCartButton] }],
+			components: [{ type: 1, components: [ViewOnWebsiteButton, CancelCartButton] }],
 			files: [attachment],
 		};
 	}

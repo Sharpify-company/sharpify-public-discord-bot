@@ -9,7 +9,7 @@ import { HandleDeliverToDiscordUserPrivate } from "./usecases/handle-deliver-to-
 export class HandleOrderDeliveryWorker {
 	constructor(private readonly handleDeliverToDiscordUserPrivate: HandleDeliverToDiscordUserPrivate) {}
 
-	@Cron("*/5 * * * * *")
+	@Cron("*/3 * * * * *")
 	handleCron() {
 		this.execute();
 	}

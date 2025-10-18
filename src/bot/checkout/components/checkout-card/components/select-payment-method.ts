@@ -34,7 +34,7 @@ import { ValidateDatabaseCartItemsHelper } from "../../../helpers";
 import { formatCheckoutCartItemNameHelper, getCheckoutCartItemsHelper } from "../helper";
 import { SectionManagerHandler } from "../section-manager";
 import { WrapperType } from "@/@shared/types";
-import { Sharpify } from "@/@shared/sharpify";
+import { getLocalStoreConfig, Sharpify } from "@/@shared/sharpify";
 
 @Injectable()
 export class SelectPaymentMethodComponent {
@@ -64,23 +64,16 @@ export class SelectPaymentMethodComponent {
 	async createSelect({ discordUserId }: { discordUserId: string }) {
 		const discordUser = await DiscordUserEntity.findOneBy({ id: discordUserId });
 
-		const store = await Sharpify.api.v1.management.store.getStore();
-		if (!store.success) {
-			return {
-				selectPaymentMethod: new StringSelectMenuBuilder()
-					.setPlaceholder("Nenhum método de pagamento disponível")
-					.addOptions([]),
-			};
-		}
+		const storeConfig = await getLocalStoreConfig()
 
-		const defaultGatewayMethod = discordUser?.cart.gatewayMethod || store.data.paymentConfigs.at(0)?.gatewayMethod || null;
+		const defaultGatewayMethod = discordUser?.cart.gatewayMethod || storeConfig.paymentGateways.at(0)?.gatewayMethod || null;
 
 		if (discordUser && defaultGatewayMethod) {
 			discordUser.cart.gatewayMethod = defaultGatewayMethod;
 			discordUser.save();
 		}
 
-		const options = store.data.paymentConfigs.map((item, index) => ({
+		const options = storeConfig.paymentGateways.map((item, index) => ({
 			label: "Método de pagamento PIX (❖)",
 			description: `Pague via PIX utilizando nosso gerenciador de pagamentos.`,
 			value: item.gatewayMethod,

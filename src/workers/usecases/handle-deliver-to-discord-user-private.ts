@@ -1,10 +1,11 @@
 import { ExternalEventsEntity, OrderEntity } from "@/@shared/db/entities";
 import { formatPrice } from "@/@shared/lib";
+import { getLocalStoreConfig } from "@/@shared/sharpify";
 import { ProductProps } from "@/@shared/sharpify/api";
 import { ProductCardComponent } from "@/bot/checkout/components";
 import { BotConfig } from "@/config";
 import { Inject, Injectable } from "@nestjs/common";
-import { APIEmbedField, Client, EmbedBuilder, Message, MessageCreateOptions, TextChannel, User } from "discord.js";
+import { APIEmbedField, ButtonBuilder, ButtonStyle, Client, EmbedBuilder, Message, MessageCreateOptions, TextChannel, User } from "discord.js";
 import {} from "necord";
 
 @Injectable()
@@ -13,6 +14,13 @@ export class HandleDeliverToDiscordUserPrivate {
 
 	async getUserDMChannelEmbed({ orderEntity, user }: { orderEntity: OrderEntity; user: User }): Promise<MessageCreateOptions> {
 		const fields: APIEmbedField[] = [];
+
+		const { url } = await getLocalStoreConfig();
+		const ViewOnWebsiteButton = new ButtonBuilder()
+			.setLabel("Visualizar compra no site") // text on the button
+			.setStyle(ButtonStyle.Link) // gray button, like in the image
+			.setEmoji("🔗")
+			.setURL(`${url}/checkout/${orderEntity.id}`);
 
 		for (const orderItem of orderEntity.orderProps.orderItems) {
 			fields.push({
@@ -56,6 +64,7 @@ export class HandleDeliverToDiscordUserPrivate {
 		return {
 			content: `Olá ${user}! 👋\nSeu pedido #${orderEntity.orderProps.shortReference} foi entregue com sucesso!`,
 			embeds: [embed],
+			components: [{ type: 1, components: [ViewOnWebsiteButton] }],
 		};
 	}
 

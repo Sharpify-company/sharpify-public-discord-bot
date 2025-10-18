@@ -121,7 +121,7 @@ export class UpdateQuantityButtonComponent {
 		if (!cartItem) {
 			await interaction.reply({
 				content: "Item não encontrado no carrinho.",
-				ephemeral: true,
+				flags: ["Ephemeral"],
 			});
 			return;
 		}

@@ -32,6 +32,7 @@ import { ApplyCouponButtonComponent } from "./components/apply-coupon-button";
 import { PlaceOrderButtonComponent } from "./components/place-order-button";
 import { SelectPaymentMethodComponent } from "./components/select-payment-method";
 import { ViewOnWebsiteButtonComponent } from "./components/view-on-website";
+import { OpenDmTutorialButtonComponent } from "./components/open-dm-tutorial-button";
 
 type SetSectionProps = {
 	discordUserId: string;
@@ -64,6 +65,7 @@ export class SectionManagerHandler {
 		private readonly placeOrderButtonComponent: PlaceOrderButtonComponent,
 		private readonly selectPaymentMethodComponent: SelectPaymentMethodComponent,
 		private readonly viewOnWebsiteButtonComponent: ViewOnWebsiteButtonComponent,
+		private readonly openDmTutorialButtonComponent: OpenDmTutorialButtonComponent
 	) {}
 
 	async setSection({ discordUserId, ...props }: SetSectionProps): Promise<string | MessagePayload | MessageCreateOptions> {
@@ -116,6 +118,18 @@ export class SectionManagerHandler {
 			};
 		}
 
+		const steps = new EmbedBuilder().setColor(BotConfig.color).setTitle(`Passos para finalizar o pedido`).setDescription(`
+			\`\`\`
+✅ 1. Lembre-se de abrir a sua DM antes de pagar.
+--------------------------
+✅ 2. Realize o pagamento via Pix utilizando o código copia e cola ou o QR Code abaixo.
+--------------------------
+✅ 3. Após o pagamento, seu pedido será processado automaticamente.
+--------------------------
+✅ 4. Assim que o pagamento for confirmado, você receberá seus produtos aqui na sua DM.
+			\`\`\`
+				`);
+
 		const { emmbed } = await this.cartEmmbedComponent.makeCartEmmbed({
 			discordUserId,
 		});
@@ -123,6 +137,14 @@ export class SectionManagerHandler {
 		const { ViewOnWebsiteButton } = await this.viewOnWebsiteButtonComponent.createButton({
 			orderId: props.orderEntity.id,
 		});
+		const { OpenDmTutorialButton } = await this.openDmTutorialButtonComponent.createButton();
+
+		// 		:Zennify_confirm: Pedido gerado com sucesso!
+
+		// :Zennify_pepe_money_animated: | Agora, basta fazer o pagamento no valor de R$ 3,00
+		// :Zennify_money: | Você pode pagar com PIX via :Zennify_qrcode: QR Code ou :Zennify_method_pix: copia e cola
+		// :Zennify_clock: | Fique atento, esse pedido expirará in 8 minutes!
+		// :Zennify_green_ball: | Lembre-se de abrir a sua DM pra poder receber o seu produto!
 
 		const qrCode = props.orderEntity.orderProps.payment.gateway.data.qrCode;
 
@@ -141,8 +163,8 @@ export class SectionManagerHandler {
 			.setImage(qrUrl);
 
 		return {
-			embeds: [emmbed, Pixemmbed],
-			components: [{ type: 1, components: [ViewOnWebsiteButton, CancelCartButton] }],
+			embeds: [steps, Pixemmbed],
+			components: [{ type: 1, components: [ViewOnWebsiteButton, OpenDmTutorialButton, CancelCartButton] }],
 			files: [attachment],
 		};
 	}

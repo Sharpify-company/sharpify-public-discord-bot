@@ -81,7 +81,7 @@ export class PlaceOrderButtonComponent {
 			email,
 		});
 
-		await interaction.deferReply({ ephemeral: true });
+		await interaction.deferReply({ flags: ["Ephemeral"] });
 
 		const placeOrderResult = await Sharpify.api.v1.checkout.order.placeOrder({
 			storeId: dotEnv.STORE_ID,

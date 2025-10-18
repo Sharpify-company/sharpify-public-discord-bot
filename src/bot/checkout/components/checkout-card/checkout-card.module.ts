@@ -13,6 +13,7 @@ import { PlaceOrderButtonComponent } from "./components/place-order-button";
 import { SelectPaymentMethodComponent } from "./components/select-payment-method";
 import { HandleOrderApprovedUsecase } from "./usecases";
 import { ViewOnWebsiteButtonComponent } from "./components/view-on-website";
+import { OpenDmTutorialButtonComponent } from "./components/open-dm-tutorial-button";
 
 @Global()
 @Module({
@@ -32,7 +33,8 @@ import { ViewOnWebsiteButtonComponent } from "./components/view-on-website";
 		PlaceOrderButtonComponent,
 		SelectPaymentMethodComponent,
 		HandleOrderApprovedUsecase,
-		ViewOnWebsiteButtonComponent
+		ViewOnWebsiteButtonComponent,
+		OpenDmTutorialButtonComponent
 	],
 	exports: [CheckoutCardComponent, CartEmmbedComponent, SectionManagerHandler, HandleOrderApprovedUsecase],
 })

@@ -49,6 +49,7 @@ type StoreProps = {
         image: string | null;
         favicon: string | null;
     };
+    url: string;
     affiliate: {
         associationType: StoreProps.Affiliate.AssociationTypeEnum;
         minWithdrawAmount: number;

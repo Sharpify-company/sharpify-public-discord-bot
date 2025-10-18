@@ -22,6 +22,7 @@ export class ExpireOrderWorker {
 				cartCreatedAt: LessThan(subMinutes(new Date(), 15)),
 			},
 		});
+		console.log("🚀 ~ ExpireOrderWorker ~ execute ~ users:", users)
 
 		for (const userEntity of users) {
 			const channel = await this.client.channels.fetch(userEntity.cart.channelId).catch(() => null);

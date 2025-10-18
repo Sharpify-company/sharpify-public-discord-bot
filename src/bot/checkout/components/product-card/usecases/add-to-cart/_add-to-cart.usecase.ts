@@ -17,6 +17,7 @@ import { CheckoutCardComponent } from "../../../checkout-card/checkout-card";
 import { CreateReplyToGoToCheckout } from "./create-reply-to-go-to-checkout";
 import { ValidateDatabaseCartItemsHelper } from "@/bot/checkout/helpers";
 import { Injectable } from "@nestjs/common";
+import { ProductEntity } from "@/@shared/db/entities";
 
 @Injectable()
 export class AddToCartUsecase {
@@ -24,6 +25,13 @@ export class AddToCartUsecase {
 
 	async execute(input: { interaction: ButtonInteraction<CacheType>; productId: string; productItemId: string }) {
 		const { interaction } = input;
+
+		if (!(await ProductEntity.existsBy({ id: input.productId }))) {
+			return interaction.reply({
+				content: "❌ Produto não encontrado ou indisponível.",
+				flags: ["Ephemeral"],
+			});
+		}
 
 		const validateProductResult = await ValidateProduct(input);
 		if (validateProductResult.isFailure()) return;

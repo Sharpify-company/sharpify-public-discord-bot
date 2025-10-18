@@ -20,11 +20,10 @@ export class EmojiService {
 
 		const files = fs.readdirSync(emojiDir).filter((file) => /\.(png|jpg|jpeg|gif)$/i.test(file));
 
+		const AllEmojis = await application.emojis.fetch();
+
 		for (const file of files) {
 			const emojiName = `Sharpify_${path.parse(file).name}`;
-
-			const exists = application.emojis.cache.find((e) => e.name === emojiName);
-			if (exists) continue;
 
 			const existsOnDb = await EmojiEntity.findOneBy({ name: emojiName as any });
 			if (existsOnDb) continue;
@@ -44,6 +43,16 @@ export class EmojiService {
 				console.log(`✅ Emoji criado: ${emoji.name}`);
 			} catch (err) {
 				if ((err as any).code === 50035) {
+					const emojiExists = AllEmojis.find((e) => e.name === emojiName);
+					if (emojiExists) {
+						await EmojiEntity.createEmoji({
+							id: emojiExists.id,
+							name: emojiExists.name,
+						}).save();
+						console.log(`⚙️ Emoji '${emojiName}' já existe (erro capturado), salvando no banco de dados.`);
+						continue;
+					}
+
 					console.log(`⚙️ Emoji '${emojiName}' já existe (erro capturado), pulando.`);
 				} else console.error(`❌ Erro ao criar emoji '${emojiName}':`, JSON.stringify(err));
 			}

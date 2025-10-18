@@ -26,7 +26,7 @@ export class CartEmbedded {
 	@Column({ name: "cart_totalPrice", type: "real", nullable: false, default: 0 })
 	totalPrice!: number;
 
-	@Column({ name: "cart_createdAt", type: "text", nullable: true })
+	@Column({ name: "cart_createdAt", type: "datetime", nullable: true })
 	cartCreatedAt!: Date;
 
 	@Column({ name: "cart_isOpened", type: "boolean", nullable: false, default: 0 })
@@ -58,7 +58,10 @@ export class CartEmbedded {
 			this.cartItems.push(item);
 		}
 
-		if (!this.isOpened && this.cartItems.length > 0) this.isOpened = true;
+		if (!this.isOpened && this.cartItems.length > 0) {
+			this.isOpened = true;
+			this.cartCreatedAt = new Date();
+		}
 	}
 
 	async removeFromCart({ productId, productItemId }: { productId: string; productItemId: string }) {
@@ -66,7 +69,10 @@ export class CartEmbedded {
 			(cartItem) => !(cartItem.productId === productId && cartItem.productItemId === productItemId),
 		);
 
-		if (this.isCartEmpty()) this.isOpened = false;
+		if (this.isCartEmpty()) {
+			this.isOpened = false;
+			this.cartCreatedAt = null!;
+		}
 		await this.discordUser.save();
 	}
 
@@ -78,6 +84,7 @@ export class CartEmbedded {
 		this.subTotalPrice = 0;
 		this.totalPrice = 0;
 		this.cartCreatedAt = null!;
+        this.isOpened = false;
 
 		await this.discordUser.save();
 	}

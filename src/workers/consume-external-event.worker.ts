@@ -1,5 +1,4 @@
 import { ExternalEventsEntity } from "@/@shared/db/entities";
-import { getExternalEventsRepository } from "@/@shared/db/repositories";
 import { Sharpify } from "@/@shared/sharpify";
 import { Injectable } from "@nestjs/common";
 import { Cron, CronExpression } from "@nestjs/schedule";
@@ -12,20 +11,18 @@ export class ConsumeExternalEventWorker {
 	}
 
 	async execute() {
-		const externalEventsRepository = await getExternalEventsRepository();
 		const req = await Sharpify.api.v1.commomServices.externalEvents.listPendingEvents();
 		if (!req.success) return console.log("Error fetching events:", req.errorName);
 
 		for (const event of req.data.events) {
-			const exists = await externalEventsRepository.findById(event.id);
+			const exists = await ExternalEventsEntity.findOneBy({ id: event.id });
 			if (exists) continue;
-			const externalEventEntity = ExternalEventsEntity.create({
+			await ExternalEventsEntity.createExternalEvent({
 				id: event.id,
 				contextAggregateId: event.contextAggregateId,
 				eventName: event.eventName,
 				payload: event.payload,
-			});
-			await externalEventsRepository.create(externalEventEntity);
+			}).save();
 		}
 		await Sharpify.api.v1.commomServices.externalEvents.markAsReceived({ ids: req.data.events.map((e) => e.id) });
 	}

@@ -29,12 +29,14 @@
     "@types/turndown": "^5.0.5",
     "better-sqlite3": "^12.4.1",
     "cross-env": "^10.1.0",
+    "date-fns": "^4.1.0",
     "discord.js": "^14.23.2",
     "dotenv": "^17.2.3",
     "necord": "^6.11.1",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
     "turndown": "^7.2.1",
+    "typeorm": "^0.3.27",
     "zod": "^4.1.12"
   },
   "devDependencies": {

@@ -1,5 +1,4 @@
 import { ExternalEventsEntity, OrderEntity } from "@/@shared/db/entities";
-import { getOrderRepository, getProductRepository } from "@/@shared/db/repositories";
 import { formatPrice } from "@/@shared/lib";
 import { ProductProps } from "@/@shared/sharpify/api";
 import { ProductCardComponent } from "@/bot/checkout/components";
@@ -61,8 +60,6 @@ export class HandleDeliverToDiscordUserPrivate {
 	}
 
 	async execute({ orderEntity }: { orderEntity: OrderEntity }) {
-		const orderRepository = await getOrderRepository();
-
 		// 1️⃣ Get the user by ID
 		const user = await this.client.users.fetch(orderEntity.customerId).catch(() => null);
 		if (!user) {
@@ -84,8 +81,6 @@ export class HandleDeliverToDiscordUserPrivate {
 			return;
 		}
 
-		orderEntity.deliveryStatus = "DELIVERED";
-
-		await orderRepository.update(orderEntity);
+		await orderEntity.markAsDelivered();
 	}
 }

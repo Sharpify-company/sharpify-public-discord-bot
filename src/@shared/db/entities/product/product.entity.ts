@@ -1,37 +1,44 @@
 import { ProductProps } from "@/@shared/sharpify/api";
+import { BaseEntity, Column, Entity, PrimaryColumn } from "typeorm";
 
-export class ProductEntity {
+@Entity("products")
+export class ProductEntity extends BaseEntity {
+	@PrimaryColumn({ name: "id", type: "text" })
 	id!: string;
+
+	@Column({ name: "orderProps", type: "json" })
 	productProps!: ProductProps;
+
+	@Column({ name: "channelsLinked", type: "json" })
 	channelsLinked!: ProductEntity.ChannelsLinked[];
 
-	constructor(props: ProductEntity.Props) {
-		Object.assign(this, props);
+	constructor() {
+		super();
 	}
 
-	static createFromDatabase(row: ProductEntity.Props): ProductEntity {
-		return new ProductEntity({
-			id: row.id,
-			productProps: row.productProps,
-			channelsLinked: row.channelsLinked,
-		});
-	}
-
-	static create(props: ProductEntity.Input) {
+	static createProduct(props: ProductEntity.Input) {
 		const defaultProps: ProductEntity.Props = {
 			...props,
 			channelsLinked: props.channelsLinked || [],
 		};
-		return new ProductEntity(defaultProps);
+		const entity = new ProductEntity();
+		Object.assign(entity, defaultProps);
+		return entity;
 	}
 
-	setChannelLinked({ channelId, messageId }: { channelId: string; messageId: string }) {
+	async updateProps(props: ProductProps) {
+		this.productProps = props;
+		await this.save();
+	}
+
+	async setChannelLinked({ channelId, messageId }: { channelId: string; messageId: string }) {
 		const existing = this.channelsLinked.find((c) => c.channelId === channelId);
 		if (existing) {
 			existing.messageId = messageId;
 		} else {
 			this.channelsLinked.push({ channelId, messageId });
 		}
+		this.save()
 	}
 }
 

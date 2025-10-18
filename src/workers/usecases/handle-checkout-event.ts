@@ -1,5 +1,4 @@
-import { ExternalEventsEntity } from "@/@shared/db/entities";
-import { getOrderRepository, getProductRepository } from "@/@shared/db/repositories";
+import { ExternalEventsEntity, OrderEntity } from "@/@shared/db/entities";
 import { OrderProps, ProductProps } from "@/@shared/sharpify/api";
 import { ProductCardComponent } from "@/bot/checkout/components";
 import { HandleOrderApprovedUsecase } from "@/bot/checkout/components/checkout-card/usecases";
@@ -15,19 +14,15 @@ export class HandleCheckoutEvent {
 	) {}
 
 	async create(externalEventEntity: ExternalEventsEntity) {
-		const orderRepository = await getOrderRepository();
-
 		const payloadOrder: OrderProps = externalEventEntity.payload as OrderProps;
 
-		const orderEntity = await orderRepository.findById(externalEventEntity.contextAggregateId);
+		const orderEntity = await OrderEntity.findOneBy({ id: externalEventEntity.contextAggregateId });
 		if (!orderEntity) return;
 
 		if (orderEntity.deliveryStatus !== "PENDING") return;
 
-		orderEntity.orderProps = payloadOrder;
-
 		if (externalEventEntity.eventName === "ORDER_APPROVED") {
-			await orderRepository.update(orderEntity);
+			await orderEntity.updateOrderProps(payloadOrder);
 			this.handleOrderApprovedUsecase.execute({ orderId: orderEntity.id });
 		}
 	}

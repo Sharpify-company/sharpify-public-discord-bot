@@ -10,10 +10,10 @@ import {
 	PermissionsBitField,
 } from "discord.js";
 import { dotEnv } from "@/@shared/lib";
-import { getDiscordUserRepository } from "@/@shared/db/repositories";
 
 import { ValidateDatabaseCartItemsHelper } from "@/bot/checkout/helpers";
 import { Injectable } from "@nestjs/common";
+import { DiscordUserEntity } from "@/@shared/db/entities";
 
 export class RemoveFromCartUsecase {
 	static async execute({
@@ -25,17 +25,14 @@ export class RemoveFromCartUsecase {
 		productItemId: string;
 		discordUserId: string;
 	}): Promise<{ cartIsEmpty: boolean }> {
-		const discordUserRepository = await getDiscordUserRepository();
-
-		const userEntity = await discordUserRepository.findById(discordUserId);
+		const userEntity = await DiscordUserEntity.findOneBy({ id: discordUserId });
 		if (!userEntity) return { cartIsEmpty: true };
 
-		userEntity.removeFromCart({
+		await userEntity.cart.removeFromCart({
 			productId,
 			productItemId,
 		});
-		await discordUserRepository.update(userEntity);
 
-		return { cartIsEmpty: userEntity.cartItems.length === 0 };
+		return { cartIsEmpty: userEntity.cart.isCartEmpty() };
 	}
 }

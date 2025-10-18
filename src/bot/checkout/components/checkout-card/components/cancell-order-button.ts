@@ -37,12 +37,12 @@ import { ProductProps } from "@/@shared/sharpify/api";
 import { formatPrice } from "@/@shared/lib";
 import TurndownService from "turndown";
 import { DiscordUserEntity, ProductEntity } from "@/@shared/db/entities";
-import { getDiscordUserRepository, getProductRepository } from "@/@shared/db/repositories";
 import { ValidateDatabaseCartItemsHelper } from "../../../helpers";
 import { formatCheckoutCartItemNameHelper, getCheckoutCartItemsHelper } from "../helper";
 import { SectionManagerHandler } from "../section-manager";
 import { WrapperType } from "@/@shared/types";
 import { RemoveFromCartUsecase } from "../usecases";
+import { HandleDiscordMemberNotFound } from "@/@shared/handlers";
 
 @Injectable()
 export class CancelOrderButtonComponent {
@@ -54,28 +54,21 @@ export class CancelOrderButtonComponent {
 
 	@Button("cancel_order")
 	private async handleButtonClicked(@Context() [interaction]: [ButtonInteraction]) {
-        const discordUserRepository = await getDiscordUserRepository();
-        await interaction.deferReply({ flags: "Ephemeral" });
+		await interaction.deferReply({ flags: "Ephemeral" });
 
-        const discordUser = await discordUserRepository.findById(interaction.user.id);
-        if (!discordUser) {
-            return interaction.reply({
-                content: "❌ | Você não possui um carrinho ativo.",
-                ephemeral: true,
-            });
-        }
-        discordUser.cancelOrder()
+		const discordUser = await DiscordUserEntity.findOneBy({ id: interaction.user.id });
+		if (!discordUser) return await HandleDiscordMemberNotFound({ interaction });
+	
+		await discordUser.cart.cancelOrder();
 
-        await discordUserRepository.update(discordUser);
+		await interaction.editReply({
+			content: "✅ | Seu pedido foi cancelado com sucesso.",
+			components: [],
+			embeds: [],
+		});
 
-        await interaction.editReply({
-            content: "✅ | Seu pedido foi cancelado com sucesso.",
-            components: [],
-            embeds: [],
-        });
-
-        await interaction.channel?.delete()
-    }
+		await interaction.channel?.delete();
+	}
 
 	async createButton() {
 		const CancelCartButton = new ButtonBuilder()

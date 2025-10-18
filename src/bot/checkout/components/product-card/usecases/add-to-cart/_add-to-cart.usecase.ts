@@ -13,7 +13,6 @@ import { ValidateProduct } from "./validate-product";
 import { dotEnv } from "@/@shared/lib";
 import { EnsureCartChannelCreated } from "./ensure-cart-channel-created";
 import { EnsureUserExistsOnDb } from "./ensure-user-exists-on-db";
-import { getDiscordUserRepository } from "@/@shared/db/repositories";
 import { CheckoutCardComponent } from "../../../checkout-card/checkout-card";
 import { CreateReplyToGoToCheckout } from "./create-reply-to-go-to-checkout";
 import { ValidateDatabaseCartItemsHelper } from "@/bot/checkout/helpers";
@@ -24,8 +23,6 @@ export class AddToCartUsecase {
 	constructor(private readonly checkoutCardComponent: CheckoutCardComponent) {}
 
 	async execute(input: { interaction: ButtonInteraction<CacheType>; productId: string; productItemId: string }) {
-		const discordUserRepository = await getDiscordUserRepository();
-
 		const { interaction } = input;
 
 		const validateProductResult = await ValidateProduct(input);
@@ -38,12 +35,12 @@ export class AddToCartUsecase {
 
 		const user = ensureUserCreatedResult.value;
 
-		user.addToCart({
+		user.cart.addToCart({
 			productId: product.id,
 			productItemId: input.productItemId,
 			quantity: 1,
 		});
-		await discordUserRepository.update(user);
+		await user.save();
 
 		const ensureCartResult = await EnsureCartChannelCreated({
 			...input,
@@ -63,19 +60,19 @@ export class AddToCartUsecase {
 				channel,
 				discordUser: user,
 			});
-			user.cartMessageId = checkoutReply.id;
-		}else {
+			user.cart.messageId = checkoutReply.id;
+		} else {
 			await this.checkoutCardComponent.editCheckoutCardToChannel({
 				channel,
 				discordUser: user,
-				messageId: user.cartMessageId!,
+				messageId: user.cart.messageId!,
 			});
 		}
 
-		user.cartChannelId = channel.id;
-		if(user.cartItems.length === 1) user.cartCreatedAt = new Date();
+		user.cart.channelId = channel.id;
+		if (user.cart.cartItems.length === 1) user.cart.cartCreatedAt = new Date();
 
-		await discordUserRepository.update(user);
+		await user.save();
 
 		await ValidateDatabaseCartItemsHelper({ discordUserId: user.id });
 	}

@@ -19,7 +19,6 @@ import { ProductProps } from "@/@shared/sharpify/api";
 import { formatPrice } from "@/@shared/lib";
 import TurndownService from "turndown";
 import { DiscordUserEntity, ProductEntity } from "@/@shared/db/entities";
-import { getDiscordUserRepository, getProductRepository } from "@/@shared/db/repositories";
 import { ValidateDatabaseCartItemsHelper } from "../../helpers";
 import { formatCheckoutCartItemNameHelper, getCheckoutCartItemsHelper } from "./helper";
 import { CartEmmbedComponent } from "./components/cart-emmbed";

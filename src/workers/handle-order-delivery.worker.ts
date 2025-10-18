@@ -1,5 +1,4 @@
-import { ExternalEventsEntity } from "@/@shared/db/entities";
-import { getExternalEventsRepository, getOrderRepository } from "@/@shared/db/repositories";
+import { ExternalEventsEntity, OrderEntity } from "@/@shared/db/entities";
 import { Sharpify } from "@/@shared/sharpify";
 import { Injectable, OnModuleInit } from "@nestjs/common";
 import { Cron } from "@nestjs/schedule";
@@ -16,9 +15,7 @@ export class HandleOrderDeliveryWorker {
 	}
 
 	async execute() {
-		const orderRepository = await getOrderRepository();
-
-		const pendingDeliveringOrder = await orderRepository.listAllPendingDelivery();
+		const pendingDeliveringOrder = await OrderEntity.findBy({ deliveryStatus: "PREPARING_DELIVERY" });
 
 		for (const orderEntity of pendingDeliveringOrder) {
 			await this.handleDeliverToDiscordUserPrivate.execute({ orderEntity });

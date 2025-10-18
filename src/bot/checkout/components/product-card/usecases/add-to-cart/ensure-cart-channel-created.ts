@@ -9,7 +9,6 @@ import {
   TextChannel,
 } from 'discord.js';
 import { DiscordUserEntity } from '@/@shared/db/entities';
-import { getDiscordUserRepository } from '@/@shared/db/repositories';
 
 export async function EnsureCartChannelCreated({
   interaction,
@@ -60,8 +59,8 @@ export async function EnsureCartChannelCreated({
     );
   }
 
-  if (user.cartChannelId) {
-    const existingChannel = guild.channels.cache.get(user.cartChannelId);
+  if (user.cart.channelId) {
+    const existingChannel = guild.channels.cache.get(user.cart.channelId);
     if (existingChannel)
       return success({ channel: existingChannel as TextChannel, same: true });
   }

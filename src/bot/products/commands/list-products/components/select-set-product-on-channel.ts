@@ -34,8 +34,7 @@ import { formatPrice } from "@/@shared/lib";
 import TurndownService from "turndown";
 import { ProductCardComponent } from "@/bot/checkout/components";
 import { Sharpify } from "@/@shared/sharpify";
-import { getProductRepository } from "@/@shared/db/repositories";
-import { ProductEntity } from "@/@shared/db/entities";
+import { OrderEntity, ProductEntity } from "@/@shared/db/entities";
 
 @Injectable()
 export class SelectSetProductOnChannel {
@@ -67,16 +66,13 @@ export class SelectSetProductOnChannel {
 			});
 		}
 
-		const productRepository = await getProductRepository();
-
-		let productEntity = await productRepository.findById(product.data.product.id);
+		let productEntity = await ProductEntity.findOneBy({ id: product.data.product.id });
 		if (!productEntity) {
-			productEntity = ProductEntity.create({
+			productEntity = ProductEntity.createProduct({
 				id: product.data.product.id,
 				productProps: product.data.product,
 			});
-
-			await productRepository.create(productEntity);
+			await productEntity.save();
 		}
 
 		const reply = await this.productCardComponent.sendProductCardToChannel({
@@ -84,9 +80,7 @@ export class SelectSetProductOnChannel {
 			product: product.data.product,
 		});
 
-		productEntity.setChannelLinked({ channelId: channel.id, messageId: reply.id });
-
-		await productRepository.update(productEntity);
+		await productEntity.setChannelLinked({ channelId: channel.id, messageId: reply.id });
 
 		interaction.reply({
 			content: "Produto setado no canal com sucesso!",

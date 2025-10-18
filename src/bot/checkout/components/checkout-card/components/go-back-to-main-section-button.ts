@@ -34,7 +34,6 @@ import { ProductProps } from "@/@shared/sharpify/api";
 import { formatPrice } from "@/@shared/lib";
 import TurndownService from "turndown";
 import { DiscordUserEntity, ProductEntity } from "@/@shared/db/entities";
-import { getDiscordUserRepository, getProductRepository } from "@/@shared/db/repositories";
 import { ValidateDatabaseCartItemsHelper } from "../../../helpers";
 import { formatCheckoutCartItemNameHelper, getCheckoutCartItemsHelper } from "../helper";
 import { SectionManagerHandler } from "../section-manager";
@@ -54,8 +53,8 @@ export class GoBackToMainSectionButionComponent {
 			discordUserId: interaction.user.id,
 			section: "MAIN",
 		});
-        await interaction.deferUpdate();
-        await interaction.message.edit(result as any);
+		await interaction.deferUpdate();
+		await interaction.message.edit(result as any);
 	}
 
 	async createButton() {
@@ -63,7 +62,7 @@ export class GoBackToMainSectionButionComponent {
 			.setCustomId("go_back_to_checkout_main_section") // unique ID to handle clicks
 			.setLabel("Voltar ao resumo do pedido")
 			.setStyle(ButtonStyle.Secondary) // gray button, like in the image
-			.setEmoji("⬅"); 
+			.setEmoji("⬅");
 		return { backToSummaryButton };
 	}
 }

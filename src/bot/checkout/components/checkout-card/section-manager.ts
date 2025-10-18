@@ -26,7 +26,6 @@ import { CartEmmbedComponent } from "./components/cart-emmbed";
 import { SelectCartItemComponent } from "./components/select-cart-item";
 import { GoBackToMainSectionButionComponent } from "./components/go-back-to-main-section-button";
 import { RemoveFromCartButtonComponent } from "./components/remove-from-cart-button";
-import { getDiscordUserRepository } from "@/@shared/db/repositories";
 import { UpdateQuantityButtonComponent } from "./components/update-quantity-button";
 import { CancelOrderButtonComponent } from "./components/cancell-order-button";
 import { ApplyCouponButtonComponent } from "./components/apply-coupon-button";

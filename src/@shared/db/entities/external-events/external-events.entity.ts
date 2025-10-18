@@ -1,29 +1,31 @@
 import { ExternalEventsProps, ProductProps } from "@/@shared/sharpify/api";
+import { BaseEntity, Column, Entity, PrimaryColumn } from "typeorm";
 
-export class ExternalEventsEntity {
+@Entity("externalEvents")
+export class ExternalEventsEntity extends BaseEntity {
+	@PrimaryColumn({ name: "id", type: "text" })
 	id!: string;
+
+	@Column({ name: "eventName", type: "text" })
 	eventName!: ExternalEventsProps.EventNameEnum;
+
+	@Column({ name: "contextAggregateId", type: "text" })
 	contextAggregateId!: string;
-    payload!: any;
 
-	constructor(props: ExternalEventsEntity.Props) {
-		Object.assign(this, props);
+	@Column({ name: "payload", type: "json" })
+	payload!: any;
+
+	constructor() {
+		super();
 	}
 
-	static createFromDatabase(row: ExternalEventsEntity.Props): ExternalEventsEntity {
-		return new ExternalEventsEntity({
-			id: row.id,
-            eventName: row.eventName,
-            contextAggregateId: row.contextAggregateId,
-            payload: row.payload,
-        });
-	}
-
-	static create(props: ExternalEventsEntity.Input) {
+	static createExternalEvent(props: ExternalEventsEntity.Input) {
 		const defaultProps: ExternalEventsEntity.Props = {
 			...props,
 		};
-		return new ExternalEventsEntity(defaultProps);
+		const entity = new ExternalEventsEntity();
+		Object.assign(entity, defaultProps);
+		return entity;
 	}
 }
 

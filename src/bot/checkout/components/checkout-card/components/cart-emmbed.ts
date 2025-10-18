@@ -19,7 +19,6 @@ import { ProductProps } from "@/@shared/sharpify/api";
 import { formatPrice } from "@/@shared/lib";
 import TurndownService from "turndown";
 import { DiscordUserEntity, ProductEntity } from "@/@shared/db/entities";
-import { getDiscordUserRepository, getProductRepository } from "@/@shared/db/repositories";
 import { ValidateDatabaseCartItemsHelper } from "../../../helpers";
 import { formatCheckoutCartItemNameHelper, getCheckoutCartItemsHelper } from "../helper";
 
@@ -28,12 +27,9 @@ export class CartEmmbedComponent {
 	constructor(@Inject(Client) private readonly client: Client) {}
 
 	async makeCartEmmbed({ discordUserId }: { discordUserId: string }) {
-		const discordUserRepository = await getDiscordUserRepository();
-		const productRepository = await getProductRepository();
-
 		await ValidateDatabaseCartItemsHelper({ discordUserId });
 
-		const discordUserEntity = await discordUserRepository.findById(discordUserId);
+		const discordUserEntity = await DiscordUserEntity.findOneBy({ id: discordUserId });
 		if (!discordUserEntity) return { emmbed: new EmbedBuilder().setColor(BotConfig.color).setTitle("Compra") };
 
 		const discordMember = await this.client.users.fetch(discordUserId);
@@ -59,17 +55,22 @@ export class CartEmmbedComponent {
 				},
 				{
 					name: "🧾 **Subtotal**",
-					value: "``" + formatPrice(discordUserEntity.subTotalPrice) + "``",
+					value: "``" + formatPrice(discordUserEntity.cart.subTotalPrice) + "``",
 					inline: true,
 				},
 				{
 					name: "🏷️ **Cupom de desconto**",
-					value: "``" + (discordUserEntity.couponCode ? discordUserEntity.couponCode.toUpperCase() : "Sem cupom aplicado") + "``",
+					value:
+						"``" +
+						(discordUserEntity.cart.couponCode
+							? discordUserEntity.cart.couponCode.toUpperCase()
+							: "Sem cupom aplicado") +
+						"``",
 					inline: true,
 				},
 				{
 					name: "💰 **Valor total**",
-					value: "``" + formatPrice(discordUserEntity.totalPrice) + "``",
+					value: "``" + formatPrice(discordUserEntity.cart.totalPrice) + "``",
 					inline: true,
 				},
 			)

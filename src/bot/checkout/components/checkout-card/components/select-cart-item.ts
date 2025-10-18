@@ -30,7 +30,6 @@ import { ProductProps } from "@/@shared/sharpify/api";
 import { formatPrice } from "@/@shared/lib";
 import TurndownService from "turndown";
 import { DiscordUserEntity, ProductEntity } from "@/@shared/db/entities";
-import { getDiscordUserRepository, getProductRepository } from "@/@shared/db/repositories";
 import { ValidateDatabaseCartItemsHelper } from "../../../helpers";
 import { formatCheckoutCartItemNameHelper, getCheckoutCartItemsHelper } from "../helper";
 import { SectionManagerHandler } from "../section-manager";
@@ -60,7 +59,6 @@ export class SelectCartItemComponent {
 	}
 
 	async createSelect({ discordUserId, defaultItemId }: { discordUserId: string; defaultItemId?: string }) {
-		const discordUserRepository = await getDiscordUserRepository();
 		await ValidateDatabaseCartItemsHelper({ discordUserId });
 
 		const checkoutCartItems = await getCheckoutCartItemsHelper({ discordUserId });

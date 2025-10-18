@@ -30,7 +30,6 @@ import { ProductProps } from "@/@shared/sharpify/api";
 import { formatPrice } from "@/@shared/lib";
 import TurndownService from "turndown";
 import { DiscordUserEntity, ProductEntity } from "@/@shared/db/entities";
-import { getDiscordUserRepository, getProductRepository } from "@/@shared/db/repositories";
 import { ValidateDatabaseCartItemsHelper } from "../../../helpers";
 import { formatCheckoutCartItemNameHelper, getCheckoutCartItemsHelper } from "../helper";
 import { SectionManagerHandler } from "../section-manager";
@@ -47,11 +46,10 @@ export class SelectPaymentMethodComponent {
 
 	@StringSelect("gateway_method_selected")
 	private async handleItemSelected(@Context() [interaction]: StringSelectContext, @SelectedStrings() selected: string[]) {
-		const discordUserRepository = await getDiscordUserRepository();
-		const discordUser = await discordUserRepository.findById(interaction.user.id);
+		const discordUser = await DiscordUserEntity.findOneBy({ id: interaction.user.id });
 		if (discordUser) {
-			discordUser.gatewayMethod = selected[0]! as any;
-			await discordUserRepository.update(discordUser);
+			discordUser.cart.gatewayMethod = selected[0]! as any;
+			await discordUser.save();
 		}
 
 		const result = await this.sectionManagerHandler.setSection({
@@ -64,8 +62,7 @@ export class SelectPaymentMethodComponent {
 	}
 
 	async createSelect({ discordUserId }: { discordUserId: string }) {
-		const discordUserRepository = await getDiscordUserRepository();
-		const discordUser = await discordUserRepository.findById(discordUserId);
+		const discordUser = await DiscordUserEntity.findOneBy({ id: discordUserId });
 
 		const store = await Sharpify.api.v1.management.store.getStore();
 		if (!store.success) {
@@ -76,11 +73,11 @@ export class SelectPaymentMethodComponent {
 			};
 		}
 
-		const defaultGatewayMethod = discordUser?.gatewayMethod || store.data.paymentConfigs.at(0)?.gatewayMethod || null;
+		const defaultGatewayMethod = discordUser?.cart.gatewayMethod || store.data.paymentConfigs.at(0)?.gatewayMethod || null;
 
 		if (discordUser && defaultGatewayMethod) {
-			discordUser.gatewayMethod = defaultGatewayMethod;
-			await discordUserRepository.update(discordUser);
+			discordUser.cart.gatewayMethod = defaultGatewayMethod;
+			discordUser.save();
 		}
 
 		const options = store.data.paymentConfigs.map((item, index) => ({

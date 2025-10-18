@@ -1,20 +1,46 @@
 import { OrderProps } from "@/@shared/sharpify/api";
+import { BaseEntity, Column, Entity, PrimaryColumn } from "typeorm";
 
-export class OrderEntity {
+@Entity("orders")
+export class OrderEntity extends BaseEntity {
+	@PrimaryColumn({ name: "id", type: "text" })
 	id!: string;
+
+	@Column({ name: "orderProps", type: "json" })
 	orderProps!: OrderProps;
+
+	@Column({ name: "customerId", type: "text" })
 	customerId!: string;
+
+	@Column({ name: "deliveryStatus", type: "text" })
 	deliveryStatus!: OrderEntity.DeliveryStatus;
 
-	constructor(props: OrderEntity.Props) {
-		Object.assign(this, props);
+	constructor() {
+		super();
 	}
 
-	static create(props: OrderEntity.Input) {
+	static createOrder(props: OrderEntity.Input) {
 		const defaultProps: OrderEntity.Props = {
 			...props,
 		};
-		return new OrderEntity(defaultProps);
+		const entity = new OrderEntity();
+		Object.assign(entity, defaultProps);
+		return entity;
+	}
+
+	async markAsDelivered() {
+		this.deliveryStatus = "DELIVERED";
+		await this.save();
+	}
+
+	async markAsPreparingDelivery() {
+		this.deliveryStatus = "PREPARING_DELIVERY";
+		await this.save();
+	}
+
+	async updateOrderProps(props: OrderProps) {
+		this.orderProps = props;
+		await this.save();
 	}
 }
 

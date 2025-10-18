@@ -1,5 +1,4 @@
 import { ExternalEventsEntity } from "@/@shared/db/entities";
-import { getExternalEventsRepository } from "@/@shared/db/repositories";
 import { Sharpify } from "@/@shared/sharpify";
 import { Injectable, OnModuleInit } from "@nestjs/common";
 import { Cron } from "@nestjs/schedule";
@@ -18,9 +17,7 @@ export class HandleExternalEventWorker {
 	}
 
 	async execute() {
-		const externalEventsRepository = await getExternalEventsRepository();
-
-		const pendingEvents = await externalEventsRepository.listAll();
+		const pendingEvents = await ExternalEventsEntity.find();
 
 		for (const event of pendingEvents) {
 			if (event.eventName === "PRODUCT_DELETED" || event.eventName === "PRODUCT_UPDATED") {
@@ -29,7 +26,7 @@ export class HandleExternalEventWorker {
 			if (event.eventName === "ORDER_APPROVED") {
 				await this.handleCheckoutEvent.create(event);
 			}
-			await externalEventsRepository.delete(event.id);
+			await event.remove();
 		}
 	}
 }

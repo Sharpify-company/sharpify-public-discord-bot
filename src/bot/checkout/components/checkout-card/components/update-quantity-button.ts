@@ -37,7 +37,6 @@ import { ProductProps } from "@/@shared/sharpify/api";
 import { formatPrice } from "@/@shared/lib";
 import TurndownService from "turndown";
 import { DiscordUserEntity, ProductEntity } from "@/@shared/db/entities";
-import { getDiscordUserRepository, getProductRepository } from "@/@shared/db/repositories";
 import { ValidateDatabaseCartItemsHelper } from "../../../helpers";
 import { formatCheckoutCartItemNameHelper, getCheckoutCartItemsHelper } from "../helper";
 import { SectionManagerHandler } from "../section-manager";
@@ -54,8 +53,7 @@ export class UpdateQuantityButtonComponent {
 
 	@Modal("update_cart_quantity_modal/:productIdAndItemId")
 	public async onModalSubmit(@Ctx() [interaction]: ModalContext, @ModalParam("productIdAndItemId") productIdAndItemId: string) {
-		const discordUserRepository = await getDiscordUserRepository();
-		const discordUser = await discordUserRepository.findById(interaction.user.id);
+		const discordUser = await DiscordUserEntity.findOneBy({ id: interaction.user.id });
 		if (!discordUser) {
 			await interaction.reply({
 				content: "Usuário não encontrado. Por favor, inicie uma compra primeiro.",
@@ -93,13 +91,13 @@ export class UpdateQuantityButtonComponent {
 			return;
 		}
 
-        discordUser.cartItems = discordUser.cartItems.map((v) => {
-            if (v.productId === productId && v.productItemId === productItemId) {
-                v.quantity = quantity;
-            }
-            return v;
-        });
-        await discordUserRepository.update(discordUser);
+		discordUser.cart.cartItems = discordUser.cart.cartItems.map((v) => {
+			if (v.productId === productId && v.productItemId === productItemId) {
+				v.quantity = quantity;
+			}
+			return v;
+		});
+		await discordUser.save();
 
 		interaction.deferUpdate();
 		const result = await this.sectionManagerHandler.setSection({

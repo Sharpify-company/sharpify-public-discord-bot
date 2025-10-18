@@ -1,123 +1,49 @@
 import { StoreProps } from "@/@shared/sharpify/api";
+import { AfterLoad, BaseEntity, Column, Entity, PrimaryColumn } from "typeorm";
+import { CartEmbedded } from "./cart.embedded";
+import { PersonalInfoEmbedded } from "./personal-info.embedded";
 
-export class DiscordUserEntity {
+@Entity("discordUsers")
+export class DiscordUserEntity extends BaseEntity {
+	@PrimaryColumn({ name: "id", type: "text" })
 	id!: string;
-	cartChannelId!: string | null;
-	cartMessageId!: string | null;
-	cartItems!: DiscordUserEntity.CartItem[];
 
-	couponCode!: string | null;
-	subTotalPrice!: number;
-	totalPrice!: number;
+	@Column(() => CartEmbedded, { prefix: false })
+	cart!: CartEmbedded;
 
-	firstName!: string | null;
-	lastName!: string | null;
-	email!: string | null;
+	@Column(() => PersonalInfoEmbedded, { prefix: false })
+	personalInfo!: PersonalInfoEmbedded;
 
-	gatewayMethod!: StoreProps.GatewayMethodsEnum | null;
-	cartCreatedAt!: Date | null 
-
-	constructor(props: DiscordUserEntity.Props) {
-		Object.assign(this, props);
+	constructor() {
+		super();
 	}
 
-	static createFromDatabase(row: DiscordUserEntity.Props): DiscordUserEntity {
-		return new DiscordUserEntity({
-			id: row.id,
-			cartChannelId: row.cartChannelId,
-			cartMessageId: row.cartMessageId,
-			cartItems: row.cartItems || [],
-			couponCode: row.couponCode || null,
-			subTotalPrice: row.subTotalPrice || 0,
-			totalPrice: row.totalPrice || 0,
-			firstName: row.firstName || null,
-			lastName: row.lastName || null,
-			email: row.email || null,
-			gatewayMethod: row.gatewayMethod || null,
-			cartCreatedAt: row.cartCreatedAt || null,
-		});
-	}
-
-	static create(props: DiscordUserEntity.Input) {
+	static createUser(props: DiscordUserEntity.Input) {
 		const defaultProps: DiscordUserEntity.Props = {
 			...props,
-			cartChannelId: null,
-			cartMessageId: null,
-			cartItems: [],
-			couponCode: null,
-			subTotalPrice: 0,
-			totalPrice: 0,
-			firstName: null,
-			lastName: null,
-			email: null,
-			gatewayMethod: null,
-			cartCreatedAt: null,
+			cart: CartEmbedded.createDefault(),
+			personalInfo: PersonalInfoEmbedded.createDefault(),
 		};
-		return new DiscordUserEntity(defaultProps);
+		const entity = new DiscordUserEntity();
+		Object.assign(entity, defaultProps);
+		entity.afterLoad();
 	}
 
-	addToCart(item: DiscordUserEntity.CartItem) {
-		const existingItemIndex = this.cartItems.findIndex(
-			(cartItem) => cartItem.productId === item.productId && cartItem.productItemId === item.productItemId,
-		);
-		if (existingItemIndex === -1) {
-			this.cartItems.push(item);
-		}
-	}
-
-	removeFromCart({ productId, productItemId }: { productId: string; productItemId: string }) {
-		this.cartItems = this.cartItems.filter(
-			(cartItem) => !(cartItem.productId === productId && cartItem.productItemId === productItemId),
-		);
-	}
-
-	cancelOrder() {
-		this.cartItems = [];
-		this.cartChannelId = null;
-		this.cartMessageId = null;
-		this.couponCode = null;
-		this.subTotalPrice = 0;
-		this.totalPrice = 0;
-		this.cartCreatedAt = null;
-	}
-
-	clearOrderData() {
-		this.cartItems = [];
-		this.cartChannelId = null;
-		this.cartMessageId = null;
-		this.couponCode = null;
-		this.subTotalPrice = 0;
-		this.totalPrice = 0;
-		this.cartCreatedAt = null;
+	@AfterLoad()
+	private afterLoad() {
+		this.cart.discordUser = this;
+		this.personalInfo.discordUser = this;
 	}
 }
 
 export namespace DiscordUserEntity {
-	export type CartItem = {
-		productId: string;
-		productItemId: string;
-		quantity: number;
-	};
-
 	export type Input = {
 		id: string;
 	};
 
 	export type Props = {
 		id: string;
-		cartChannelId: string | null;
-		cartMessageId: string | null;
-		cartItems: CartItem[];
-
-		couponCode: string | null;
-		subTotalPrice: number;
-		totalPrice: number;
-
-		firstName: string | null;
-		lastName: string | null;
-		email: string | null;
-
-		gatewayMethod: StoreProps.GatewayMethodsEnum | null;
-		cartCreatedAt: Date | null;
+		cart: CartEmbedded;
+		personalInfo: PersonalInfoEmbedded;
 	};
 }

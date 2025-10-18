@@ -1,5 +1,4 @@
-import { ExternalEventsEntity } from "@/@shared/db/entities";
-import { getProductRepository } from "@/@shared/db/repositories";
+import { ExternalEventsEntity, ProductEntity } from "@/@shared/db/entities";
 import { ProductProps } from "@/@shared/sharpify/api";
 import { ProductCardComponent } from "@/bot/checkout/components";
 import { Inject, Injectable } from "@nestjs/common";
@@ -14,11 +13,9 @@ export class HandleProductEvent {
 	) {}
 
 	async create(externalEventEntity: ExternalEventsEntity) {
-		const productRepository = await getProductRepository();
-		
 		const payloadProduct: ProductProps = externalEventEntity.payload as ProductProps;
-		
-		const productEntity = await productRepository.findById(externalEventEntity.contextAggregateId);
+
+		const productEntity = await ProductEntity.findOneBy({ id: externalEventEntity.contextAggregateId });
 		if (!productEntity) return;
 
 		if (externalEventEntity.eventName === "PRODUCT_DELETED") {
@@ -28,11 +25,11 @@ export class HandleProductEvent {
 				if (!channel || !channel.isTextBased()) continue;
 				const message = await channel.messages.fetch(channelLiked.messageId).catch(() => null);
 				if (!message) continue;
-				
+
 				await message.delete();
 			}
 
-			await productRepository.delete(productEntity.id);
+			await productEntity.remove();
 		} else if (externalEventEntity.eventName === "PRODUCT_UPDATED") {
 			for (const channelLiked of productEntity.channelsLinked) {
 				const channel = (await this.client.channels.fetch(channelLiked.channelId).catch(() => null)) as TextChannel;
@@ -48,8 +45,7 @@ export class HandleProductEvent {
 					components: [reply.normalPurchaseButton],
 				});
 			}
-			productEntity.productProps = payloadProduct;
-			await productRepository.update(productEntity);
+			await productEntity.updateProps(payloadProduct);
 		}
 	}
 }

@@ -32,8 +32,9 @@ export async function ValidateDatabaseCartItemsHelper({ discordUserId }: { disco
 				? product.productProps.normalItem
 				: product.productProps.dynamicItems.find((v) => v.id === cartItem.productItemId);
 
-		if (!productItem) {
-			// Product item no longer exists, remove from cart
+				if (!productItem) {
+					// Product item no longer exists, remove from cart
+					console.log("🚀 ~ ValidateDatabaseCartItemsHelper ~ productItem:", productItem)
 			user.cart.removeFromCart({ productId: cartItem.productId, productItemId: cartItem.productItemId });
 			continue;
 		}

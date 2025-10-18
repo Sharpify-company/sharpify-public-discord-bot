@@ -70,8 +70,6 @@ export class AddToCartUsecase {
 		}
 
 		user.cart.channelId = channel.id;
-		if (user.cart.cartItems.length === 1) user.cart.cartCreatedAt = new Date();
-
 		await user.save();
 
 		await ValidateDatabaseCartItemsHelper({ discordUserId: user.id });

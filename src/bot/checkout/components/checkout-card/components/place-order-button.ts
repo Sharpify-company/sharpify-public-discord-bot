@@ -81,7 +81,7 @@ export class PlaceOrderButtonComponent {
 			email,
 		});
 
-		interaction.deferUpdate();
+		await interaction.deferReply({ ephemeral: true });
 
 		const placeOrderResult = await Sharpify.api.v1.checkout.order.placeOrder({
 			storeId: dotEnv.STORE_ID,
@@ -118,7 +118,10 @@ export class PlaceOrderButtonComponent {
 		await orderEntity.save();
 
 		if (placeOrderResult.data.isApproved) {
-			interaction.deferUpdate();
+			interaction.reply({
+				content: `Pagamento aprovado! Seu pedido #${orderEntity.id} foi confirmado com sucesso.`,
+				flags: ["Ephemeral"],
+			});
 			return await this.handleOrderApprovedUsecase.execute({
 				orderId: orderEntity.id,
 			});
@@ -130,6 +133,10 @@ export class PlaceOrderButtonComponent {
 			orderEntity,
 		});
 		await interaction.message?.edit(result as any);
+		await interaction.followUp({
+			content: `✅ pagamento criado com sucesso! .`,
+			flags: ["Ephemeral"],
+		});
 	}
 
 	@Button("place_order")
@@ -142,29 +149,29 @@ export class PlaceOrderButtonComponent {
 		const firstNameInput = new TextInputBuilder()
 			.setCustomId("firstNameInput")
 			.setLabel(`Nome`)
-			.setValue(discordUser.personalInfo.firstName ?? "")
 			.setStyle(TextInputStyle.Short)
 			.setMinLength(1)
 			.setMaxLength(40)
 			.setRequired(true);
+		if (discordUser.personalInfo.firstName) firstNameInput.setValue(discordUser.personalInfo.firstName);
 
 		const lastNameInput = new TextInputBuilder()
 			.setCustomId("lastNameInput")
 			.setLabel(`Ultimo nome`)
-			.setValue(discordUser.personalInfo.lastName ?? "")
 			.setStyle(TextInputStyle.Short)
 			.setMinLength(1)
 			.setMaxLength(40)
 			.setRequired(true);
+		if (discordUser.personalInfo.lastName) lastNameInput.setValue(discordUser.personalInfo.lastName);
 
 		const emailInput = new TextInputBuilder()
 			.setCustomId("emailInput")
 			.setLabel(`Email`)
-			.setValue(discordUser.personalInfo.email ?? "")
 			.setStyle(TextInputStyle.Short)
 			.setMinLength(1)
 			.setMaxLength(150)
 			.setRequired(true);
+		if (discordUser.personalInfo.email) emailInput.setValue(discordUser.personalInfo.email);
 
 		modal.setComponents(
 			new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents([firstNameInput]),

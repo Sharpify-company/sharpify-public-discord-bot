@@ -41,7 +41,7 @@ import { ValidateDatabaseCartItemsHelper } from "../../../helpers";
 import { formatCheckoutCartItemNameHelper, getCheckoutCartItemsHelper } from "../helper";
 import { SectionManagerHandler } from "../section-manager";
 import { WrapperType } from "@/@shared/types";
-import { RemoveFromCartUsecase } from "../usecases";
+import { HandleOrderCancelledUsecase, RemoveFromCartUsecase } from "../usecases";
 import { HandleDiscordMemberNotFound } from "@/@shared/handlers";
 import { FindEmojiHelper } from "@/@shared/helpers";
 
@@ -51,6 +51,7 @@ export class CancelOrderButtonComponent {
 		@Inject(Client) private readonly client: Client,
 		@Inject(forwardRef(() => SectionManagerHandler))
 		private readonly sectionManagerHandler: WrapperType<SectionManagerHandler>,
+		private readonly HandleOrderCancelledUsecase: HandleOrderCancelledUsecase,
 	) {}
 
 	@Button("cancel_order")
@@ -60,7 +61,7 @@ export class CancelOrderButtonComponent {
 		const discordUser = await DiscordUserEntity.findOneBy({ id: interaction.user.id });
 		if (!discordUser) return await HandleDiscordMemberNotFound({ interaction });
 
-		await discordUser.cart.cancelOrder();
+		await this.HandleOrderCancelledUsecase.execute({ discordUserId: discordUser.id });
 
 		await interaction.editReply({
 			content: "✅ | Seu pedido foi cancelado com sucesso.",

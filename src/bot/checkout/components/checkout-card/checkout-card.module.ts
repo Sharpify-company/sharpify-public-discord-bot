@@ -11,7 +11,7 @@ import { CancelOrderButtonComponent } from "./components/cancell-order-button";
 import { ApplyCouponButtonComponent } from "./components/apply-coupon-button";
 import { PlaceOrderButtonComponent } from "./components/place-order-button";
 import { SelectPaymentMethodComponent } from "./components/select-payment-method";
-import { HandleOrderApprovedUsecase } from "./usecases";
+import { HandleOrderApprovedUsecase, HandleOrderCancelledUsecase } from "./usecases";
 import { ViewOnWebsiteButtonComponent } from "./components/view-on-website";
 import { OpenDmTutorialButtonComponent } from "./components/open-dm-tutorial-button";
 
@@ -33,9 +33,10 @@ import { OpenDmTutorialButtonComponent } from "./components/open-dm-tutorial-but
 		PlaceOrderButtonComponent,
 		SelectPaymentMethodComponent,
 		HandleOrderApprovedUsecase,
+		HandleOrderCancelledUsecase,
 		ViewOnWebsiteButtonComponent,
 		OpenDmTutorialButtonComponent
 	],
-	exports: [CheckoutCardComponent, CartEmmbedComponent, SectionManagerHandler, HandleOrderApprovedUsecase],
+	exports: [CheckoutCardComponent, CartEmmbedComponent, SectionManagerHandler, HandleOrderApprovedUsecase, HandleOrderCancelledUsecase],
 })
 export class CheckoutCardModule {}

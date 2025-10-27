@@ -30,6 +30,7 @@ export namespace EmojiEntity {
 		Sharpify_money: "Sharpify_money",
 		Sharpify_carrinho: "Sharpify_carrinho",
 		Sharpify_carregando: "Sharpify_carregando",
+		Sharpify_efibank: "Sharpify_efibank",
 	} as const;
 	export type EmojiNameEnum = keyof typeof EmojiNameEnum;
 

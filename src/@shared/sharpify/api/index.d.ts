@@ -77,6 +77,7 @@ declare namespace StoreProps {
     }
     const GatewayMethodsEnum: {
         readonly PIX: "PIX";
+        readonly EFI_PAY_PREFERENCE: "EFI_PAY_PREFERENCE";
     };
     type GatewayMethodsEnum = keyof typeof GatewayMethodsEnum;
     const FeeTypeEnum: {
@@ -232,6 +233,7 @@ type OrderProps = {
         id: string;
         amount: number;
         gateway: {
+            gatewayMethod: StoreProps.GatewayMethodsEnum;
             expirationDate: Date | null;
             data: {
                 hasQrCode: boolean;

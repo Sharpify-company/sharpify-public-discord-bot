@@ -440,7 +440,8 @@ var Sharpify = class {
     };
   })(StoreProps2.Affiliate || (StoreProps2.Affiliate = {}));
   StoreProps2.GatewayMethodsEnum = {
-    PIX: "PIX"
+    PIX: "PIX",
+    EFI_PAY_PREFERENCE: "EFI_PAY_PREFERENCE"
   };
   StoreProps2.FeeTypeEnum = {
     FIXED: "FIXED",

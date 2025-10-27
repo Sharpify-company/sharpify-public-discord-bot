@@ -3,6 +3,8 @@ import { Modal, Context, SlashCommand, SlashCommandContext, Ctx, ModalContext } 
 import {
 	ActionRowBuilder,
 	AttachmentBuilder,
+	ButtonBuilder,
+	ButtonStyle,
 	CacheType,
 	ChatInputCommandInteraction,
 	Client,
@@ -33,6 +35,7 @@ import { PlaceOrderButtonComponent } from "./components/place-order-button";
 import { SelectPaymentMethodComponent } from "./components/select-payment-method";
 import { ViewOnWebsiteButtonComponent } from "./components/view-on-website";
 import { OpenDmTutorialButtonComponent } from "./components/open-dm-tutorial-button";
+import { FindEmojiHelper } from "@/@shared/helpers";
 
 type SetSectionProps = {
 	discordUserId: string;
@@ -65,7 +68,7 @@ export class SectionManagerHandler {
 		private readonly placeOrderButtonComponent: PlaceOrderButtonComponent,
 		private readonly selectPaymentMethodComponent: SelectPaymentMethodComponent,
 		private readonly viewOnWebsiteButtonComponent: ViewOnWebsiteButtonComponent,
-		private readonly openDmTutorialButtonComponent: OpenDmTutorialButtonComponent
+		private readonly openDmTutorialButtonComponent: OpenDmTutorialButtonComponent,
 	) {}
 
 	async setSection({ discordUserId, ...props }: SetSectionProps): Promise<string | MessagePayload | MessageCreateOptions> {
@@ -139,33 +142,46 @@ export class SectionManagerHandler {
 		});
 		const { OpenDmTutorialButton } = await this.openDmTutorialButtonComponent.createButton();
 
-		// 		:Zennify_confirm: Pedido gerado com sucesso!
+		if (props.orderEntity.orderProps.payment.gateway.data.hasQrCode) {
+			const qrCode = props.orderEntity.orderProps.payment.gateway.data.qrCode;
 
-		// :Zennify_pepe_money_animated: | Agora, basta fazer o pagamento no valor de R$ 3,00
-		// :Zennify_money: | Você pode pagar com PIX via :Zennify_qrcode: QR Code ou :Zennify_method_pix: copia e cola
-		// :Zennify_clock: | Fique atento, esse pedido expirará in 8 minutes!
-		// :Zennify_green_ball: | Lembre-se de abrir a sua DM pra poder receber o seu produto!
+			const base64Data = qrCode.replace(/^data:image\/png;base64,/, "");
+			const attachment = new AttachmentBuilder(Buffer.from(base64Data, "base64"), { name: "qrcode.png" });
+			const qrUrl = `attachment://qrcode.png`;
 
-		const qrCode = props.orderEntity.orderProps.payment.gateway.data.qrCode;
+			const Pixemmbed = new EmbedBuilder()
+				.setColor(BotConfig.color)
+				.setTitle(`Pagamento via Pix`)
+				.setDescription(`Para pagar via Pix, utilize o código abaixo no seu aplicativo bancário:`)
+				.addFields({
+					name: "🔑 **Código copia e cola**",
+					value: `\`\`\`${props.orderEntity.orderProps.payment.gateway.data.code}\`\`\``,
+				})
+				.setImage(qrUrl);
 
-		const base64Data = qrCode.replace(/^data:image\/png;base64,/, "");
-		const attachment = new AttachmentBuilder(Buffer.from(base64Data, "base64"), { name: "qrcode.png" });
-		const qrUrl = `attachment://qrcode.png`;
+			return {
+				embeds: [steps, Pixemmbed],
+				components: [{ type: 1, components: [ViewOnWebsiteButton, OpenDmTutorialButton, CancelCartButton] }],
+				files: [attachment],
+			};
+		}
 
-		const Pixemmbed = new EmbedBuilder()
+		const cartEmoji = await FindEmojiHelper({ client: this.client, name: "Sharpify_carrinho" });
+
+		const PayButton = new ButtonBuilder()
+			.setLabel("Pagar agora")
+			.setStyle(ButtonStyle.Link)
+			.setURL(props.orderEntity.orderProps.payment.gateway.data.paymentLink)
+			.setEmoji({ id: cartEmoji?.id });
+		const ExternalLinkEmmbed = new EmbedBuilder()
 			.setColor(BotConfig.color)
-			.setTitle(`Pagamento via Pix`)
-			.setDescription(`Para pagar via Pix, utilize o código abaixo no seu aplicativo bancário:`)
-			.addFields({
-				name: "🔑 **Código copia e cola**",
-				value: `\`\`\`${props.orderEntity.orderProps.payment.gateway.data.code}\`\`\``,
-			})
-			.setImage(qrUrl);
+			.setTitle(`Pagamento via pagamento externo`)
+			.setDescription(`Accesse o link externo para pagar:`);
 
 		return {
-			embeds: [steps, Pixemmbed],
-			components: [{ type: 1, components: [ViewOnWebsiteButton, OpenDmTutorialButton, CancelCartButton] }],
-			files: [attachment],
+			embeds: [steps, ExternalLinkEmmbed],
+			components: [{ type: 1, components: [ViewOnWebsiteButton, PayButton, OpenDmTutorialButton, CancelCartButton] }],
+			files: [],
 		};
 	}
 }

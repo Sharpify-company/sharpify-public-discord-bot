@@ -73,7 +73,7 @@ export class SelectPaymentMethodComponent {
 			discordUser.cart.gatewayMethod = defaultGatewayMethod;
 			discordUser.save();
 		}
-		
+
 		const options = await Promise.all(
 			storeConfig.paymentGateways.map(async (item, index) => {
 				const result: any = {
@@ -85,6 +85,8 @@ export class SelectPaymentMethodComponent {
 				if (item.gatewayMethod === "PIX") {
 					const pixEmoji = await FindEmojiHelper({ client: this.client, name: "Sharpify_pix" });
 					result.emoji = { id: pixEmoji?.id };
+					result.label = "Método de pagamento PIX";
+					result.description = `Pague via PIX utilizando nosso gerenciador de pagamentos.`;
 				} else if (item.gatewayMethod === "EFI_PAY_PREFERENCE") {
 					const efiEmoji = await FindEmojiHelper({ client: this.client, name: "Sharpify_efibank" });
 					result.emoji = { id: efiEmoji?.id };

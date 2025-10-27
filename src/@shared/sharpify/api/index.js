@@ -175,6 +175,20 @@ var Product = class {
       data: req.value.data
     };
   }
+  async decreseStock(input) {
+    const req = await this.options.requestHelper.execute("/catalog/product/decrease-stock", {
+      method: "POST",
+      body: input
+    });
+    if (req.isFailure()) return {
+      success: false,
+      errorName: req.value.errorName
+    };
+    return {
+      success: true,
+      data: req.value.data
+    };
+  }
 };
 
 // src/api/public-api/api/v1/catalog/index.ts

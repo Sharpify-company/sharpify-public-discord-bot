@@ -373,6 +373,7 @@ declare class Product {
         limit: number;
         page: number;
         title?: string;
+        productItemTitle?: string;
     }): Promise<ActionsOutput<{
         products: ProductProps[];
         lastPage: number;
@@ -381,6 +382,14 @@ declare class Product {
         id: string;
     }): Promise<ActionsOutput<{
         product: ProductProps;
+    }>>;
+    decreseStock(input: {
+        productId: string;
+        productItemId: string;
+        quantity: number;
+    }): Promise<ActionsOutput<{
+        stock: string;
+        type: ProductProps.StockType;
     }>>;
 }
 

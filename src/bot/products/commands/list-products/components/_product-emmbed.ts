@@ -39,7 +39,11 @@ export class ProductEmmbed {
 					inline: true,
 				},
 			)
-			.setDescription(product.info.discordDescription || "Sem descrição")
+			.setDescription(
+				product.info.discordDescription ||
+					new TurndownService().turndown(product.info.description || "") ||
+					"Sem descrição",
+			)
 			.setImage(product.info.mainImage || "");
 	}
 }

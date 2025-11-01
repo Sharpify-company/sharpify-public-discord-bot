@@ -26,7 +26,11 @@ export class ProductCardComponent {
 		const emmbed = new EmbedBuilder()
 			.setColor(BotConfig.color)
 			.setTitle("Sistema de compra")
-			.setDescription(product.info.discordDescription || "Sem descrição")
+			.setDescription(
+				product.info.discordDescription ||
+					new TurndownService().turndown(product.info.description || "") ||
+					"Sem descrição",
+			)
 			.setImage(product.info.mainImage || "");
 
 		if (product.settings.viewType === "NORMAL") {
@@ -46,7 +50,7 @@ export class ProductCardComponent {
 					inline: true,
 				},
 			);
-		} 
+		}
 		return emmbed;
 	}
 

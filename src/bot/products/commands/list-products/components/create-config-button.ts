@@ -77,6 +77,8 @@ export class CreateConfigButtonComponent {
 		const discordUser = await DiscordUserEntity.findOneBy({ id: interaction.user.id });
 		if (!discordUser) return await HandleDiscordMemberNotFound({ interaction });
 
+		const Config = MemoryCreateConfig.get(productId);
+
 		const modal = new ModalBuilder()
 			.setCustomId(`config_product_creation_modal${productId}`)
 			.setTitle(`Configurar criação do produto`);
@@ -88,7 +90,7 @@ export class CreateConfigButtonComponent {
 			.setMinLength(1)
 			.setMaxLength(40)
 			.setRequired(true);
-		if (badgeColor) badgeColor.setValue(dotEnv.DEFAULT_COLOR || "#338bff");
+		badgeColor.setValue(Config?.color || dotEnv.DEFAULT_COLOR || "#338bff");
 
 		modal.setComponents(new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents([badgeColor]));
 

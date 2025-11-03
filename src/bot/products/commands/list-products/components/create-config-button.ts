@@ -74,8 +74,6 @@ export class CreateConfigButtonComponent {
 		@Context() [interaction]: [ButtonInteraction],
 		@ComponentParam("productId") productId: string,
 	) {
-		const discordUser = await DiscordUserEntity.findOneBy({ id: interaction.user.id });
-		if (!discordUser) return await HandleDiscordMemberNotFound({ interaction });
 
 		const Config = MemoryCreateConfig.get(productId);
 

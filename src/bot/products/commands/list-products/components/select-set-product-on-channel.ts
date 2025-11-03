@@ -81,6 +81,8 @@ export class SelectSetProductOnChannel {
 			product: product.data.product,
 		});
 
+		MemoryCreateConfig.clear()
+
 		await productEntity.setChannelLinked({ channelId: channel.id, messageId: reply.id });
 
 		interaction.reply({

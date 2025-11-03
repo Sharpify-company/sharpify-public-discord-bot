@@ -89,6 +89,11 @@ export class CartEmbedded {
 		await this.discordUser.save();
 	}
 
+	async updateGatewayMethod(gatewayMethod: StoreProps.GatewayMethodsEnum) {
+		this.gatewayMethod = gatewayMethod;
+		await this.discordUser.save();
+	}
+
 	@AfterLoad()
 	private afterLoad() {
 		this.isOpened = Boolean(this.isOpened);

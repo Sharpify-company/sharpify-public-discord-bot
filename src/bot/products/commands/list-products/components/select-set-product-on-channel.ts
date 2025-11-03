@@ -35,6 +35,7 @@ import TurndownService from "turndown";
 import { ProductCardComponent } from "@/bot/checkout/components";
 import { Sharpify } from "@/@shared/sharpify";
 import { OrderEntity, ProductEntity } from "@/@shared/db/entities";
+import { MemoryCreateConfig } from "../memory-create-config";
 
 @Injectable()
 export class SelectSetProductOnChannel {

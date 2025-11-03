@@ -70,8 +70,7 @@ export class SelectPaymentMethodComponent {
 		const defaultGatewayMethod = discordUser?.cart.gatewayMethod || storeConfig.paymentGateways.at(0)?.gatewayMethod || null;
 
 		if (discordUser && defaultGatewayMethod) {
-			discordUser.cart.gatewayMethod = defaultGatewayMethod;
-			discordUser.save();
+			await discordUser?.cart.updateGatewayMethod(defaultGatewayMethod);
 		}
 
 		const options = await Promise.all(

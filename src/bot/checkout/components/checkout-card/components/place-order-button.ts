@@ -82,7 +82,6 @@ export class PlaceOrderButtonComponent {
 			email,
 		});
 
-		
 		const loadinEmoji = await FindEmojiHelper({ client: this.client, name: "Sharpify_carregando" });
 		await interaction.message?.edit({
 			embeds: [new EmbedBuilder().setDescription(`${loadinEmoji} Processando seu pedido...`).setColor(BotConfig.color)],
@@ -159,6 +158,9 @@ export class PlaceOrderButtonComponent {
 
 		const modal = new ModalBuilder().setCustomId(`place_order_modal`).setTitle(`Informações do pagador`);
 
+		const defaultFirstName = discordUser.personalInfo.firstName || interaction.user?.displayName?.split(" ")?.at(0)
+		const defaultLastName = discordUser.personalInfo.lastName || interaction.user?.username
+
 		const firstNameInput = new TextInputBuilder()
 			.setCustomId("firstNameInput")
 			.setLabel(`Nome`)
@@ -166,7 +168,7 @@ export class PlaceOrderButtonComponent {
 			.setMinLength(1)
 			.setMaxLength(40)
 			.setRequired(true);
-		if (discordUser.personalInfo.firstName) firstNameInput.setValue(discordUser.personalInfo.firstName);
+		if (defaultFirstName) firstNameInput.setValue(defaultFirstName);
 
 		const lastNameInput = new TextInputBuilder()
 			.setCustomId("lastNameInput")
@@ -175,7 +177,7 @@ export class PlaceOrderButtonComponent {
 			.setMinLength(1)
 			.setMaxLength(40)
 			.setRequired(true);
-		if (discordUser.personalInfo.lastName) lastNameInput.setValue(discordUser.personalInfo.lastName);
+		if (defaultLastName) lastNameInput.setValue(defaultLastName);
 
 		const emailInput = new TextInputBuilder()
 			.setCustomId("emailInput")

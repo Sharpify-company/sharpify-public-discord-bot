@@ -17,14 +17,16 @@ import { ProductProps } from "@/@shared/sharpify/api";
 import { formatPrice } from "@/@shared/lib";
 import TurndownService from "turndown";
 import { AddToCartButtonComponent } from "./components/add-to-cart-button";
+import { MemoryCreateConfig } from "@/bot/products/commands/list-products/memory-create-config";
 
 @Injectable()
 export class ProductCardComponent {
 	constructor(private readonly addToCartButtonComponent: AddToCartButtonComponent) {}
 
 	private getProductEmbed(product: ProductProps) {
+
 		const emmbed = new EmbedBuilder()
-			.setColor(BotConfig.color)
+			.setColor(MemoryCreateConfig.get(product.id)?.color || BotConfig.color)
 			.setTitle("Sistema de compra")
 			.setDescription(
 				product.info.discordDescription ||

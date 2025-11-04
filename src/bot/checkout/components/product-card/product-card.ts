@@ -33,7 +33,7 @@ export class ProductCardComponent {
 					new TurndownService().turndown(product.info.description || "") ||
 					"Sem descrição",
 			)
-			.setImage(product.info.mainImage || "");
+			.setImage(product.info.discordMainImage || product.info.mainImage || "");
 
 		if (product.settings.viewType === "NORMAL") {
 			emmbed.addFields(

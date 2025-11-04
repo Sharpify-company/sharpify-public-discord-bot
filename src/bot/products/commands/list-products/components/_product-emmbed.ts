@@ -44,6 +44,6 @@ export class ProductEmmbed {
 					new TurndownService().turndown(product.info.description || "") ||
 					"Sem descrição",
 			)
-			.setImage(product.info.mainImage || "");
+			.setImage(product.info.discordMainImage || product.info.mainImage || "");
 	}
 }

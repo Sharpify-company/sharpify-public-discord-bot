@@ -168,6 +168,7 @@ type ProductProps = {
     };
     info: {
         mainImage?: string;
+        discordMainImage?: string;
         images: string[];
         title: string;
         description?: string;

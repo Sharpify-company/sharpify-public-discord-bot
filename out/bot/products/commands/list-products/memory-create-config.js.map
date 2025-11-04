@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../../../../src/bot/products/commands/list-products/memory-create-config.ts"],"sourcesContent":["type Props = {\r\n\tcolor?: string;\r\n};\r\n\r\nexport const MemoryCreateConfig = new Map<string, Props>();\r\n"],"names":["MemoryCreateConfig","Map"],"mappings":";;;;+BAIaA;;;eAAAA;;;AAAN,MAAMA,qBAAqB,IAAIC"}

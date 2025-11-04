@@ -1,0 +1,463 @@
+"use strict";
+var _class, _class1, _class2, _class3, _class4, _class5, _class6, _class7, _class8, _class9, _class10, _class11, _class12, _class13, _class14, _class15;
+var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __name = (target, value)=>__defProp(target, "name", {
+        value,
+        configurable: true
+    });
+var __export = (target, all)=>{
+    for(var name in all)__defProp(target, name, {
+        get: all[name],
+        enumerable: true
+    });
+};
+var __copyProps = (to, from, except, desc)=>{
+    if (from && typeof from === "object" || typeof from === "function") {
+        for (let key of __getOwnPropNames(from))if (!__hasOwnProp.call(to, key) && key !== except) __defProp(to, key, {
+            get: ()=>from[key],
+            enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable
+        });
+    }
+    return to;
+};
+var __toCommonJS = (mod)=>__copyProps(__defProp({}, "__esModule", {
+        value: true
+    }), mod);
+// src/api/public-api/index.ts
+var index_exports = {};
+__export(index_exports, {
+    CategoryProps: ()=>CategoryProps,
+    CouponProps: ()=>CouponProps,
+    CustomFieldsProps: ()=>CustomFieldsProps,
+    ExternalEventsProps: ()=>ExternalEventsProps,
+    OrderProps: ()=>OrderProps,
+    ProductProps: ()=>ProductProps,
+    StoreProps: ()=>StoreProps,
+    default: ()=>index_default
+});
+module.exports = __toCommonJS(index_exports);
+// src/api/public-api/@shared/lib/either.ts
+var Failure = (_class = class {
+    isFailure() {
+        return true;
+    }
+    isSuccess() {
+        return false;
+    }
+    constructor(value){
+        this.value = value;
+    }
+}, __name(_class, "Failure"), _class);
+var Success = (_class1 = class {
+    isFailure() {
+        return false;
+    }
+    isSuccess() {
+        return true;
+    }
+    constructor(value){
+        this.value = value;
+    }
+}, __name(_class1, "Success"), _class1);
+var failure = /* @__PURE__ */ __name((f)=>{
+    return new Failure(f);
+}, "failure");
+var success = /* @__PURE__ */ __name((s)=>{
+    return new Success(s);
+}, "success");
+// src/api/public-api/@shared/helpers/request-helper.ts
+var RequestHelper = (_class2 = class {
+    async execute(url, props = {
+        method: "GET"
+    }) {
+        const baseURL = new URL(url, this.options.baseURL);
+        const headers = {
+            "api-token": this.options.apiToken,
+            "Content-Type": "application/json"
+        };
+        if (!props.query) props.query = {
+            ...props.query || {}
+        };
+        props.query.storeId = this.options.storeId;
+        if (props.query) {
+            for (const [key, value] of Object.entries(props.query).filter((q)=>q[1] !== void 0)){
+                baseURL.searchParams.append(key, value);
+            }
+        }
+        try {
+            const req = await fetch(baseURL, {
+                body: props.body ? JSON.stringify(props.body) : void 0,
+                method: props.method,
+                headers,
+                credentials: "include"
+            });
+            const data = await req.json().catch(()=>{
+                return {};
+            });
+            if (!req.ok) {
+                if (data.error) return failure({
+                    errorName: data.error.name,
+                    isDefaultError: true,
+                    status: req.status,
+                    additional: data.error
+                });
+                return failure({
+                    errorName: "UnknowError",
+                    status: req.status,
+                    isDefaultError: false
+                });
+            }
+            let headersObject = {};
+            req.headers?.forEach((value, key)=>{
+                headersObject[key] = value;
+            });
+            return success({
+                data,
+                status: req.status,
+                headers: headersObject
+            });
+        } catch (error) {
+            return failure({
+                errorName: "NetworkError",
+                status: 400,
+                isDefaultError: false
+            });
+        }
+    }
+    constructor(options){
+        this.options = options;
+    }
+}, __name(_class2, "RequestHelper"), _class2);
+// src/api/public-api/api/v1/catalog/product.ts
+var Product = (_class3 = class {
+    async list(input) {
+        const req = await this.options.requestHelper.execute("/api/v1/catalog/product/list-products", {
+            method: "GET",
+            query: input
+        });
+        if (req.isFailure()) return {
+            success: false,
+            errorName: req.value.errorName
+        };
+        return {
+            success: true,
+            data: req.value.data
+        };
+    }
+    async get(input) {
+        const req = await this.options.requestHelper.execute("/api/v1/catalog/product/get-product", {
+            method: "GET",
+            query: input
+        });
+        if (req.isFailure()) return {
+            success: false,
+            errorName: req.value.errorName
+        };
+        return {
+            success: true,
+            data: req.value.data
+        };
+    }
+    async decreseStock(input) {
+        const req = await this.options.requestHelper.execute("/catalog/product/decrease-stock", {
+            method: "POST",
+            body: input
+        });
+        if (req.isFailure()) return {
+            success: false,
+            errorName: req.value.errorName
+        };
+        return {
+            success: true,
+            data: req.value.data
+        };
+    }
+    constructor(options){
+        this.options = options;
+    }
+}, __name(_class3, "Product"), _class3);
+// src/api/public-api/api/v1/catalog/index.ts
+var Catalog = (_class4 = class {
+    constructor(options){
+        this.options = options;
+        this.product = new Product(options);
+    }
+}, __name(_class4, "Catalog"), _class4);
+// src/api/public-api/api/v1/commom-services/external-events.ts
+var ExternalEvents = (_class5 = class {
+    async listPendingEvents() {
+        const req = await this.options.requestHelper.execute("/commom-services/external-integration-events/list-all-pending-events", {
+            method: "GET"
+        });
+        if (req.isFailure()) return {
+            success: false,
+            errorName: req.value.errorName
+        };
+        return {
+            success: true,
+            data: req.value.data
+        };
+    }
+    async markAsReceived(input) {
+        const req = await this.options.requestHelper.execute("/commom-services/external-integration-events/mark-as-received", {
+            method: "POST",
+            body: input
+        });
+        if (req.isFailure()) return {
+            success: false,
+            errorName: req.value.errorName
+        };
+        return {
+            success: true,
+            data: req.value.data
+        };
+    }
+    constructor(options){
+        this.options = options;
+    }
+}, __name(_class5, "ExternalEvents"), _class5);
+// src/api/public-api/api/v1/commom-services/index.ts
+var CommomServices = (_class6 = class {
+    constructor(options){
+        this.options = options;
+        this.externalEvents = new ExternalEvents(options);
+    }
+}, __name(_class6, "CommomServices"), _class6);
+// src/api/public-api/api/v1/pricing/coupon.ts
+var Coupon = (_class7 = class {
+    async validateCoupon(input) {
+        const req = await this.options.requestHelper.execute("/api/v1/pricing/coupon/validate-coupon", {
+            method: "POST",
+            body: {
+                ...input,
+                storeId: this.options.storeId
+            }
+        });
+        if (req.isFailure()) return {
+            success: false,
+            errorName: req.value.errorName
+        };
+        return {
+            success: true,
+            data: req.value.data
+        };
+    }
+    constructor(options){
+        this.options = options;
+    }
+}, __name(_class7, "Coupon"), _class7);
+// src/api/public-api/api/v1/pricing/index.ts
+var Pricing = (_class8 = class {
+    constructor(options){
+        this.options = options;
+        this.coupon = new Coupon(options);
+    }
+}, __name(_class8, "Pricing"), _class8);
+// src/api/public-api/api/v1/management/store.ts
+var Store = (_class9 = class {
+    async getStore() {
+        const req = await this.options.requestHelper.execute("/management/store/get-template-store", {
+            method: "GET"
+        });
+        if (req.isFailure()) return {
+            success: false,
+            errorName: req.value.errorName
+        };
+        return {
+            success: true,
+            data: req.value.data
+        };
+    }
+    constructor(options){
+        this.options = options;
+    }
+}, __name(_class9, "Store"), _class9);
+// src/api/public-api/api/v1/management/index.ts
+var Management = (_class10 = class {
+    constructor(options){
+        this.options = options;
+        this.store = new Store(options);
+    }
+}, __name(_class10, "Management"), _class10);
+// src/api/public-api/api/v1/checkout/order.ts
+var Order = (_class11 = class {
+    async placeOrder(input) {
+        const req = await this.options.requestHelper.execute("/checkout/order/place-order", {
+            method: "POST",
+            body: {
+                ...input,
+                storeId: this.options.storeId
+            }
+        });
+        if (req.isFailure()) return {
+            success: false,
+            errorName: req.value.errorName
+        };
+        return {
+            success: true,
+            data: req.value.data
+        };
+    }
+    async getOrder(input) {
+        const req = await this.options.requestHelper.execute("/api/v1/checkout/order/get-order", {
+            method: "GET",
+            query: input
+        });
+        if (req.isFailure()) return {
+            success: false,
+            errorName: req.value.errorName
+        };
+        return {
+            success: true,
+            data: req.value.data
+        };
+    }
+    constructor(options){
+        this.options = options;
+    }
+}, __name(_class11, "Order"), _class11);
+// src/api/public-api/api/v1/checkout/index.ts
+var Checkout = (_class12 = class {
+    constructor(options){
+        this.options = options;
+        this.order = new Order(options);
+    }
+}, __name(_class12, "Checkout"), _class12);
+// src/api/public-api/api/v1/index.ts
+var ApiV1 = (_class13 = class {
+    constructor(options){
+        this.options = options;
+        this.catalog = new Catalog(options);
+        this.commomServices = new CommomServices(options);
+        this.pricing = new Pricing(options);
+        this.management = new Management(options);
+        this.checkout = new Checkout(options);
+    }
+}, __name(_class13, "ApiV1"), _class13);
+// src/api/public-api/api/index.ts
+var Api = (_class14 = class {
+    constructor(options){
+        this.options = options;
+        this.v1 = new ApiV1(options);
+    }
+}, __name(_class14, "Api"), _class14);
+// src/api/public-api/sharpify.ts
+var Sharpify = (_class15 = class {
+    constructor(options){
+        this.options = options;
+        const baseURL = options.baseUrl ?? "https://api.sharpify.com.br";
+        const requestHelper = new RequestHelper({
+            baseURL,
+            storeId: options.storeId,
+            apiToken: options.apiKey
+        });
+        this.api = new Api({
+            ...options,
+            baseUrl: baseURL,
+            requestHelper
+        });
+    }
+}, __name(_class15, "Sharpify"), _class15);
+// src/api/public-api/types/v1/store-props.ts
+(function(StoreProps2) {
+    (function(Affiliate) {
+        Affiliate.AssociationTypeEnum = {
+            MANUAL: "MANUAL",
+            AUTOMATIC: "AUTOMATIC"
+        };
+    })(StoreProps2.Affiliate || (StoreProps2.Affiliate = {}));
+    StoreProps2.GatewayMethodsEnum = {
+        PIX: "PIX",
+        EFI_PAY_PREFERENCE: "EFI_PAY_PREFERENCE"
+    };
+    StoreProps2.FeeTypeEnum = {
+        FIXED: "FIXED",
+        PERCENTAGE: "PERCENTAGE"
+    };
+})(StoreProps || (StoreProps = {}));
+var StoreProps;
+// src/api/public-api/types/v1/category-props.ts
+(function(CategoryProps2) {
+    CategoryProps2.CategoryType = {
+        MAIN_CATEGORY: "MAIN_CATEGORY",
+        SUB_CATEGORY: "SUB_CATEGORY"
+    };
+})(CategoryProps || (CategoryProps = {}));
+var CategoryProps;
+// src/api/public-api/types/v1/product-props.ts
+(function(ProductProps2) {
+    ProductProps2.ViewType = {
+        NORMAL: "NORMAL",
+        DYNAMIC: "DYNAMIC"
+    };
+    ProductProps2.VisibilityType = {
+        PRIVATE: "PRIVATE",
+        PUBLIC: "PUBLIC",
+        NON_LISTED: "NON_LISTED"
+    };
+    ProductProps2.StockType = {
+        LINES: "LINES",
+        STATIC: "STATIC",
+        FILE: "FILE"
+    };
+})(ProductProps || (ProductProps = {}));
+var ProductProps;
+// src/api/public-api/types/v1/order-props.ts
+(function(OrderProps2) {
+    OrderProps2.Status = {
+        PENDING: "PENDING",
+        CANCELLED: "CANCELLED",
+        APPROVED: "APPROVED"
+    };
+})(OrderProps || (OrderProps = {}));
+var OrderProps;
+// src/api/public-api/types/v1/coupon-props.ts
+(function(CouponProps2) {
+    CouponProps2.DiscountType = {
+        FIXED: "FIXED",
+        PERCENTAGE: "PERCENTAGE"
+    };
+})(CouponProps || (CouponProps = {}));
+var CouponProps;
+// src/api/public-api/types/v1/custom-fields.props.ts
+(function(CustomFieldsProps2) {
+    CustomFieldsProps2.FieldTypeEnum = {
+        TEXT: "TEXT",
+        NUMBER: "NUMBER",
+        PHONE_NUMBER: "PHONE_NUMBER",
+        CPF: "CPF",
+        ROBLOX: "ROBLOX"
+    };
+})(CustomFieldsProps || (CustomFieldsProps = {}));
+var CustomFieldsProps;
+// src/api/public-api/types/v1/external-events.props.ts
+(function(ExternalEventsProps2) {
+    ExternalEventsProps2.EventNameEnum = {
+        PRODUCT_UPDATED: "PRODUCT_UPDATED",
+        PRODUCT_DELETED: "PRODUCT_DELETED",
+        ORDER_APPROVED: "ORDER_APPROVED",
+        ORDER_CANCELLED: "ORDER_CANCELLED"
+    };
+    ExternalEventsProps2.StatusEnum = {
+        PENDING: "PENDING",
+        RECEIVED: "RECEIVED"
+    };
+})(ExternalEventsProps || (ExternalEventsProps = {}));
+var ExternalEventsProps;
+// src/api/public-api/index.ts
+var index_default = Sharpify;
+// Annotate the CommonJS export names for ESM import in node:
+0 && (module.exports = {
+    CategoryProps,
+    CouponProps,
+    CustomFieldsProps,
+    ExternalEventsProps,
+    OrderProps,
+    ProductProps,
+    StoreProps
+});
+
+//# sourceMappingURL=index.js.map

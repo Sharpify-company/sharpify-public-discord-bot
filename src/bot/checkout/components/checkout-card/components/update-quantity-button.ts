@@ -128,7 +128,7 @@ export class UpdateQuantityButtonComponent {
 
 		const modal = new ModalBuilder()
 			.setCustomId(`update_cart_quantity_modal/${productId}:${productItemId}`)
-			.setTitle(`Editar quantidade - ${formatCheckoutCartItemNameHelper(cartItem)}`);
+			.setTitle(`Editar quantidade - ${formatCheckoutCartItemNameHelper(cartItem)}`.slice(0, 45));
 
 		const quantityInput = new TextInputBuilder()
 			.setCustomId("quantityInput")

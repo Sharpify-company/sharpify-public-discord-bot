@@ -1,13 +1,16 @@
 {
   "$schema": "https://json.schemastore.org/nest-cli",
   "collection": "@nestjs/schematics",
-  "entryFile": "src/main.ts",
+  "entryFile": "main.ts",
   "sourceRoot": "src",
+  
   "compilerOptions": {
+
     "deleteOutDir": true,
     "builder": {
       "type": "swc",
       "options": {
+        "outDir": "out",
         "extensions": [".ts", ".tsx", ".js", ".jsx"]
       }
     }

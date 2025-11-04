@@ -55,6 +55,7 @@ export class ListProductsCommand {
 
 		const productReq = await Sharpify.api.v1.catalog.product.get({
 			id: productId,
+			includeNonListed: true
 		});
 
 		if (!productReq.success) {

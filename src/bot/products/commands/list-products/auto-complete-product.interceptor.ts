@@ -13,6 +13,7 @@ export class ProductAutocompleteInterceptor extends AutocompleteInterceptor {
       limit: 10,
       page: 1,
       title: focused.value.toString(),
+      includeNonListed: true
     });
     if (!req.success)
       return interaction.respond([

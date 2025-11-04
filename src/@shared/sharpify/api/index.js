@@ -481,7 +481,8 @@ var CategoryProps;
   };
   ProductProps2.VisibilityType = {
     PRIVATE: "PRIVATE",
-    PUBLIC: "PUBLIC"
+    PUBLIC: "PUBLIC",
+    NON_LISTED: "NON_LISTED"
   };
   ProductProps2.StockType = {
     LINES: "LINES",

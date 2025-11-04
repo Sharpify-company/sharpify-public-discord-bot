@@ -193,6 +193,7 @@ declare namespace ProductProps {
     const VisibilityType: {
         readonly PRIVATE: "PRIVATE";
         readonly PUBLIC: "PUBLIC";
+        readonly NON_LISTED: "NON_LISTED";
     };
     type VisibilityType = keyof typeof VisibilityType;
     const StockType: {
@@ -374,12 +375,16 @@ declare class Product {
         page: number;
         title?: string;
         productItemTitle?: string;
+        includeNonListed?: boolean;
     }): Promise<ActionsOutput<{
         products: ProductProps[];
         lastPage: number;
     }>>;
     get(input: {
         id: string;
+        slug?: string;
+        idOrSlug?: string;
+        includeNonListed?: boolean;
     }): Promise<ActionsOutput<{
         product: ProductProps;
     }>>;

@@ -11,6 +11,7 @@ export async function ValidateProduct({
 }: Parameters<typeof AddToCartUsecase.prototype.execute>[0]): Promise<Either<InteractionResponse, ProductProps>> {
 	const req = await Sharpify.api.v1.catalog.product.get({
 		id: productId,
+		includeNonListed: true
 	});
 
 	if (!req.success) {

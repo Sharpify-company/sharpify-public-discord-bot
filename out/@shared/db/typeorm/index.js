@@ -28,10 +28,12 @@ const AppDataSource = new _typeorm.DataSource({
     database: _path.default.join(process.cwd(), "/database.db"),
     // synchronize: true,
     entities: [
-        process.cwd() + "/dist/**/*.entity.{ts,js}"
+        process.cwd() + "/dist/**/*.entity.{ts,js}",
+        process.cwd() + "/out/**/*.entity.{ts,js}"
     ],
     migrations: [
-        process.cwd() + "/dist/migrations/*.{ts,js}"
+        process.cwd() + "/dist/migrations/*.{ts,js}",
+        process.cwd() + "/out/migrations/*.{ts,js}"
     ],
     migrationsTableName: "typeorm_migrations"
 });

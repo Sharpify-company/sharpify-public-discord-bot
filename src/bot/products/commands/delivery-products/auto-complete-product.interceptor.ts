@@ -47,7 +47,7 @@ export class ProductAutocompleteInterceptor extends AutocompleteInterceptor {
 							? product.info.title
 							: `${product.info.title} ➡️ ${item.info.title}`;
 					return {
-						name: `${title}  |  ${formatPrice(item.pricing.price)} | 📦 ${item.inventory.stockQuantity === null ? "Estoque ilimitado" : `${item.inventory.stockQuantity} em estoque`}`,
+						name: `${title.slice(0, 50)}  |  ${formatPrice(item.pricing.price)} | 📦 ${item.inventory.stockQuantity === null ? "Estoque ilimitado" : `${item.inventory.stockQuantity} em estoque`}`,
 						value: `${product.id}:${item.id}`,
 					};
 				}),

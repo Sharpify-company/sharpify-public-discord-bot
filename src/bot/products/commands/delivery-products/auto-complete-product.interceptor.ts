@@ -2,7 +2,7 @@ import { FindEmojiHelper } from "@/@shared/helpers";
 import { formatPrice } from "@/@shared/lib";
 import { Sharpify } from "@/@shared/sharpify";
 import { ProductProps } from "@/@shared/sharpify/api";
-import { Injectable } from "@nestjs/common";
+import { ConsoleLogger, Injectable } from "@nestjs/common";
 import { AutocompleteInteraction } from "discord.js";
 import { AutocompleteInterceptor } from "necord";
 
@@ -37,15 +37,20 @@ export class ProductAutocompleteInterceptor extends AutocompleteInterceptor {
 			}
 		}
 
-
 		return interaction.respond(
 			productItems
-				.filter(({ item }) => item.info.title.includes(focused.value.toString()))
+				.filter(({ item, product }) => {
+					return (
+						product.info.title?.toLowerCase()?.includes(focused.value.toString().toLowerCase()) ||
+						item.info.title?.toLowerCase()?.includes(focused.value.toString().toLowerCase())
+					);
+				})
 				.map(({ item, product }) => {
 					let title =
 						product.settings.viewType === "NORMAL"
 							? product.info.title
 							: `${product.info.title} ➡️ ${item.info.title}`;
+					console.log(title)
 					return {
 						name: `${title.slice(0, 50)}  |  ${formatPrice(item.pricing.price)} | 📦 ${item.inventory.stockQuantity === null ? "Estoque ilimitado" : `${item.inventory.stockQuantity} em estoque`}`,
 						value: `${product.id}:${item.id}`,

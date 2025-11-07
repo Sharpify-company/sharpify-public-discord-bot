@@ -51,7 +51,7 @@ let ProductAutocompleteInterceptor = class ProductAutocompleteInterceptor extend
         return interaction.respond(productItems.filter(({ item })=>item.info.title.includes(focused.value.toString())).map(({ item, product })=>{
             let title = product.settings.viewType === "NORMAL" ? product.info.title : `${product.info.title} ➡️ ${item.info.title}`;
             return {
-                name: `${title}  |  ${(0, _lib.formatPrice)(item.pricing.price)} | 📦 ${item.inventory.stockQuantity === null ? "Estoque ilimitado" : `${item.inventory.stockQuantity} em estoque`}`,
+                name: `${title.slice(0, 50)}  |  ${(0, _lib.formatPrice)(item.pricing.price)} | 📦 ${item.inventory.stockQuantity === null ? "Estoque ilimitado" : `${item.inventory.stockQuantity} em estoque`}`,
                 value: `${product.id}:${item.id}`
             };
         }));

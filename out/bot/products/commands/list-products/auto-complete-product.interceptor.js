@@ -30,11 +30,11 @@ let ProductAutocompleteInterceptor = class ProductAutocompleteInterceptor extend
         if (!req.success) return interaction.respond([
             {
                 name: `Error ao buscar produtos: ${req.errorName}`,
-                value: '0'
+                value: "0"
             }
         ]);
         return interaction.respond(req.data.products.map((product)=>({
-                name: `${product.info.title}   |  ${(0, _lib.formatPrice)(product.readonly.lowestPrice)}   |    #${product.shortReference}`,
+                name: `${product.info.title.slice(0, 40)}   |  ${(0, _lib.formatPrice)(product.readonly.lowestPrice)}   |    #${product.shortReference}`,
                 value: product.id
             })));
     }

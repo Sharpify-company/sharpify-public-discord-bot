@@ -50,7 +50,6 @@ export class ProductAutocompleteInterceptor extends AutocompleteInterceptor {
 						product.settings.viewType === "NORMAL"
 							? product.info.title
 							: `${product.info.title} ➡️ ${item.info.title}`;
-					console.log(title)
 					return {
 						name: `${title.slice(0, 50)}  |  ${formatPrice(item.pricing.price)} | 📦 ${item.inventory.stockQuantity === null ? "Estoque ilimitado" : `${item.inventory.stockQuantity} em estoque`}`,
 						value: `${product.id}:${item.id}`,

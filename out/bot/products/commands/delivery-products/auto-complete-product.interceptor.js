@@ -48,7 +48,9 @@ let ProductAutocompleteInterceptor = class ProductAutocompleteInterceptor extend
                     })));
             }
         }
-        return interaction.respond(productItems.filter(({ item })=>item.info.title.includes(focused.value.toString())).map(({ item, product })=>{
+        return interaction.respond(productItems.filter(({ item, product })=>{
+            return product.info.title?.toLowerCase()?.includes(focused.value.toString().toLowerCase()) || item.info.title?.toLowerCase()?.includes(focused.value.toString().toLowerCase());
+        }).map(({ item, product })=>{
             let title = product.settings.viewType === "NORMAL" ? product.info.title : `${product.info.title} ➡️ ${item.info.title}`;
             return {
                 name: `${title.slice(0, 50)}  |  ${(0, _lib.formatPrice)(item.pricing.price)} | 📦 ${item.inventory.stockQuantity === null ? "Estoque ilimitado" : `${item.inventory.stockQuantity} em estoque`}`,

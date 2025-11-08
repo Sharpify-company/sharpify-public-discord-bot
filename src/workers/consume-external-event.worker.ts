@@ -17,6 +17,9 @@ export class ConsumeExternalEventWorker {
 		for (const event of req.data.events) {
 			const exists = await ExternalEventsEntity.findOneBy({ id: event.id });
 			if (exists) continue;
+
+			if (!event.id || !event.contextAggregateId || !event.eventName) return;
+
 			await ExternalEventsEntity.createExternalEvent({
 				id: event.id,
 				contextAggregateId: event.contextAggregateId,

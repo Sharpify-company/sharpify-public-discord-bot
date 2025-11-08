@@ -22,6 +22,9 @@ export class HandleExternalEventWs implements OnModuleInit {
 			.subscribe(async ({ payload: { externalEvent: event } }) => {
 				const exists = await ExternalEventsEntity.findOneBy({ id: event.id });
 				if (exists) return;
+
+				if(!event.id || !event.contextAggregateId || !event.eventName) return;
+
 				await ExternalEventsEntity.createExternalEvent({
 					id: event.id,
 					contextAggregateId: event.contextAggregateId,

@@ -130,10 +130,19 @@ export class PlaceOrderButtonComponent {
 		await orderEntity.save();
 
 		if (placeOrderResult.data.isApproved) {
-			interaction.followUp({
-				content: `Pagamento aprovado! Seu pedido #${orderEntity.id} foi confirmado com sucesso.`,
-				flags: ["Ephemeral"],
-			});
+			if(interaction.replied || interaction.deferred) {
+				await interaction.editReply({
+					content: `Pagamento aprovado! Seu pedido #${orderEntity.id} foi confirmado com sucesso.`,
+				});
+			} else {
+				await interaction.followUp({
+					content: `Pagamento aprovado! Seu pedido #${orderEntity.id} foi confirmado com sucesso.`,
+				});
+			}
+			// interaction.followUp({
+			// 	content: `Pagamento aprovado! Seu pedido #${orderEntity.id} foi confirmado com sucesso.`,
+			// 	flags: ["Ephemeral"],
+			// });
 			return await this.handleOrderApprovedUsecase.execute({
 				orderId: orderEntity.id,
 			});

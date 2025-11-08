@@ -1,5 +1,5 @@
 import { Injectable, Logger, UseInterceptors } from "@nestjs/common";
-import { EmbedBuilder, Integration, User } from "discord.js";
+import { AttachmentBuilder, EmbedBuilder, Integration, User } from "discord.js";
 import { Context, Options, SlashCommand, SlashCommandContext, StringOption, UserOption, NumberOption } from "necord";
 import { ProductAutocompleteInterceptor } from "./auto-complete-product.interceptor";
 import { Sharpify } from "@/@shared/sharpify";
@@ -55,7 +55,7 @@ export class ListProductsCommand {
 
 		const productReq = await Sharpify.api.v1.catalog.product.get({
 			id: productId,
-			includeNonListed: true
+			includeNonListed: true,
 		});
 
 		if (!productReq.success) {
@@ -64,6 +64,8 @@ export class ListProductsCommand {
 				flags: ["Ephemeral"],
 			});
 		}
+
+		await interaction.deferReply({ flags: ["Ephemeral"] });
 
 		const StockReq = await Sharpify.api.v1.catalog.product.decreseStock({
 			productId,
@@ -76,17 +78,16 @@ export class ListProductsCommand {
 			if (StockReq.errorName === "InsufficientStockError") {
 				errorMessage = `Estoque insuficiente para entregar ${quantity} unidade(s) deste produto.`;
 			}
-			return interaction.reply({
+			return interaction.editReply({
 				content: `Error ao buscar produto: ${errorMessage}`,
-				flags: ["Ephemeral"],
 			});
 		}
 
 		const staticStock = StockReq.data.type === "STATIC" ? StockReq.data.stock : "Sem stoque";
 		const lineStocks = StockReq.data.type === "LINES" ? JSON.parse(StockReq.data.stock || "[]") : [];
 
-    const boxIcon = await FindEmojiHelper({  client: interaction.client, name: "Sharpify_caixa" })
-    const cartIcon = await FindEmojiHelper({  client: interaction.client, name: "Sharpify_carrinho" })
+		const boxIcon = await FindEmojiHelper({ client: interaction.client, name: "Sharpify_caixa" });
+		const cartIcon = await FindEmojiHelper({ client: interaction.client, name: "Sharpify_carrinho" });
 
 		const product = productReq.data.product;
 		const productEmbed = new EmbedBuilder()
@@ -108,28 +109,53 @@ export class ListProductsCommand {
 			.setTitle(`${boxIcon} **Entrega do produto: ${quantity} de ${quantity}**`)
 			.setColor(BotConfig.color);
 
+		let fileAttachment: AttachmentBuilder | null = null;
+
 		if (StockReq.data.type === "STATIC") {
-			deliveryEmbed.addFields({ name: `Estoque:`, value: `\`\`${staticStock}\`\`` });
+			if (staticStock.length > 1024) {
+				// cria um arquivo temporário com o conteúdo do estoque
+				const fileContent = `Estoque:\n${staticStock}`;
+				fileAttachment = new AttachmentBuilder(Buffer.from(fileContent), {
+					name: "estoque.txt",
+				});
+				deliveryEmbed.addFields({
+					name: "Estoque:",
+					value: "📄 Estoque muito grande — veja o arquivo `estoque.txt` em anexo.",
+				});
+			} else {
+				deliveryEmbed.addFields({ name: `Estoque:`, value: `\`\`${staticStock}\`\`` });
+			}
 		} else if (StockReq.data.type === "LINES") {
-			deliveryEmbed.addFields({
-				name: `Estoques:`,
-				value: lineStocks.map((lineStock: string) => `\`\`${lineStock}\`\``).join("\n"),
-			});
+			const joined = lineStocks.map((lineStock: string) => `\`\`${lineStock}\`\``).join("\n");
+			if (joined.length > 1024) {
+				const fileContent = `Estoques:\n${joined}`;
+				fileAttachment = new AttachmentBuilder(Buffer.from(fileContent), {
+					name: "estoques.txt",
+				});
+				deliveryEmbed.addFields({
+					name: "Estoques:",
+					value: "📄 Lista muito grande — veja o arquivo `estoques.txt` em anexo.",
+				});
+			} else {
+				deliveryEmbed.addFields({ name: "Estoques:", value: joined });
+			}
 		}
+
 		try {
 			const dm = await user.createDM().catch(() => null);
 			await dm?.send({
 				content: `Olá ${user}! 👋\nUm administrador entregou estoque para você!`,
 				embeds: [productEmbed, deliveryEmbed],
+				files: fileAttachment ? [fileAttachment] : [],
 			});
-			return interaction.reply({
+			return interaction.editReply({
 				content: `Estoque entregue com sucesso para o usuário ${user}. \n Veja a mensagem enviada:`,
 				embeds: [productEmbed, deliveryEmbed],
 				components: [],
-				flags: ["Ephemeral"],
+				files: fileAttachment ? [fileAttachment] : [],
 			});
 		} catch (error) {
-			return interaction.reply({
+			return interaction.editReply({
 				content: `Estoque foi removido do estoque. Mas não foi possível enviar a mensagem direta ao usuário. `,
 			});
 		}

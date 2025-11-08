@@ -5,7 +5,18 @@ import { ProductProps } from "@/@shared/sharpify/api";
 import { ProductCardComponent } from "@/bot/checkout/components";
 import { BotConfig } from "@/config";
 import { Inject, Injectable } from "@nestjs/common";
-import { APIEmbedField, ButtonBuilder, ButtonStyle, Client, EmbedBuilder, Message, MessageCreateOptions, TextChannel, User } from "discord.js";
+import {
+	APIEmbedField,
+	AttachmentBuilder,
+	ButtonBuilder,
+	ButtonStyle,
+	Client,
+	EmbedBuilder,
+	Message,
+	MessageCreateOptions,
+	TextChannel,
+	User,
+} from "discord.js";
 import {} from "necord";
 
 @Injectable()
@@ -22,6 +33,7 @@ export class HandleDeliverToDiscordUserPrivate {
 			.setEmoji("🔗")
 			.setURL(`${url}/checkout/${orderEntity.id}`);
 
+		let fileAttachments: AttachmentBuilder[] = [];
 		for (const orderItem of orderEntity.orderProps.orderItems) {
 			fields.push({
 				name: `🛒 Produto:`,
@@ -39,17 +51,45 @@ export class HandleDeliverToDiscordUserPrivate {
 			});
 
 			if (orderItem.product.itemBackup.stockType === "STATIC") {
-				fields.push({
-					name: `Estoque:`,
-					value: `\`\`\`${orderItem.product.itemBackup.stockContent}\`\`\``,
-				});
+				if ((orderItem.product?.itemBackup?.stockContent as string)?.length > 1024) {
+					// cria um arquivo temporário com o conteúdo do estoque
+					const fileContent = `Estoque:\n${orderItem.product?.itemBackup?.stockContent}`;
+					fileAttachments.push(
+						new AttachmentBuilder(Buffer.from(fileContent), {
+							name: "estoque.txt",
+						}),
+					);
+					fields.push({
+						name: "Estoque:",
+						value: "📄 Estoque muito grande — veja o arquivo `estoque.txt` em anexo.",
+					});
+				} else {
+					fields.push({
+						name: `Estoque:`,
+						value: `\`\`\`${orderItem.product.itemBackup.stockContent}\`\`\``,
+					});
+				}
 			} else if (orderItem.product.itemBackup.stockType === "LINES") {
-				fields.push({
-					name: `Estoque:`,
-					value: (orderItem.product.itemBackup.stockContent as any)
-						.map((line: string) => `\`\`\`${line}\`\`\``)
-						.join("\n"),
-				});
+				const joined = (orderItem.product.itemBackup.stockContent as any)
+					.map((lineStock: string) => `\`\`\`${lineStock}\`\`\``)
+					.join("\n");
+				if (joined.length > 1024) {
+					const fileContent = `Estoques:\n${joined}`;
+					fileAttachments.push(
+						new AttachmentBuilder(Buffer.from(fileContent), {
+							name: "estoques.txt",
+						}),
+					);
+					fields.push({
+						name: "Estoques:",
+						value: "📄 Lista muito grande — veja o arquivo `estoques.txt` em anexo.",
+					});
+				} else {
+					fields.push({
+						name: `Estoque:`,
+						value: joined,
+					});
+				}
 			}
 
 			fields.push({ name: "\u200b", value: "" }); // Empty field for spacing
@@ -65,6 +105,7 @@ export class HandleDeliverToDiscordUserPrivate {
 			content: `Olá ${user}! 👋\nSeu pedido #${orderEntity.orderProps.shortReference} foi entregue com sucesso!`,
 			embeds: [embed],
 			components: [{ type: 1, components: [ViewOnWebsiteButton] }],
+			files: fileAttachments,
 		};
 	}
 

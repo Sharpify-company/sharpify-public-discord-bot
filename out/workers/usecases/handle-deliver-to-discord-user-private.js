@@ -35,6 +35,7 @@ let HandleDeliverToDiscordUserPrivate = class HandleDeliverToDiscordUserPrivate 
         const ViewOnWebsiteButton = new _discord.ButtonBuilder().setLabel("Visualizar compra no site") // text on the button
         .setStyle(_discord.ButtonStyle.Link) // gray button, like in the image
         .setEmoji("🔗").setURL(`${url}/checkout/${orderEntity.id}`);
+        let fileAttachments = [];
         for (const orderItem of orderEntity.orderProps.orderItems){
             fields.push({
                 name: `🛒 Produto:`,
@@ -51,15 +52,39 @@ let HandleDeliverToDiscordUserPrivate = class HandleDeliverToDiscordUserPrivate 
                 inline: true
             });
             if (orderItem.product.itemBackup.stockType === "STATIC") {
-                fields.push({
-                    name: `Estoque:`,
-                    value: `\`\`\`${orderItem.product.itemBackup.stockContent}\`\`\``
-                });
+                if (orderItem.product?.itemBackup?.stockContent?.length > 1024) {
+                    // cria um arquivo temporário com o conteúdo do estoque
+                    const fileContent = `Estoque:\n${orderItem.product?.itemBackup?.stockContent}`;
+                    fileAttachments.push(new _discord.AttachmentBuilder(Buffer.from(fileContent), {
+                        name: "estoque.txt"
+                    }));
+                    fields.push({
+                        name: "Estoque:",
+                        value: "📄 Estoque muito grande — veja o arquivo `estoque.txt` em anexo."
+                    });
+                } else {
+                    fields.push({
+                        name: `Estoque:`,
+                        value: `\`\`\`${orderItem.product.itemBackup.stockContent}\`\`\``
+                    });
+                }
             } else if (orderItem.product.itemBackup.stockType === "LINES") {
-                fields.push({
-                    name: `Estoque:`,
-                    value: orderItem.product.itemBackup.stockContent.map((line)=>`\`\`\`${line}\`\`\``).join("\n")
-                });
+                const joined = orderItem.product.itemBackup.stockContent.map((lineStock)=>`\`\`\`${lineStock}\`\`\``).join("\n");
+                if (joined.length > 1024) {
+                    const fileContent = `Estoques:\n${joined}`;
+                    fileAttachments.push(new _discord.AttachmentBuilder(Buffer.from(fileContent), {
+                        name: "estoques.txt"
+                    }));
+                    fields.push({
+                        name: "Estoques:",
+                        value: "📄 Lista muito grande — veja o arquivo `estoques.txt` em anexo."
+                    });
+                } else {
+                    fields.push({
+                        name: `Estoque:`,
+                        value: joined
+                    });
+                }
             }
             fields.push({
                 name: "\u200b",
@@ -81,7 +106,8 @@ let HandleDeliverToDiscordUserPrivate = class HandleDeliverToDiscordUserPrivate 
                         ViewOnWebsiteButton
                     ]
                 }
-            ]
+            ],
+            files: fileAttachments
         };
     }
     async execute({ orderEntity }) {

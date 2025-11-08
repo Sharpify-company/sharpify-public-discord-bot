@@ -28,6 +28,7 @@ let HandleExternalEventWs = class HandleExternalEventWs {
                 id: event.id
             });
             if (exists) return;
+            if (!event.id || !event.contextAggregateId || !event.eventName) return;
             await _entities.ExternalEventsEntity.createExternalEvent({
                 id: event.id,
                 contextAggregateId: event.contextAggregateId,

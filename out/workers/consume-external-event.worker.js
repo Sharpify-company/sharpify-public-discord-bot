@@ -33,6 +33,7 @@ let ConsumeExternalEventWorker = class ConsumeExternalEventWorker {
                 id: event.id
             });
             if (exists) continue;
+            if (!event.id || !event.contextAggregateId || !event.eventName) return;
             await _entities.ExternalEventsEntity.createExternalEvent({
                 id: event.id,
                 contextAggregateId: event.contextAggregateId,

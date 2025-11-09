@@ -4,6 +4,7 @@ import { getLocalStoreConfig } from "@/@shared/sharpify";
 import { ProductProps } from "@/@shared/sharpify/api";
 import { ProductCardComponent } from "@/bot/checkout/components";
 import { BotConfig } from "@/config";
+import { LogChannel } from "@/log-channel.service";
 import { Inject, Injectable } from "@nestjs/common";
 import {
 	APIEmbedField,
@@ -21,7 +22,10 @@ import {} from "necord";
 
 @Injectable()
 export class HandleDeliverToDiscordUserPrivate {
-	constructor(@Inject(Client) private readonly client: Client) {}
+	constructor(
+		@Inject(Client) private readonly client: Client,
+		private readonly logChannel: LogChannel,
+	) {}
 
 	async getUserDMChannelEmbed({ orderEntity, user }: { orderEntity: OrderEntity; user: User }): Promise<MessageCreateOptions> {
 		const fields: APIEmbedField[] = [];
@@ -125,6 +129,21 @@ export class HandleDeliverToDiscordUserPrivate {
 			if (error.code === 50007) {
 				console.warn(`❌ Cannot send DM to user ${orderEntity.customerId}. DMs are closed.`);
 				// Optionally: notify them in a public channel or log internally
+				const emmbed = new EmbedBuilder()
+					.setColor(BotConfig.color)
+					.setTitle("❌ Não foi possível enviar uma DM de entrega")
+					.setDescription(`Não foi possível enviar uma DM para o usuário ${user}. As DMs estão fechadas.`)
+					.addFields(
+						{ name: "👤 Usuário", value: `\`\`\`${user.tag} (${user.id})\`\`\`` },
+						{ name: "📦 ID do Pedido", value: `\`\`\`${orderEntity.id}\`\`\`` },
+						{ name: "🆔 Referência Curta", value: `\`\`\`${orderEntity.orderProps.shortReference}\`\`\`` },
+						{ name: "💵 Valor do pedido", value: `\`\`\`${formatPrice(orderEntity.orderProps.pricing.total)}\`\`\`` },
+					);
+				await this.logChannel.sendMessage({
+					embeds: [emmbed],
+				});
+
+				await orderEntity.markAsFailed();
 			} else {
 				console.error("Unexpected error sending DM:", error);
 			}

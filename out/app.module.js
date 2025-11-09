@@ -14,6 +14,7 @@ const _workermodule = require("./workers/worker.module");
 const _schedule = require("@nestjs/schedule");
 const _appwsservice = require("./app.ws.service");
 const _websocketmodule = require("./websocket/websocket.module");
+const _logchannelservice = require("./log-channel.service");
 function _ts_decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -33,10 +34,12 @@ AppModule = _ts_decorate([
         ],
         controllers: [],
         providers: [
-            _appwsservice.WsClientService
+            _appwsservice.WsClientService,
+            _logchannelservice.LogChannel
         ],
         exports: [
-            _appwsservice.WsClientService
+            _appwsservice.WsClientService,
+            _logchannelservice.LogChannel
         ]
     })
 ], AppModule);

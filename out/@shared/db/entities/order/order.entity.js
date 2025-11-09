@@ -32,6 +32,10 @@ let OrderEntity = class OrderEntity extends _typeorm.BaseEntity {
         this.deliveryStatus = "DELIVERED";
         await this.save();
     }
+    async markAsFailed() {
+        this.deliveryStatus = "FAILED";
+        await this.save();
+    }
     async markAsPreparingDelivery() {
         this.deliveryStatus = "PREPARING_DELIVERY";
         await this.save();
@@ -81,7 +85,8 @@ OrderEntity = _ts_decorate([
     OrderEntity.DeliveryStatus = {
         PENDING: "PENDING",
         PREPARING_DELIVERY: "PREPARING_DELIVERY",
-        DELIVERED: "DELIVERED"
+        DELIVERED: "DELIVERED",
+        FAILED: "FAILED"
     };
 })(OrderEntity || (OrderEntity = {}));
 

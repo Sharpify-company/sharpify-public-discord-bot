@@ -33,6 +33,11 @@ export class OrderEntity extends BaseEntity {
 		await this.save();
 	}
 
+	async markAsFailed() {
+		this.deliveryStatus = "FAILED";
+		await this.save();
+	}
+
 	async markAsPreparingDelivery() {
 		this.deliveryStatus = "PREPARING_DELIVERY";
 		await this.save();
@@ -49,6 +54,7 @@ export namespace OrderEntity {
 		PENDING: "PENDING",
 		PREPARING_DELIVERY: "PREPARING_DELIVERY",
 		DELIVERED: "DELIVERED",
+		FAILED: "FAILED",
 	} as const;
 	export type DeliveryStatus = keyof typeof DeliveryStatus;
 

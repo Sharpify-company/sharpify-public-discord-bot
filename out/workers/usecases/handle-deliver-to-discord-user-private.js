@@ -11,6 +11,7 @@ Object.defineProperty(exports, "HandleDeliverToDiscordUserPrivate", {
 const _lib = require("../../@shared/lib");
 const _sharpify = require("../../@shared/sharpify");
 const _config = require("../../config");
+const _logchannelservice = require("../../log-channel.service");
 const _common = require("@nestjs/common");
 const _discord = require("discord.js");
 require("necord");
@@ -125,17 +126,54 @@ let HandleDeliverToDiscordUserPrivate = class HandleDeliverToDiscordUserPrivate 
             }));
         } catch (error) {
             if (error.code === 50007) {
-                console.warn(`❌ Cannot send DM to user ${orderEntity.customerId}. DMs are closed.`);
-            // Optionally: notify them in a public channel or log internally
+                // Optionally: notify them in a public channel or log internally
+                const emmbed = new _discord.EmbedBuilder().setColor(_config.BotConfig.color).setTitle("❌ Não foi possível enviar uma DM de entrega").setDescription(`Não foi possível enviar uma DM para o usuário ${user}. As DMs estão fechadas.`).addFields({
+                    name: "👤 Usuário",
+                    value: `\`\`\`${user.tag} (${user.id})\`\`\``
+                }, {
+                    name: "📦 ID do Pedido",
+                    value: `\`\`\`${orderEntity.id}\`\`\``
+                }, {
+                    name: "🆔 Referência Curta",
+                    value: `\`\`\`${orderEntity.orderProps.shortReference}\`\`\``
+                }, {
+                    name: "💵 Valor do pedido",
+                    value: `\`\`\`${(0, _lib.formatPrice)(orderEntity.orderProps.pricing.total)}\`\`\``
+                });
+                await this.logChannel.sendMessage({
+                    embeds: [
+                        emmbed
+                    ]
+                });
             } else {
+                const emmbed = new _discord.EmbedBuilder().setColor(_config.BotConfig.color).setTitle("❌ Não foi possível enviar uma DM de entrega").setDescription(`Não foi possível enviar uma DM para o usuário ${user}. Error tecnico aconteceu.`).addFields({
+                    name: "👤 Usuário",
+                    value: `\`\`\`${user.tag} (${user.id})\`\`\``
+                }, {
+                    name: "📦 ID do Pedido",
+                    value: `\`\`\`${orderEntity.id}\`\`\``
+                }, {
+                    name: "🆔 Referência Curta",
+                    value: `\`\`\`${orderEntity.orderProps.shortReference}\`\`\``
+                }, {
+                    name: "💵 Valor do pedido",
+                    value: `\`\`\`${(0, _lib.formatPrice)(orderEntity.orderProps.pricing.total)}\`\`\``
+                });
+                await this.logChannel.sendMessage({
+                    embeds: [
+                        emmbed
+                    ]
+                });
                 console.error("Unexpected error sending DM:", error);
             }
+            await orderEntity.markAsFailed();
             return;
         }
         await orderEntity.markAsDelivered();
     }
-    constructor(client){
+    constructor(client, logChannel){
         this.client = client;
+        this.logChannel = logChannel;
     }
 };
 HandleDeliverToDiscordUserPrivate = _ts_decorate([
@@ -143,7 +181,8 @@ HandleDeliverToDiscordUserPrivate = _ts_decorate([
     _ts_param(0, (0, _common.Inject)(_discord.Client)),
     _ts_metadata("design:type", Function),
     _ts_metadata("design:paramtypes", [
-        typeof _discord.Client === "undefined" ? Object : _discord.Client
+        typeof _discord.Client === "undefined" ? Object : _discord.Client,
+        typeof _logchannelservice.LogChannel === "undefined" ? Object : _logchannelservice.LogChannel
     ])
 ], HandleDeliverToDiscordUserPrivate);
 

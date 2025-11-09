@@ -59,6 +59,7 @@ const envSchema = _zod.z.object({
     DISCORD_GUILD_ID: _zod.z.string().min(1, "DISCORD_GUILD_ID is required"),
     STORE_ID: _zod.z.string().min(1, "STORE_ID is required"),
     CHECKOUT_CATEGORY_ID: _zod.z.string().min(1, "CHECKOUT_CATEGORY_ID is required"),
+    LOG_CHANNEL_ID: _zod.z.string().min(1, "LOG_CHANNEL_ID is required").optional(),
     API_TOKEN: _zod.z.string().min(1, "API_TOKEN is required"),
     DEFAULT_COLOR: _zod.z.string().optional(),
     NODE_ENV: _zod.z.enum([

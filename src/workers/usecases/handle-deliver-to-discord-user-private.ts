@@ -127,7 +127,6 @@ export class HandleDeliverToDiscordUserPrivate {
 			await dm.send(await this.getUserDMChannelEmbed({ orderEntity, user }));
 		} catch (error: any) {
 			if (error.code === 50007) {
-				console.warn(`❌ Cannot send DM to user ${orderEntity.customerId}. DMs are closed.`);
 				// Optionally: notify them in a public channel or log internally
 				const emmbed = new EmbedBuilder()
 					.setColor(BotConfig.color)
@@ -142,11 +141,25 @@ export class HandleDeliverToDiscordUserPrivate {
 				await this.logChannel.sendMessage({
 					embeds: [emmbed],
 				});
-
-				await orderEntity.markAsFailed();
 			} else {
+				const emmbed = new EmbedBuilder()
+					.setColor(BotConfig.color)
+					.setTitle("❌ Não foi possível enviar uma DM de entrega")
+					.setDescription(`Não foi possível enviar uma DM para o usuário ${user}. Error tecnico aconteceu.`)
+					.addFields(
+						{ name: "👤 Usuário", value: `\`\`\`${user.tag} (${user.id})\`\`\`` },
+						{ name: "📦 ID do Pedido", value: `\`\`\`${orderEntity.id}\`\`\`` },
+						{ name: "🆔 Referência Curta", value: `\`\`\`${orderEntity.orderProps.shortReference}\`\`\`` },
+						{ name: "💵 Valor do pedido", value: `\`\`\`${formatPrice(orderEntity.orderProps.pricing.total)}\`\`\`` },
+					);
+
+				await this.logChannel.sendMessage({
+					embeds: [emmbed],
+				});
 				console.error("Unexpected error sending DM:", error);
 			}
+			await orderEntity.markAsFailed();
+
 			return;
 		}
 

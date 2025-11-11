@@ -17,6 +17,7 @@ const _sectionmanager = require("../section-manager");
 const _types = require("../../../../../@shared/types");
 const _handlers = require("../../../../../@shared/handlers");
 const _helpers1 = require("../../../../../@shared/helpers");
+const _sharpify = require("../../../../../@shared/sharpify");
 function _ts_decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -40,6 +41,17 @@ let ApplyCouponButtonComponent = class ApplyCouponButtonComponent {
             interaction
         });
         const couponCode = interaction.fields.getTextInputValue("couponCodeInput");
+        const couponReq = await _sharpify.Sharpify.api.v1.pricing.coupon.validateCoupon({
+            code: couponCode
+        });
+        if (!couponReq.success) {
+            return await interaction.reply({
+                content: `O código de cupom "${couponCode}" é inválido ou expirou.`,
+                flags: [
+                    "Ephemeral"
+                ]
+            });
+        }
         discordUser.cart.couponCode = couponCode;
         await discordUser.save();
         await (0, _helpers.ValidateDatabaseCartItemsHelper)({

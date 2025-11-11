@@ -35,7 +35,12 @@ let CartEmbedded = class CartEmbedded {
     addToCart(item) {
         const existingItemIndex = this.cartItems.findIndex((cartItem)=>cartItem.productId === item.productId && cartItem.productItemId === item.productItemId);
         if (existingItemIndex === -1) {
-            this.cartItems.push(item);
+            this.cartItems.push({
+                ...item,
+                subTotalPrice: 0,
+                totalPrice: 0,
+                isCouponApplied: false
+            });
         }
         if (!this.isOpened && this.cartItems.length > 0) {
             this.isOpened = true;

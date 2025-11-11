@@ -30,7 +30,9 @@ let LogChannel = class LogChannel {
         if (!_lib.dotEnv.LOG_CHANNEL_ID) return;
         const channel = await this.client?.channels.fetch(_lib.dotEnv.LOG_CHANNEL_ID).catch(()=>null);
         if (!channel || !channel.isTextBased()) return;
-        await channel.send(options);
+        await channel.send(options).catch((err)=>{
+            console.error("❌ Failed to send log message:", err);
+        });
     }
     constructor(client){
         this.client = client;

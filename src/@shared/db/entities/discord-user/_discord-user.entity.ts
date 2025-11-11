@@ -41,6 +41,8 @@ export namespace DiscordUserEntity {
 		id: string;
 	};
 
+	export type CartItemProps = CartEmbedded.CartItem;
+
 	export type Props = {
 		id: string;
 		cart: CartEmbedded;

@@ -326,6 +326,10 @@ type CouponProps = {
     code: string;
     amout: number;
     type: CouponProps.DiscountType;
+    useCondition: {
+        productIds: string[];
+        minAmount: number | null;
+    };
     createdAt: Date;
 };
 declare namespace CouponProps {

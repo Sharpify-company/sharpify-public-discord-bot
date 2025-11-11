@@ -44,6 +44,7 @@ import { WrapperType } from "@/@shared/types";
 import { RemoveFromCartUsecase } from "../usecases";
 import { HandleDiscordMemberNotFound } from "@/@shared/handlers";
 import { FindEmojiHelper } from "@/@shared/helpers";
+import { Sharpify } from "@/@shared/sharpify";
 
 @Injectable()
 export class ApplyCouponButtonComponent {
@@ -59,6 +60,14 @@ export class ApplyCouponButtonComponent {
 		if (!discordUser) return await HandleDiscordMemberNotFound({ interaction });
 
 		const couponCode = interaction.fields.getTextInputValue("couponCodeInput");
+
+		const couponReq = await Sharpify.api.v1.pricing.coupon.validateCoupon({ code: couponCode });
+		if (!couponReq.success) {
+			return await interaction.reply({
+				content: `O código de cupom "${couponCode}" é inválido ou expirou.`,
+				flags: ["Ephemeral"],
+			});
+		}
 
 		discordUser.cart.couponCode = couponCode;
 

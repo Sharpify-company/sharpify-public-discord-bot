@@ -50,12 +50,12 @@ export class CartEmbedded {
 		});
 	}
 
-	addToCart(item: CartEmbedded.CartItem) {
+	addToCart(item: Pick<CartEmbedded.CartItem, "productId" | "productItemId" | "quantity">) {
 		const existingItemIndex = this.cartItems.findIndex(
 			(cartItem) => cartItem.productId === item.productId && cartItem.productItemId === item.productItemId,
 		);
 		if (existingItemIndex === -1) {
-			this.cartItems.push(item);
+			this.cartItems.push({ ...item, subTotalPrice: 0, totalPrice: 0, isCouponApplied: false });
 		}
 
 		if (!this.isOpened && this.cartItems.length > 0) {
@@ -84,7 +84,7 @@ export class CartEmbedded {
 		this.subTotalPrice = 0;
 		this.totalPrice = 0;
 		this.cartCreatedAt = null!;
-        this.isOpened = false;
+		this.isOpened = false;
 
 		await this.discordUser.save();
 	}
@@ -110,6 +110,9 @@ export namespace CartEmbedded {
 		productId: string;
 		productItemId: string;
 		quantity: number;
+		subTotalPrice: number;
+		totalPrice: number;
+		isCouponApplied: boolean;
 	};
 
 	export type Props = {

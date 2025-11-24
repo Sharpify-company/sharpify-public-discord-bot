@@ -23,7 +23,6 @@ import {
 	ModalActionRowComponentBuilder,
 	ModalBuilder,
 	ModalSubmitInteraction,
-	StringSelectMenuBuilder,
 	StringSelectMenuInteraction,
 	TextInputBuilder,
 	TextInputStyle,

@@ -69,7 +69,7 @@ export class SelectCartItemComponent {
 			value: `${item.product.id}:${item.item.id}`,
 			emoji: "🛒",
 			default: defaultItemId ? item.item.id === defaultItemId : false,
-		}));
+		})).slice(0, 24); // Discord limit
 
 		const selectMenu = new StringSelectMenuBuilder()
 			.setCustomId(`cart_item_select`)

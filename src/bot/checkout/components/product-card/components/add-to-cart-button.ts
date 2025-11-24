@@ -17,7 +17,7 @@ export class AddToCartButtonComponent {
 			description: `💸 Valor: ${formatPrice(item.pricing.price)} | 📦 Estoque ${item.inventory.stockQuantity === null ? "Ilimitado" : `${item.inventory.stockQuantity} unidades`}`,
 			value: item.id,
 			emoji: product.readonly.stockQuantityAvailable !== null && product.readonly.stockQuantityAvailable <= 0 ? "❌" : "🛒",
-		}));
+		})).slice(0, 24); // O Discord permite no máximo 25 opções
 
 
 

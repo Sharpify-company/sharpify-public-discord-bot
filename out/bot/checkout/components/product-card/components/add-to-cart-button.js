@@ -32,7 +32,7 @@ let AddToCartButtonComponent = class AddToCartButtonComponent {
                 description: `💸 Valor: ${(0, _lib.formatPrice)(item.pricing.price)} | 📦 Estoque ${item.inventory.stockQuantity === null ? "Ilimitado" : `${item.inventory.stockQuantity} unidades`}`,
                 value: item.id,
                 emoji: product.readonly.stockQuantityAvailable !== null && product.readonly.stockQuantityAvailable <= 0 ? "❌" : "🛒"
-            }));
+            })).slice(0, 24); // O Discord permite no máximo 25 opções
         const selectMenu = new _discord.StringSelectMenuBuilder().setCustomId(`add_to_cart_${product.id}`).setPlaceholder("Selecione um item...").addOptions(options);
         const row = new _discord.ActionRowBuilder().addComponents(selectMenu);
         return row;

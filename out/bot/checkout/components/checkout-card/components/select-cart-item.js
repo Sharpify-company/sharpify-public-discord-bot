@@ -55,7 +55,7 @@ let SelectCartItemComponent = class SelectCartItemComponent {
                 value: `${item.product.id}:${item.item.id}`,
                 emoji: "🛒",
                 default: defaultItemId ? item.item.id === defaultItemId : false
-            }));
+            })).slice(0, 24); // Discord limit
         const selectMenu = new _discord.StringSelectMenuBuilder().setCustomId(`cart_item_select`).setPlaceholder("📦 Edite a quantidade ou remova o item do carrinho").addOptions(options);
         const row = new _discord.ActionRowBuilder().addComponents(selectMenu);
         return {

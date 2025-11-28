@@ -33,11 +33,18 @@ let HandleCheckoutEvent = class HandleCheckoutEvent {
         const orderEntity = await _entities.OrderEntity.findOneBy({
             id: externalEventEntity.contextAggregateId
         });
-        if (!orderEntity) return;
+        if (!orderEntity) {
+            if (payloadOrder.customer.info?.platform?.discordId) {
+                await this.handleOrderApprovedUsecase.giveRoleToUser({
+                    discordUserId: payloadOrder.customer.info.platform.discordId
+                });
+            }
+            return;
+        }
         if (orderEntity.deliveryStatus !== "PENDING") return;
         if (externalEventEntity.eventName === "ORDER_APPROVED") {
             await orderEntity.updateOrderProps(payloadOrder);
-            this.handleOrderApprovedUsecase.execute({
+            await this.handleOrderApprovedUsecase.execute({
                 orderId: orderEntity.id
             });
         }

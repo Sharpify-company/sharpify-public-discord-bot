@@ -1,4 +1,4 @@
-import { Sharpify } from "@/@shared/sharpify";
+import { getLocalStoreConfig, Sharpify } from "@/@shared/sharpify";
 import {
 	ActionRowBuilder,
 	ButtonBuilder,
@@ -20,6 +20,25 @@ import { DiscordUserEntity, OrderEntity } from "@/@shared/db/entities";
 export class HandleOrderApprovedUsecase {
 	constructor(@Inject(Client) private readonly client: Client) {}
 
+	async giveRoleToUser({ discordUserId }: { discordUserId: string }) {
+		const guild = await this.client.guilds.fetch(process.env.DISCORD_GUILD_ID!).catch(() => null);
+		if (!guild) return;
+
+		const member = await guild.members.fetch(discordUserId).catch(() => null);
+		if (!member) return;
+
+		const store = await getLocalStoreConfig();
+		const rolesToGive = store?.applyRolesSettings || [];
+		for (const roleToGive of rolesToGive) {
+			const role = await guild.roles.fetch(roleToGive.roleId).catch(() => null);
+			if (!role) continue;
+			const result = await member.roles.add(role).catch((err) => {
+				console.log(err);
+				return null;
+			});
+		}
+	}
+
 	async execute({ orderId }: { orderId: string }) {
 		const orderEntity = await OrderEntity.findOneBy({ id: orderId });
 		if (!orderEntity) return;
@@ -32,5 +51,6 @@ export class HandleOrderApprovedUsecase {
 
 		await orderEntity.markAsPreparingDelivery();
 		await discordUser.cart.cancelOrder();
+		await this.giveRoleToUser({ discordUserId: discordUser.id });
 	}
 }

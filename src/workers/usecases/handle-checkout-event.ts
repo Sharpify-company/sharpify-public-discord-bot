@@ -1,4 +1,5 @@
 import { ExternalEventsEntity, OrderEntity } from "@/@shared/db/entities";
+import { getLocalStoreConfig } from "@/@shared/sharpify";
 import { OrderProps, ProductProps } from "@/@shared/sharpify/api";
 import { ProductCardComponent } from "@/bot/checkout/components";
 import { HandleOrderApprovedUsecase, HandleOrderCancelledUsecase } from "@/bot/checkout/components/checkout-card/usecases";
@@ -18,13 +19,21 @@ export class HandleCheckoutEvent {
 		const payloadOrder: OrderProps = externalEventEntity.payload as OrderProps;
 
 		const orderEntity = await OrderEntity.findOneBy({ id: externalEventEntity.contextAggregateId });
-		if (!orderEntity) return;
+		if (!orderEntity) {
+			if (payloadOrder.customer.info?.platform?.discordId) {
+				await this.handleOrderApprovedUsecase.giveRoleToUser({
+					discordUserId: payloadOrder.customer.info.platform.discordId,
+				});
+			}
+
+			return;
+		}
 
 		if (orderEntity.deliveryStatus !== "PENDING") return;
 
 		if (externalEventEntity.eventName === "ORDER_APPROVED") {
 			await orderEntity.updateOrderProps(payloadOrder);
-			this.handleOrderApprovedUsecase.execute({ orderId: orderEntity.id });
+			await this.handleOrderApprovedUsecase.execute({ orderId: orderEntity.id });
 		}
 
 		if (externalEventEntity.eventName === "ORDER_CANCELLED") {

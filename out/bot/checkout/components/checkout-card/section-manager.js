@@ -50,7 +50,7 @@ let SectionManagerHandler = class SectionManagerHandler {
             const { ApplyCouponButton } = await this.applyCouponButtonComponent.createButton({
                 discordUserId
             });
-            const { selectPaymentMethod } = await this.selectPaymentMethodComponent.createSelect({
+            const { selectPaymentMethod, options } = await this.selectPaymentMethodComponent.createSelect({
                 discordUserId
             });
             const { PlaceOrderButton } = await this.placeOrderButtonComponent.createButton({
@@ -69,9 +69,9 @@ let SectionManagerHandler = class SectionManagerHandler {
                             CancelCartButton
                         ]
                     },
-                    selectPaymentMethod,
+                    options.length > 0 ? selectPaymentMethod : undefined,
                     row
-                ],
+                ].filter(Boolean),
                 options: {
                     withResponse: true
                 }

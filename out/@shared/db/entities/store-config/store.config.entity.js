@@ -22,6 +22,7 @@ let StoreConfigEntity = class StoreConfigEntity extends _typeorm.BaseEntity {
     static createStore(props) {
         const entity = new StoreConfigEntity();
         entity.updateStoreProps(props);
+        entity.applyRolesSettings = [];
         return entity;
     }
     updateStoreProps(props) {
@@ -33,6 +34,10 @@ let StoreConfigEntity = class StoreConfigEntity extends _typeorm.BaseEntity {
     }
     async updateProps(props) {
         this.updateStoreProps(props);
+        await this.save();
+    }
+    async updateRoleSettings(roleSettings) {
+        this.applyRolesSettings = roleSettings;
         await this.save();
     }
     constructor(){
@@ -87,6 +92,15 @@ _ts_decorate([
     }),
     _ts_metadata("design:type", Array)
 ], StoreConfigEntity.prototype, "paymentGateways", void 0);
+_ts_decorate([
+    (0, _typeorm.Column)({
+        name: "applyRolesSettings",
+        type: "json",
+        nullable: false,
+        default: "[]"
+    }),
+    _ts_metadata("design:type", Array)
+], StoreConfigEntity.prototype, "applyRolesSettings", void 0);
 StoreConfigEntity = _ts_decorate([
     (0, _typeorm.Entity)("storeConfig"),
     _ts_metadata("design:type", Function),

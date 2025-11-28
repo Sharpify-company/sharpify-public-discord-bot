@@ -77,16 +77,16 @@ export class SectionManagerHandler {
 			const { row } = await this.selectCartItemComponent.createSelect({ discordUserId });
 			const { CancelCartButton } = await this.cancelOrderButtonComponent.createButton();
 			const { ApplyCouponButton } = await this.applyCouponButtonComponent.createButton({ discordUserId });
-			const { selectPaymentMethod } = await this.selectPaymentMethodComponent.createSelect({ discordUserId });
+			const { selectPaymentMethod, options } = await this.selectPaymentMethodComponent.createSelect({ discordUserId });
 			const { PlaceOrderButton } = await this.placeOrderButtonComponent.createButton({ discordUserId });
 
 			return {
 				embeds: [emmbed],
 				components: [
 					{ type: 1, components: [PlaceOrderButton, ApplyCouponButton, CancelCartButton] },
-					selectPaymentMethod as any,
+					options.length > 0 ? selectPaymentMethod : undefined!,
 					row,
-				],
+				].filter(Boolean),
 				options: {
 					withResponse: true,
 				},

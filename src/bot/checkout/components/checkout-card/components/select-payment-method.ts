@@ -103,6 +103,6 @@ export class SelectPaymentMethodComponent {
 
 		const selectPaymentMethod = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(selectMenu);
 
-		return { selectPaymentMethod };
+		return { selectPaymentMethod, options };
 	}
 }

@@ -8,6 +8,7 @@ Object.defineProperty(exports, "HandleOrderApprovedUsecase", {
         return HandleOrderApprovedUsecase;
     }
 });
+const _sharpify = require("../../../../../@shared/sharpify");
 const _discord = require("discord.js");
 const _common = require("@nestjs/common");
 const _entities = require("../../../../../@shared/db/entities");
@@ -26,6 +27,22 @@ function _ts_param(paramIndex, decorator) {
     };
 }
 let HandleOrderApprovedUsecase = class HandleOrderApprovedUsecase {
+    async giveRoleToUser({ discordUserId }) {
+        const guild = await this.client.guilds.fetch(process.env.DISCORD_GUILD_ID).catch(()=>null);
+        if (!guild) return;
+        const member = await guild.members.fetch(discordUserId).catch(()=>null);
+        if (!member) return;
+        const store = await (0, _sharpify.getLocalStoreConfig)();
+        const rolesToGive = store?.applyRolesSettings || [];
+        for (const roleToGive of rolesToGive){
+            const role = await guild.roles.fetch(roleToGive.roleId).catch(()=>null);
+            if (!role) continue;
+            const result = await member.roles.add(role).catch((err)=>{
+                console.log(err);
+                return null;
+            });
+        }
+    }
     async execute({ orderId }) {
         const orderEntity = await _entities.OrderEntity.findOneBy({
             id: orderId
@@ -39,6 +56,9 @@ let HandleOrderApprovedUsecase = class HandleOrderApprovedUsecase {
         orderChannel && await orderChannel.delete().catch(()=>null);
         await orderEntity.markAsPreparingDelivery();
         await discordUser.cart.cancelOrder();
+        await this.giveRoleToUser({
+            discordUserId: discordUser.id
+        });
     }
     constructor(client){
         this.client = client;

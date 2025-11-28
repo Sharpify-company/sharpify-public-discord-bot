@@ -1,3 +1,5 @@
+import * as react from 'react';
+
 declare class Failure<F, S> {
     readonly value: F;
     constructor(value: F);
@@ -50,14 +52,19 @@ type StoreProps = {
         favicon: string | null;
     };
     url: string;
+    settings: {
+        forceLoginOnPurchase: boolean;
+    };
     affiliate: {
         associationType: StoreProps.Affiliate.AssociationTypeEnum;
         minWithdrawAmount: number;
     };
     paymentConfigs: StoreProps.PaymentConfig[];
+    pluginConfigs: StoreProps.PluginsConfig;
     template: {
         theme: {
             primaryColor: string;
+            primaryColorRgb: string;
             secondaryColor: string;
             backgroundColor: string;
             borderColor: string;
@@ -68,26 +75,28 @@ type StoreProps = {
     createdAt: Date;
 };
 declare namespace StoreProps {
-    namespace Affiliate {
+    export namespace Affiliate {
         const AssociationTypeEnum: {
             readonly MANUAL: "MANUAL";
             readonly AUTOMATIC: "AUTOMATIC";
         };
         type AssociationTypeEnum = keyof typeof AssociationTypeEnum;
     }
-    const GatewayMethodsEnum: {
+    export const GatewayMethodsEnum: {
         readonly PIX: "PIX";
         readonly EFI_PAY_PREFERENCE: "EFI_PAY_PREFERENCE";
     };
-    type GatewayMethodsEnum = keyof typeof GatewayMethodsEnum;
-    const FeeTypeEnum: {
+    export type GatewayMethodsEnum = keyof typeof GatewayMethodsEnum;
+    export const FeeTypeEnum: {
         readonly FIXED: "FIXED";
         readonly PERCENTAGE: "PERCENTAGE";
     };
-    type FeeTypeEnum = keyof typeof FeeTypeEnum;
-    type PaymentConfig = {
+    export type FeeTypeEnum = keyof typeof FeeTypeEnum;
+    export type PaymentConfig = {
         gatewayMethod: GatewayMethodsEnum;
         isEnabled: boolean;
+        name: string;
+        logoURL: string;
         fee: {
             type: FeeTypeEnum;
             enabled: boolean;
@@ -96,6 +105,34 @@ declare namespace StoreProps {
             amount: number;
         };
     };
+    export const PluginEnumEnum: {
+        readonly GOOGLE_ADS: "GOOGLE_ADS";
+        readonly GOOGLE_ANALYTICS: "GOOGLE_ANALYTICS";
+        readonly GOOGLE_TAG_MANAGER: "GOOGLE_TAG_MANAGER";
+        readonly FACEBOOK_PIXEL: "FACEBOOK_PIXEL";
+        readonly CRISP: "CRISP";
+    };
+    export type PluginEnumEnum = keyof typeof PluginEnumEnum;
+    type BasePlugin<TData> = {
+        pluginType: PluginEnumEnum;
+        isEnabled: boolean;
+        config: TData;
+    };
+    export type PluginsConfig = {
+        [PluginEnumEnum.CRISP]: BasePlugin<{
+            websiteId: string;
+        }>;
+        [PluginEnumEnum.GOOGLE_ANALYTICS]: BasePlugin<{
+            googleId: string;
+        }>;
+        [PluginEnumEnum.GOOGLE_TAG_MANAGER]: BasePlugin<{
+            gtmId: string;
+        }>;
+        [PluginEnumEnum.FACEBOOK_PIXEL]: BasePlugin<{
+            pixelId: string;
+        }>;
+    };
+    export {  };
 }
 
 type CategoryProps = {
@@ -155,6 +192,32 @@ type ProductProps = {
     shortReference: string;
     storeId: string;
     category: CategoryProps;
+    feedbacks: {
+        count: number;
+        averageRating: number;
+        ratingsDistribution: {
+            1: {
+                count: number;
+                percentage: number;
+            };
+            2: {
+                count: number;
+                percentage: number;
+            };
+            3: {
+                count: number;
+                percentage: number;
+            };
+            4: {
+                count: number;
+                percentage: number;
+            };
+            5: {
+                count: number;
+                percentage: number;
+            };
+        };
+    };
     customFields: CustomFieldsProps[];
     pricing: {
         type: ProductProps.PricingType;
@@ -165,6 +228,8 @@ type ProductProps = {
     settings: {
         viewType: ProductProps.ViewType;
         position: number;
+        hideFeedback: boolean;
+        hideSales: boolean;
     };
     info: {
         mainImage?: string;
@@ -174,11 +239,14 @@ type ProductProps = {
         description?: string;
         discordDescription?: string;
         youtubeLink?: string;
+        slug: string;
     };
     normalItem: ProductProps.ProductItem;
     dynamicItems: ProductProps.ProductItem[];
     readonly: {
         stockQuantityAvailable: number | null;
+        hasStockAvailable: boolean;
+        isStockUnlimited: boolean;
         highestPrice: number;
         lowestPrice: number;
         salesQuantity: number;
@@ -222,14 +290,60 @@ declare namespace ProductProps {
     };
 }
 
+type CouponProps = {
+    id: string;
+    shortReference: string;
+    storeId: string;
+    code: string;
+    amout: number;
+    type: CouponProps.DiscountType;
+    useCondition: {
+        productIds: string[];
+        minAmount: number | null;
+    };
+    createdAt: Date;
+};
+declare namespace CouponProps {
+    const DiscountType: {
+        readonly FIXED: "FIXED";
+        readonly PERCENTAGE: "PERCENTAGE";
+    };
+    type DiscountType = keyof typeof DiscountType;
+}
+
 type OrderProps = {
     id: string;
     shortReference: string;
     createdAt: Date;
     lastTimeStatusUpdated: Date;
+    feedback: OrderProps.FeedbackProps;
+    customer: {
+        id: string | undefined;
+        hasCustomer: boolean;
+        firstName: string;
+        lastName: string;
+        email: string;
+        info?: {
+            avatarURL?: string;
+            platform: {
+                discordId: string | undefined;
+            };
+        };
+    };
     pricing: {
         total: number;
         subTotal: number;
+        storeGatewayFee?: {
+            type: "FIXED" | "PERCENTAGE";
+            fixedAmount: number;
+            percentageAmount: number;
+        };
+    };
+    coupon: {
+        isApplied: boolean;
+        code: string;
+        amount: number;
+        type: CouponProps.DiscountType;
     };
     payment: {
         id: string;
@@ -237,6 +351,8 @@ type OrderProps = {
         gateway: {
             gatewayMethod: StoreProps.GatewayMethodsEnum;
             expirationDate: Date | null;
+            name: string;
+            logoURL: string;
             data: {
                 hasQrCode: boolean;
                 hasExternalLink: boolean;
@@ -250,6 +366,24 @@ type OrderProps = {
     orderItems: OrderProps.OrderItem[];
 };
 declare namespace OrderProps {
+    type FeedbackProps = {
+        status: OrderProps.FeedbackProps.StatusEnum;
+        content: string;
+        rating: number;
+        sentAt: Date;
+        author: {
+            avatarURL: string;
+            fullName: string;
+        };
+    };
+    namespace FeedbackProps {
+        const StatusEnum: {
+            readonly PENDING: "PENDING";
+            readonly SENT: "SENT";
+            readonly DISABLED: "DISABLED";
+        };
+        type StatusEnum = keyof typeof StatusEnum;
+    }
     const Status: {
         readonly PENDING: "PENDING";
         readonly CANCELLED: "CANCELLED";
@@ -266,7 +400,16 @@ declare namespace OrderProps {
             unitPrice: number;
             subTotal: number;
             total: number;
+            discountAmount: number;
+            storeGatewayFeeAmount: number;
         };
+        customFields: {
+            id: string;
+            label: string;
+            value: string;
+            customId: string;
+            type: CustomFieldsProps.FieldTypeEnum;
+        }[];
         product: {
             productId: string;
             productItemId: string;
@@ -298,6 +441,7 @@ type UserProps = {
         balance: number;
         commission: number;
         cookieExpirationInDays: number;
+        isReseller: boolean;
         affiliateCodes: {
             id: string;
             createdAt: Date;
@@ -317,28 +461,10 @@ type UserProps = {
             orderItemsQuantity: number;
         };
     };
-};
-
-type CouponProps = {
-    id: string;
-    shortReference: string;
-    storeId: string;
-    code: string;
-    amout: number;
-    type: CouponProps.DiscountType;
-    useCondition: {
-        productIds: string[];
-        minAmount: number | null;
+    platform: {
+        discordId: string | undefined;
     };
-    createdAt: Date;
 };
-declare namespace CouponProps {
-    const DiscountType: {
-        readonly FIXED: "FIXED";
-        readonly PERCENTAGE: "PERCENTAGE";
-    };
-    type DiscountType = keyof typeof DiscountType;
-}
 
 type ExternalEventsProps = {
     id: string;
@@ -363,6 +489,34 @@ declare namespace ExternalEventsProps {
     type StatusEnum = keyof typeof StatusEnum;
 }
 
+type AffiliateWithdrawProps = {
+    id: string;
+    createdAt: Date;
+    shortReference: string;
+    amount: number;
+    storeId: string;
+    customerId: string;
+    canCancel: boolean;
+    withdrawInfo: AffiliateWithdrawProps.WithdrawInfo;
+    lastTimeStatusChanged: Date;
+    status: AffiliateWithdrawProps.StatusEnum;
+    reasonForDecision: string | null;
+};
+declare namespace AffiliateWithdrawProps {
+    const StatusEnum: {
+        readonly PENDING: "PENDING";
+        readonly CANCELLED: "CANCELLED";
+        readonly APPROVED: "APPROVED";
+        readonly REJECTED: "REJECTED";
+    };
+    type StatusEnum = keyof typeof StatusEnum;
+    type WithdrawInfo = {
+        fullName: string;
+        document: string;
+        pixKey: string;
+    };
+}
+
 type ActionsOutput<T = Record<string, any>> = {
     success: true;
     data: T;
@@ -380,10 +534,18 @@ declare class Product {
         page: number;
         title?: string;
         productItemTitle?: string;
+        categoryId?: string;
+        ids?: string[];
+        includeSubCategories?: boolean;
         includeNonListed?: boolean;
     }): Promise<ActionsOutput<{
         products: ProductProps[];
         lastPage: number;
+    }>>;
+    listSimilarProducts(input: {
+        productId: string;
+    }): Promise<ActionsOutput<{
+        products: ProductProps[];
     }>>;
     get(input: {
         id: string;
@@ -400,6 +562,9 @@ declare class Product {
     }): Promise<ActionsOutput<{
         stock: string;
         type: ProductProps.StockType;
+    }>>;
+    listMyResellersProducts(): Promise<ActionsOutput<{
+        products: ProductProps[];
     }>>;
 }
 
@@ -420,9 +585,23 @@ declare class ExternalEvents {
     }): Promise<ActionsOutput>;
 }
 
+declare class Roblox {
+    private options;
+    constructor(options: SharpifyOptions);
+    getUserByUsername(input: {
+        username: string;
+    }): Promise<ActionsOutput<{
+        id: number;
+        name: string;
+        displayName: string;
+        avatarUrl: string;
+    }>>;
+}
+
 declare class CommomServices {
     private options;
     externalEvents: ExternalEvents;
+    roblox: Roblox;
     constructor(options: SharpifyOptions);
 }
 
@@ -436,9 +615,41 @@ declare class Coupon {
     }>>;
 }
 
+declare class Affiliate {
+    private options;
+    constructor(options: SharpifyOptions);
+    becomeAffiliate(): Promise<ActionsOutput>;
+    leaveAffiliate(): Promise<ActionsOutput>;
+    createMyAffiliateCode(input: {
+        code: string;
+    }): Promise<ActionsOutput>;
+    updateMyAffiliateCode(input: {
+        code: string;
+        affiliateCodeId: string;
+    }): Promise<ActionsOutput>;
+    deleteMyAffiliateCode(input: {
+        affiliateCodeId: string;
+    }): Promise<ActionsOutput>;
+    listMyWithdraws(input: {
+        page: number;
+        limit: number;
+    }): Promise<ActionsOutput<{
+        withdraws: AffiliateWithdrawProps[];
+        lastPage: number;
+    }>>;
+    requestMyWithdraw(input: {
+        amount: number;
+        withdrawInfo: AffiliateWithdrawProps.WithdrawInfo;
+    }): Promise<ActionsOutput>;
+    cancelMyWithdraw(input: {
+        withdrawId: string;
+    }): Promise<ActionsOutput>;
+}
+
 declare class Pricing {
     private options;
     coupon: Coupon;
+    affiliate: Affiliate;
     constructor(options: SharpifyOptions);
 }
 
@@ -446,11 +657,36 @@ declare class Store {
     private options;
     constructor(options: SharpifyOptions);
     getStore(): Promise<ActionsOutput<StoreProps>>;
+    getStoreTerms(): Promise<ActionsOutput<{
+        terms: string;
+    }>>;
+}
+
+declare class Auth {
+    private options;
+    constructor(options: SharpifyOptions);
+    getCurrentSession(): Promise<ActionsOutput<UserProps>>;
+    oauthChangeCodeForToken(input: {
+        code: string;
+        platform: "GOOGLE" | "DISCORD";
+    }): Promise<ActionsOutput<{
+        accessToken: string;
+    }>>;
+    defaultSendVerificationCodeToEmail(input: {
+        email: string;
+    }): Promise<ActionsOutput>;
+    defaultVerifyCode(input: {
+        code: string;
+        email: string;
+    }): Promise<ActionsOutput<{
+        accessToken: string;
+    }>>;
 }
 
 declare class Management {
     private options;
     store: Store;
+    auth: Auth;
     constructor(options: SharpifyOptions);
 }
 
@@ -486,12 +722,52 @@ declare class Order {
     placeOrder(input: PlaceOrderInput): Promise<ActionsOutput<PlaceOrderOutput>>;
     getOrder(input: {
         orderId: string;
-    }): Promise<ActionsOutput<OrderProps>>;
+    }): Promise<ActionsOutput<{
+        order: OrderProps;
+    }>>;
+    customerListMyOrders(input: {
+        page: number;
+        limit: number;
+    }): Promise<ActionsOutput<{
+        orders: OrderProps[];
+        lastPage: number;
+    }>>;
+}
+
+declare class Feedback {
+    private options;
+    constructor(options: SharpifyOptions);
+    listProductFeedbacks(input: {
+        page: number;
+        limit: number;
+        productId: string;
+        star?: number | string;
+    }): Promise<ActionsOutput<{
+        feedbacks: OrderProps.FeedbackProps[];
+        lastPage: number;
+    }>>;
 }
 
 declare class Checkout {
     private options;
     order: Order;
+    feedback: Feedback;
+    constructor(options: SharpifyOptions);
+}
+
+declare class Analytics {
+    private options;
+    constructor(options: SharpifyOptions);
+    createSession(input: {
+        sessionId: string;
+    }): Promise<ActionsOutput<{
+        id: string;
+    }>>;
+}
+
+declare class Ecommerce {
+    private options;
+    analytics: Analytics;
     constructor(options: SharpifyOptions);
 }
 
@@ -502,6 +778,7 @@ declare class ApiV1 {
     pricing: Pricing;
     management: Management;
     checkout: Checkout;
+    eCommerce: Ecommerce;
     constructor(options: SharpifyOptions);
 }
 
@@ -519,8 +796,91 @@ interface SharpifyOptions {
 }
 declare class Sharpify {
     private options;
+    readonly url: string;
     api: Api;
     constructor(options: Omit<SharpifyOptions, "requestHelper">);
 }
 
-export { CategoryProps, CouponProps, CustomFieldsProps, ExternalEventsProps, OrderProps, ProductProps, StoreProps, type UserProps, Sharpify as default };
+declare namespace SharpifyReact {
+    const TemplateContext: react.Context<TemplateContext.Props>;
+    namespace TemplateContext {
+        type Props = {
+            store: StoreProps;
+            user?: UserProps;
+            PROPERTIES_INJECT: any;
+            isSsr: boolean;
+            sharpifyApi: Sharpify;
+        };
+    }
+    class Failure<F, S> {
+        readonly value: F;
+        constructor(value: F);
+        isFailure(): this is Failure<F, S>;
+        isSuccess(): this is Success<F, S>;
+    }
+    class Success<F, S> {
+        readonly value: S;
+        constructor(value: S);
+        isFailure(): this is Failure<F, S>;
+        isSuccess(): this is Success<F, S>;
+    }
+    type Either<F, S> = Failure<F, S> | Success<F, S>;
+    const failure: <F, S>(f: F) => Either<F, S>;
+    const success: <F, S>(s?: S) => Either<F, S>;
+    type ActionsOutput<T = Record<string, any>> = {
+        success: true;
+        data: T;
+    } | {
+        success: false;
+        errorName: string;
+        additional?: any;
+    };
+    function getCookies(): any;
+    function ReactQueryAdapter<T>(action: Promise<ActionsOutput<T>>): Promise<T>;
+    const showComponentIfTruthy: (condition: any, component: (...args: any) => any, variable?: string) => any;
+    function showComponentIfFalse(condition: any, component: (...args: any) => any, variable?: string): any;
+    function showComponentIfPathnameEquals(equalsPath: string, component: (...args: any) => any): any;
+    function showComponentIfPathnameStartsWith(equalsPath: string, component: (...args: any) => any): any;
+    function showComponentIfPathnameNotEquals(equalsPath: string, component: (...args: any) => any): any;
+    function showComponentIfPathnameNotStartsWith(equalsPath: string, component: (...args: any) => any): any;
+    function showComponentIfEquals(value: any, compare: string, component: (...args: any) => any, variablePath: string): any;
+    type PageConfigProps = {
+        pageTitle?: string;
+        INJECT?: ({
+            type: "PRODUCTS";
+            variableName: string;
+            productsIds?: string[];
+        } | {
+            type: "PRODUCT";
+            variableName: string;
+            queryByUrlParam?: {
+                paramName: string;
+                property: "idOrSlug";
+                shouldNotFoundPageIfNotFound?: boolean;
+            };
+        } | {
+            type: "ALL_CATEGORIES";
+            onlyMainCategories?: boolean;
+            onlyWithAtLeastOneProduct?: boolean;
+            variableName: string;
+        } | {
+            type: "CATEGORY";
+            variableName: string;
+            queryByUrlParam?: {
+                paramName: string;
+                property: "idOrSlug";
+                shouldNotFoundPageIfNotFound?: boolean;
+            };
+        } | {
+            type: "ORDER";
+            variableName: string;
+            queryByUrlParam?: {
+                paramName: string;
+                property: "id";
+                shouldNotFoundPageIfNotFound?: boolean;
+            };
+        })[];
+    };
+}
+
+export { AffiliateWithdrawProps, CategoryProps, CouponProps, CustomFieldsProps, ExternalEventsProps, OrderProps, ProductProps, SharpifyReact, StoreProps, type UserProps, Sharpify as default };

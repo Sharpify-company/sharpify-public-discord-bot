@@ -16,6 +16,7 @@ const _botservice = require("./bot.service");
 const _productsmodule = require("./products/products.module");
 const _checkoutmodule = require("./checkout/checkout.module");
 const _emojiservice = require("./emoji.service");
+const _rolessettingsmodule = require("./roles-settings/roles-settings.module");
 function _ts_decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -33,12 +34,19 @@ BotModule = _ts_decorate([
                     _lib.dotEnv.DISCORD_GUILD_ID
                 ],
                 intents: [
-                    'Guilds',
-                    'GuildMessages'
+                    "Guilds",
+                    "GuildMessages",
+                    "Guilds",
+                    "GuildMembers",
+                    "GuildMessages",
+                    "GuildMessageReactions",
+                    "GuildPresences",
+                    "MessageContent"
                 ]
             }),
             _productsmodule.ProductsModule,
-            _checkoutmodule.CheckoutModule
+            _checkoutmodule.CheckoutModule,
+            _rolessettingsmodule.RoleSettingsModule
         ],
         controllers: [],
         providers: [

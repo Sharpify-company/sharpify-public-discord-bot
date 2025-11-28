@@ -9,6 +9,9 @@ function _export(target, all) {
     });
 }
 _export(exports, {
+    get AffiliateWithdrawProps () {
+        return AffiliateWithdrawProps;
+    },
     get CategoryProps () {
         return CategoryProps;
     },
@@ -26,6 +29,9 @@ _export(exports, {
     },
     get ProductProps () {
         return ProductProps;
+    },
+    get SharpifyReact () {
+        return SharpifyReact;
     },
     get StoreProps () {
         return StoreProps;

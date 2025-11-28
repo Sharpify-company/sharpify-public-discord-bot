@@ -88,7 +88,8 @@ let SelectPaymentMethodComponent = class SelectPaymentMethodComponent {
         const selectMenu = new _discord.StringSelectMenuBuilder().setCustomId(`gateway_method_selected`).setPlaceholder("Selecione o método de pagamento").addOptions(options);
         const selectPaymentMethod = new _discord.ActionRowBuilder().addComponents(selectMenu);
         return {
-            selectPaymentMethod
+            selectPaymentMethod,
+            options
         };
     }
     constructor(client, sectionManagerHandler){

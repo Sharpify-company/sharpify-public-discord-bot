@@ -21,6 +21,9 @@ export class StoreConfigEntity extends BaseEntity {
 	@Column({ name: "paymentGateways", type: "json", nullable: false, default: "[]" })
 	paymentGateways!: StoreProps.PaymentConfig[];
 
+	@Column({ name: "applyRolesSettings", type: "json", nullable: false, default: "[]" })
+	applyRolesSettings!: StoreConfigEntity.RoleSettings[];
+
 	constructor() {
 		super();
 	}
@@ -28,6 +31,7 @@ export class StoreConfigEntity extends BaseEntity {
 	static createStore(props: StoreProps) {
 		const entity = new StoreConfigEntity();
 		entity.updateStoreProps(props);
+		entity.applyRolesSettings = [];
 		return entity;
 	}
 
@@ -43,6 +47,11 @@ export class StoreConfigEntity extends BaseEntity {
 		this.updateStoreProps(props);
 		await this.save();
 	}
+
+	async updateRoleSettings(roleSettings: StoreConfigEntity.RoleSettings[]) {
+		this.applyRolesSettings = roleSettings;
+		await this.save();
+	}
 }
 
 export namespace StoreConfigEntity {
@@ -53,5 +62,10 @@ export namespace StoreConfigEntity {
 		url: string;
 		image: string;
 		paymentGateways: StoreProps.PaymentConfig[];
+		applyRolesSettings: RoleSettings[];
+	};
+
+	export type RoleSettings = {
+		roleId: string;
 	};
 }

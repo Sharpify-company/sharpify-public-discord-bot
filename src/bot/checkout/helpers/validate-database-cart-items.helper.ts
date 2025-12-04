@@ -35,7 +35,7 @@ export async function ValidateDatabaseCartItemsHelper({ discordUserId }: { disco
 	const allProductsWithCouponApplied = productEntities.filter((product) =>
 		coupon?.useCondition?.productIds?.includes(product.id),
 	);
-	if(coupon && coupon.useCondition?.productIds && allProductsWithCouponApplied.length === 0) {
+	if (coupon && coupon.useCondition?.productIds && allProductsWithCouponApplied.length === 0) {
 		// Coupon no longer valid for any products in cart, remove it
 		user.cart.couponCode = null;
 	}
@@ -46,7 +46,6 @@ export async function ValidateDatabaseCartItemsHelper({ discordUserId }: { disco
 		fixedDiscountPerProduct = coupon?.amout / allProductsWithCouponApplied.length;
 		if (fixedDiscountPerProduct < 0.01) fixedDiscountPerProduct = 0;
 	}
-
 
 	for (const cartItem of user.cart.cartItems) {
 		const isCouponApplied = !!allProductsWithCouponApplied.find((p) => p.id === cartItem.productId);
@@ -67,8 +66,7 @@ export async function ValidateDatabaseCartItemsHelper({ discordUserId }: { disco
 			continue;
 		}
 
-		if (productItem.inventory.stockQuantity === null) continue;
-		if (cartItem.quantity > productItem.inventory.stockQuantity) {
+		if (productItem.inventory.stockQuantity !== null && cartItem.quantity > productItem.inventory.stockQuantity) {
 			// Adjust quantity to available stock
 			cartItem.quantity = productItem.inventory.stockQuantity;
 			if (cartItem.quantity <= 0) {
@@ -76,7 +74,6 @@ export async function ValidateDatabaseCartItemsHelper({ discordUserId }: { disco
 				continue;
 			}
 		}
-
 		cartItem.subTotalPrice = productItem.pricing.price * cartItem.quantity;
 		cartItem.totalPrice = cartItem.subTotalPrice;
 

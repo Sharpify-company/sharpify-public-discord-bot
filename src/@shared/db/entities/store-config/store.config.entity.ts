@@ -24,6 +24,9 @@ export class StoreConfigEntity extends BaseEntity {
 	@Column({ name: "applyRolesSettings", type: "json", nullable: false, default: "[]" })
 	applyRolesSettings!: StoreConfigEntity.RoleSettings[];
 
+	@Column({ name: "preferences", type: "json", nullable: false, default: "{}" })
+	preferences!: StoreConfigEntity.Preferences[];
+
 	constructor() {
 		super();
 	}
@@ -67,5 +70,10 @@ export namespace StoreConfigEntity {
 
 	export type RoleSettings = {
 		roleId: string;
+	};
+
+	export type Preferences = {
+		privateLogSales: boolean;
+		publicLogSales: boolean;
 	};
 }

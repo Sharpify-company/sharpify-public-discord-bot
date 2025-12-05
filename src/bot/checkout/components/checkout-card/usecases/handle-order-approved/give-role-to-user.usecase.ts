@@ -15,12 +15,16 @@ import { dotEnv } from "@/@shared/lib";
 import { ValidateDatabaseCartItemsHelper } from "@/bot/checkout/helpers";
 import { Inject, Injectable } from "@nestjs/common";
 import { DiscordUserEntity, OrderEntity } from "@/@shared/db/entities";
+import { get } from "http";
 
 @Injectable()
-export class HandleOrderApprovedUsecase {
-	constructor(@Inject(Client) private readonly client: Client) {}
+export class GiveRoleToUserUsecase {
+	constructor(
+		@Inject(Client) private readonly client: Client,
+	) {}
 
-	async giveRoleToUser({ discordUserId }: { discordUserId: string }) {
+
+	async execute({ discordUserId }: GiveRoleToUserUsecase.Input) {
 		const guild = await this.client.guilds.fetch(process.env.DISCORD_GUILD_ID!).catch(() => null);
 		if (!guild) return;
 
@@ -38,19 +42,10 @@ export class HandleOrderApprovedUsecase {
 			});
 		}
 	}
+}
 
-	async execute({ orderId }: { orderId: string }) {
-		const orderEntity = await OrderEntity.findOneBy({ id: orderId });
-		if (!orderEntity) return;
-
-		const discordUser = await DiscordUserEntity.findOneBy({ id: orderEntity.customerId });
-		if (!discordUser) return;
-
-		const orderChannel = await this.client.channels.fetch(discordUser.cart.channelId!).catch(() => null);
-		orderChannel && (await orderChannel.delete().catch(() => null));
-
-		await orderEntity.markAsPreparingDelivery();
-		await discordUser.cart.cancelOrder();
-		await this.giveRoleToUser({ discordUserId: discordUser.id });
+export namespace GiveRoleToUserUsecase {
+	export interface Input {
+		discordUserId: string;
 	}
 }

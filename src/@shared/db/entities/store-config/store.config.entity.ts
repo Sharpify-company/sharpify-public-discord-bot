@@ -25,7 +25,7 @@ export class StoreConfigEntity extends BaseEntity {
 	applyRolesSettings!: StoreConfigEntity.RoleSettings[];
 
 	@Column({ name: "preferences", type: "json", nullable: false, default: "{}" })
-	preferences!: StoreConfigEntity.Preferences[];
+	preferences!: StoreConfigEntity.Preferences;
 
 	constructor() {
 		super();
@@ -55,6 +55,28 @@ export class StoreConfigEntity extends BaseEntity {
 		this.applyRolesSettings = roleSettings;
 		await this.save();
 	}
+
+	getPreferences(): StoreConfigEntity.Preferences {
+		return {
+			...(this.preferences || {}),
+			privateLogSales: this.preferences?.privateLogSales ?? {
+				enabled: this.preferences?.privateLogSales?.enabled ?? false,
+				onlyDiscordSales: this.preferences?.privateLogSales?.onlyDiscordSales ?? false,
+			},
+			publicLogSales: this.preferences?.publicLogSales ?? {
+				enabled: this.preferences?.publicLogSales?.enabled ?? false,
+				onlyDiscordSales: this.preferences?.publicLogSales?.onlyDiscordSales ?? false,
+			},
+			failLog: this.preferences?.failLog ?? {
+				enabled: this.preferences?.failLog?.enabled ?? false,
+			},
+		};
+	}
+
+	async savePreferences(preferences: StoreConfigEntity.Preferences) {
+		this.preferences = preferences;
+		await this.save();
+	}
 }
 
 export namespace StoreConfigEntity {
@@ -73,7 +95,19 @@ export namespace StoreConfigEntity {
 	};
 
 	export type Preferences = {
-		privateLogSales: boolean;
-		publicLogSales: boolean;
+		privateLogSales: {
+			enabled: boolean;
+			channelId?: string;
+			onlyDiscordSales?: boolean;
+		};
+		publicLogSales: {
+			enabled: boolean;
+			channelId?: string;
+			onlyDiscordSales?: boolean;
+		};
+		failLog: {
+			enabled: boolean;
+			channelId?: string;
+		};
 	};
 }

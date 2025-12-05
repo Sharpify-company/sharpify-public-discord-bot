@@ -14,10 +14,11 @@ import { SelectPaymentMethodComponent } from "./components/select-payment-method
 import { HandleOrderApprovedUsecase, HandleOrderCancelledUsecase } from "./usecases";
 import { ViewOnWebsiteButtonComponent } from "./components/view-on-website";
 import { OpenDmTutorialButtonComponent } from "./components/open-dm-tutorial-button";
+import { HandleOrderApprovedUsecaseModuleModule } from "./usecases/handle-order-approved/handle-order-approved.module";
 
 @Global()
 @Module({
-	imports: [],
+	imports: [HandleOrderApprovedUsecaseModuleModule],
 	controllers: [],
 	providers: [
 		HandleChannelClicked,

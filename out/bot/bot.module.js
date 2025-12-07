@@ -17,6 +17,8 @@ const _productsmodule = require("./products/products.module");
 const _checkoutmodule = require("./checkout/checkout.module");
 const _emojiservice = require("./emoji.service");
 const _rolessettingsmodule = require("./roles-settings/roles-settings.module");
+const _preferencesmodule = require("./preferences/preferences.module");
+const _manualdeliveryconfirmmodule = require("./manual-delivery-confirm/manual-delivery-confirm.module");
 function _ts_decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -46,7 +48,9 @@ BotModule = _ts_decorate([
             }),
             _productsmodule.ProductsModule,
             _checkoutmodule.CheckoutModule,
-            _rolessettingsmodule.RoleSettingsModule
+            _rolessettingsmodule.RoleSettingsModule,
+            _preferencesmodule.PreferencesModule,
+            _manualdeliveryconfirmmodule.ManualDeliveryConfirmModule
         ],
         controllers: [],
         providers: [

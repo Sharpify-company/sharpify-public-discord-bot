@@ -39,6 +39,12 @@ let HandleCheckoutEvent = class HandleCheckoutEvent {
                     discordUserId: payloadOrder.customer.info.platform.discordId
                 });
             }
+            await this.handleOrderApprovedUsecase.sendPublicSalesLog({
+                orderProps: payloadOrder
+            });
+            await this.handleOrderApprovedUsecase.sendPrivateSalesLog({
+                orderProps: payloadOrder
+            });
             return;
         }
         if (orderEntity.deliveryStatus !== "PENDING") return;

@@ -70,8 +70,7 @@ async function ValidateDatabaseCartItemsHelper({ discordUserId }) {
             });
             continue;
         }
-        if (productItem.inventory.stockQuantity === null) continue;
-        if (cartItem.quantity > productItem.inventory.stockQuantity) {
+        if (productItem.inventory.stockQuantity !== null && cartItem.quantity > productItem.inventory.stockQuantity) {
             // Adjust quantity to available stock
             cartItem.quantity = productItem.inventory.stockQuantity;
             if (cartItem.quantity <= 0) {

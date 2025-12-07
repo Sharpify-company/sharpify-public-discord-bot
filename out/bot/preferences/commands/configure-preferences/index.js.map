@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../../../../src/bot/preferences/commands/configure-preferences/index.ts"],"sourcesContent":["export * from \"./configure-preferences.module\";\r\n"],"names":[],"mappings":";;;;qBAAc"}

@@ -22,9 +22,11 @@ function _ts_decorate(decorators, target, key, desc) {
 function _ts_metadata(k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 }
+let isLogged = false;
 let WsClientService = class WsClientService {
     connect() {
-        console.log("Connecting to WS:", this.url);
+        // Evita múltiplas conexões simultâneas
+        if (this.socket?.connected) return;
         this.socket = (0, _socketioclient.io)(this.url, {
             transports: [
                 "websocket"
@@ -37,18 +39,37 @@ let WsClientService = class WsClientService {
                 token: _lib.dotEnv.API_TOKEN,
                 connectionType: "STORE"
             },
-            reconnectionAttempts: Infinity,
-            reconnectionDelay: this.reconnectTimeout
+            reconnection: false
         });
         this.socket.on("connect", ()=>{
-            console.log("✅ Socket.IO connected!");
+            // ✅ ZERA falhas quando conecta
+            // Só loga se antes estava em falha crítica
+            if (this.failedAttempts >= this.MAX_FAIL_LOG) {
+                console.log("✅ Socket.IO reconectado após tentativas! Nada mais a relatar. Ta tudo tranquilo!");
+            }
+            this.failedAttempts = 0;
+            !isLogged && console.log("✅ Socket.IO connected!");
+            isLogged = true;
+            // Cancela qualquer tentativa pendente
+            if (this.reconnectTimer) {
+                clearTimeout(this.reconnectTimer);
+                this.reconnectTimer = null;
+            }
         });
         this.socket.on("disconnect", (reason)=>{
-            console.log("❌ Socket.IO disconnected:", reason);
-            setTimeout(()=>this.connect(), 5000);
+            this.failedAttempts++;
+            // Só loga depois de 7 falhas seguidas
+            if (this.failedAttempts >= this.MAX_FAIL_LOG) {
+                console.log(`❌ Socket.IO disconnected ${this.failedAttempts}x seguidas:`, reason);
+            }
+            this.scheduleReconnect();
         });
         this.socket.on("connect_error", (err)=>{
-            console.log("Socket.IO connection error:", err.message);
+            this.failedAttempts++;
+            if (this.failedAttempts >= this.MAX_FAIL_LOG) {
+                console.log(`⚠️ Socket.IO connection error ${this.failedAttempts}x:`, err.message);
+            }
+            this.scheduleReconnect();
         });
         this.socket.onAny((event, payload)=>{
             this.messages$.next({
@@ -56,6 +77,13 @@ let WsClientService = class WsClientService {
                 payload
             });
         });
+    }
+    scheduleReconnect() {
+        if (this.reconnectTimer) return; // já agendado
+        this.reconnectTimer = setTimeout(()=>{
+            this.reconnectTimer = null;
+            this.connect();
+        }, this.reconnectTimeout);
     }
     send(event, payload) {
         if (this.socket && this.socket.connected) {
@@ -74,10 +102,16 @@ let WsClientService = class WsClientService {
     }
     onModuleDestroy() {
         this.socket?.disconnect();
+        if (this.reconnectTimer) {
+            clearTimeout(this.reconnectTimer);
+        }
     }
     constructor(){
         this.socket = null;
-        this.reconnectTimeout = 3000; // 3 seconds
+        this.reconnectTimeout = 3000; // 3s
+        this.reconnectTimer = null;
+        this.failedAttempts = 0;
+        this.MAX_FAIL_LOG = 15;
         this.url = _lib.dotEnv.NODE_ENV === "development" ? "http://localhost:1000" : "https://ws.sharpify.com.br";
         this.messages$ = new _rxjs.Subject();
         this.connect();

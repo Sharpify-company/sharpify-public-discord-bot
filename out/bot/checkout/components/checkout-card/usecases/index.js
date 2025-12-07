@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 _export_star(require("./remove-from-cart.usecase"), exports);
-_export_star(require("./handle-order-approved.usecase"), exports);
+_export_star(require("./handle-order-approved/_handle-order-approved.usecase"), exports);
 _export_star(require("./handle-order-cancelled.usecase"), exports);
 function _export_star(from, to) {
     Object.keys(from).forEach(function(k) {

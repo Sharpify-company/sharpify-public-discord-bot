@@ -24,6 +24,8 @@ const _selectpaymentmethod = require("./components/select-payment-method");
 const _usecases = require("./usecases");
 const _viewonwebsite = require("./components/view-on-website");
 const _opendmtutorialbutton = require("./components/open-dm-tutorial-button");
+const _handleorderapprovedmodule = require("./usecases/handle-order-approved/handle-order-approved.module");
+const _handleorderfeedbacksentmodule = require("./usecases/handle-order-feedback-sent/handle-order-feedback-sent.module");
 function _ts_decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -35,7 +37,10 @@ let CheckoutCardModule = class CheckoutCardModule {
 CheckoutCardModule = _ts_decorate([
     (0, _common.Global)(),
     (0, _common.Module)({
-        imports: [],
+        imports: [
+            _handleorderapprovedmodule.HandleOrderApprovedUsecaseModuleModule,
+            _handleorderfeedbacksentmodule.HandleOrderFeedbackSentModule
+        ],
         controllers: [],
         providers: [
             _events.HandleChannelClicked,

@@ -8,9 +8,9 @@ Object.defineProperty(exports, "LogChannel", {
         return LogChannel;
     }
 });
+const _sharpify = require("./@shared/sharpify");
 const _common = require("@nestjs/common");
 const _discord = require("discord.js");
-const _lib = require("./@shared/lib");
 function _ts_decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -27,8 +27,12 @@ function _ts_param(paramIndex, decorator) {
 }
 let LogChannel = class LogChannel {
     async sendMessage(options) {
-        if (!_lib.dotEnv.LOG_CHANNEL_ID) return;
-        const channel = await this.client?.channels.fetch(_lib.dotEnv.LOG_CHANNEL_ID).catch(()=>null);
+        const storeEntity = await (0, _sharpify.getLocalStoreConfig)();
+        const storePreferences = storeEntity.getPreferences();
+        if (!storePreferences.failLog.enabled) return;
+        const guild = await this.client.guilds.fetch(process.env.DISCORD_GUILD_ID).catch(()=>null);
+        if (!guild) return;
+        const channel = await this.client?.channels.fetch(storePreferences.failLog.channelId).catch(()=>null);
         if (!channel || !channel.isTextBased()) return;
         await channel.send(options).catch((err)=>{
             console.error("❌ Failed to send log message:", err);

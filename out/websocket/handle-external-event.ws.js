@@ -10,7 +10,6 @@ Object.defineProperty(exports, "HandleExternalEventWs", {
 });
 const _entities = require("../@shared/db/entities");
 const _appwsservice = require("../app.ws.service");
-const _usecases = require("../workers/usecases");
 const _common = require("@nestjs/common");
 function _ts_decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -37,17 +36,15 @@ let HandleExternalEventWs = class HandleExternalEventWs {
             }).save();
         });
     }
-    constructor(wsClientService, handleExternalEventCreatedUsecase){
+    constructor(wsClientService){
         this.wsClientService = wsClientService;
-        this.handleExternalEventCreatedUsecase = handleExternalEventCreatedUsecase;
     }
 };
 HandleExternalEventWs = _ts_decorate([
     (0, _common.Injectable)(),
     _ts_metadata("design:type", Function),
     _ts_metadata("design:paramtypes", [
-        typeof _appwsservice.WsClientService === "undefined" ? Object : _appwsservice.WsClientService,
-        typeof _usecases.HandleExternalEventCreatedUsecase === "undefined" ? Object : _usecases.HandleExternalEventCreatedUsecase
+        typeof _appwsservice.WsClientService === "undefined" ? Object : _appwsservice.WsClientService
     ])
 ], HandleExternalEventWs);
 

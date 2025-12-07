@@ -3,7 +3,6 @@ import { Sharpify } from "@/@shared/sharpify";
 import { ExternalEventsProps } from "@/@shared/sharpify/api";
 import { WsProps } from "@/@shared/types";
 import { WsClientService } from "@/app.ws.service";
-import { HandleExternalEventCreatedUsecase } from "@/workers/usecases";
 import { Injectable, OnModuleInit } from "@nestjs/common";
 import { Cron } from "@nestjs/schedule";
 
@@ -11,7 +10,6 @@ import { Cron } from "@nestjs/schedule";
 export class HandleExternalEventWs implements OnModuleInit {
 	constructor(
 		private readonly wsClientService: WsClientService,
-		private readonly handleExternalEventCreatedUsecase: HandleExternalEventCreatedUsecase,
 	) {}
 
 	onModuleInit() {

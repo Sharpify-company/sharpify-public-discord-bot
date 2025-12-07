@@ -15,28 +15,30 @@ import { dotEnv } from "@/@shared/lib";
 import { ValidateDatabaseCartItemsHelper } from "@/bot/checkout/helpers";
 import { Inject, Injectable } from "@nestjs/common";
 import { DiscordUserEntity, OrderEntity } from "@/@shared/db/entities";
+import { get } from "http";
+import { GiveRoleToUserUsecase } from "./give-role-to-user.usecase";
+import { SendPublicSalesLogUsecase } from "./send-public-sales-log.usecase";
+import { SendPrivateSalesLogUsecase } from "./send-private-sales-log.usecase";
 
 @Injectable()
 export class HandleOrderApprovedUsecase {
-	constructor(@Inject(Client) private readonly client: Client) {}
+	constructor(
+		@Inject(Client) private readonly client: Client,
+		private readonly giveRoleToUserUsecase: GiveRoleToUserUsecase,
+		private readonly sendPublicSalesLogUsecase: SendPublicSalesLogUsecase,
+		private readonly sendPrivateSalesLogUsecase: SendPrivateSalesLogUsecase,
+	) {}
 
-	async giveRoleToUser({ discordUserId }: { discordUserId: string }) {
-		const guild = await this.client.guilds.fetch(process.env.DISCORD_GUILD_ID!).catch(() => null);
-		if (!guild) return;
+	async giveRoleToUser(input: GiveRoleToUserUsecase.Input) {
+		return this.giveRoleToUserUsecase.execute(input);
+	}
 
-		const member = await guild.members.fetch(discordUserId).catch(() => null);
-		if (!member) return;
+	async sendPublicSalesLog(input: SendPublicSalesLogUsecase.Input) {
+		return this.sendPublicSalesLogUsecase.execute(input);
+	}
 
-		const store = await getLocalStoreConfig();
-		const rolesToGive = store?.applyRolesSettings || [];
-		for (const roleToGive of rolesToGive) {
-			const role = await guild.roles.fetch(roleToGive.roleId).catch(() => null);
-			if (!role) continue;
-			const result = await member.roles.add(role).catch((err) => {
-				console.log(err);
-				return null;
-			});
-		}
+	async sendPrivateSalesLog(input: SendPrivateSalesLogUsecase.Input) {
+		return this.sendPrivateSalesLogUsecase.execute(input);
 	}
 
 	async execute({ orderId }: { orderId: string }) {
@@ -52,5 +54,7 @@ export class HandleOrderApprovedUsecase {
 		await orderEntity.markAsPreparingDelivery();
 		await discordUser.cart.cancelOrder();
 		await this.giveRoleToUser({ discordUserId: discordUser.id });
+		await this.sendPublicSalesLog({ discordUserId: discordUser.id, orderProps: orderEntity.orderProps });
+		await this.sendPrivateSalesLog({ discordUserId: discordUser.id, orderProps: orderEntity.orderProps });
 	}
 }

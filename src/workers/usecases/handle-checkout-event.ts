@@ -17,7 +17,6 @@ export class HandleCheckoutEvent {
 
 	async create(externalEventEntity: ExternalEventsEntity) {
 		const payloadOrder: OrderProps = externalEventEntity.payload as OrderProps;
-
 		const orderEntity = await OrderEntity.findOneBy({ id: externalEventEntity.contextAggregateId });
 		if (!orderEntity) {
 			if (payloadOrder.customer.info?.platform?.discordId) {
@@ -25,6 +24,14 @@ export class HandleCheckoutEvent {
 					discordUserId: payloadOrder.customer.info.platform.discordId,
 				});
 			}
+
+			await this.handleOrderApprovedUsecase.sendPublicSalesLog({
+				orderProps: payloadOrder
+			});
+
+			await this.handleOrderApprovedUsecase.sendPrivateSalesLog({
+				orderProps: payloadOrder
+			});
 
 			return;
 		}

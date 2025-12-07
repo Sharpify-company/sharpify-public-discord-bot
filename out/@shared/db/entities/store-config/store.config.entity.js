@@ -40,6 +40,43 @@ let StoreConfigEntity = class StoreConfigEntity extends _typeorm.BaseEntity {
         this.applyRolesSettings = roleSettings;
         await this.save();
     }
+    getPreferences() {
+        return {
+            ...this.preferences || {},
+            privateLogSales: this.preferences?.privateLogSales ?? {
+                enabled: this.preferences?.privateLogSales?.enabled ?? false,
+                onlyDiscordSales: this.preferences?.privateLogSales?.onlyDiscordSales ?? false,
+                channelId: this.preferences?.privateLogSales?.channelId ?? undefined
+            },
+            publicLogSales: this.preferences?.publicLogSales ?? {
+                enabled: this.preferences?.publicLogSales?.enabled ?? false,
+                onlyDiscordSales: this.preferences?.publicLogSales?.onlyDiscordSales ?? false,
+                channelId: this.preferences?.publicLogSales?.channelId ?? undefined
+            },
+            failLog: this.preferences?.failLog ?? {
+                enabled: this.preferences?.failLog?.enabled ?? false,
+                channelId: this.preferences?.failLog?.channelId ?? undefined
+            },
+            confirmDelivery: this.preferences?.confirmDelivery ?? {
+                enabled: this.preferences?.confirmDelivery?.enabled ?? false,
+                channelId: this.preferences?.confirmDelivery?.channelId ?? undefined
+            },
+            feedbackPublicLog: this.preferences?.feedbackPublicLog ?? {
+                enabled: this.preferences?.feedbackPublicLog?.enabled ?? false,
+                channelId: this.preferences?.feedbackPublicLog?.channelId ?? undefined,
+                onlyDiscordSales: this.preferences?.feedbackPublicLog?.onlyDiscordSales ?? false,
+                minFeedbackStar: this.preferences?.feedbackPublicLog?.minFeedbackStar ?? 4
+            },
+            feedbackPrivateLog: this.preferences?.feedbackPrivateLog ?? {
+                enabled: this.preferences?.feedbackPrivateLog?.enabled ?? false,
+                channelId: this.preferences?.feedbackPrivateLog?.channelId ?? undefined
+            }
+        };
+    }
+    async savePreferences(preferences) {
+        this.preferences = preferences;
+        await this.save();
+    }
     constructor(){
         super(), this.id = "DEFAULT";
     }
@@ -101,6 +138,15 @@ _ts_decorate([
     }),
     _ts_metadata("design:type", Array)
 ], StoreConfigEntity.prototype, "applyRolesSettings", void 0);
+_ts_decorate([
+    (0, _typeorm.Column)({
+        name: "preferences",
+        type: "json",
+        nullable: false,
+        default: "{}"
+    }),
+    _ts_metadata("design:type", typeof StoreConfigEntity === "undefined" || typeof StoreConfigEntity.Preferences === "undefined" ? Object : StoreConfigEntity.Preferences)
+], StoreConfigEntity.prototype, "preferences", void 0);
 StoreConfigEntity = _ts_decorate([
     (0, _typeorm.Entity)("storeConfig"),
     _ts_metadata("design:type", Function),

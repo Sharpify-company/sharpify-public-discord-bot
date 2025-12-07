@@ -13,6 +13,7 @@ const _handleproductevent = require("./handle-product-event");
 const _handledelivertodiscorduserprivate = require("./handle-deliver-to-discord-user-private");
 const _handlecheckoutevent = require("./handle-checkout-event");
 const _handleexternaleventcreatedusecase = require("./handle-external-event-created.usecase");
+const _handlefeedbackevent = require("./handle-feedback-event");
 function _ts_decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -30,13 +31,15 @@ UsecasesModule = _ts_decorate([
             _handleproductevent.HandleProductEvent,
             _handledelivertodiscorduserprivate.HandleDeliverToDiscordUserPrivate,
             _handlecheckoutevent.HandleCheckoutEvent,
-            _handleexternaleventcreatedusecase.HandleExternalEventCreatedUsecase
+            _handleexternaleventcreatedusecase.HandleExternalEventCreatedUsecase,
+            _handlefeedbackevent.HandleFeedbackEvent
         ],
         exports: [
             _handleproductevent.HandleProductEvent,
             _handledelivertodiscorduserprivate.HandleDeliverToDiscordUserPrivate,
             _handlecheckoutevent.HandleCheckoutEvent,
-            _handleexternaleventcreatedusecase.HandleExternalEventCreatedUsecase
+            _handleexternaleventcreatedusecase.HandleExternalEventCreatedUsecase,
+            _handlefeedbackevent.HandleFeedbackEvent
         ]
     })
 ], UsecasesModule);

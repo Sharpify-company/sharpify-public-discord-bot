@@ -13,6 +13,7 @@ const _discord = require("discord.js");
 require("necord");
 const _handleproductevent = require("./handle-product-event");
 const _handlecheckoutevent = require("./handle-checkout-event");
+const _handlefeedbackevent = require("./handle-feedback-event");
 function _ts_decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -35,12 +36,16 @@ let HandleExternalEventCreatedUsecase = class HandleExternalEventCreatedUsecase 
         if (event.eventName === "ORDER_APPROVED" || event.eventName === "ORDER_CANCELLED") {
             await this.handleCheckoutEvent.create(event);
         }
+        if (event.eventName === "ORDER_FEEDBACK_RECEIVED") {
+            await this.handleFeedbackEvent.create(event);
+        }
         await event.remove();
     }
-    constructor(client, handleProductEvent, handleCheckoutEvent){
+    constructor(client, handleProductEvent, handleCheckoutEvent, handleFeedbackEvent){
         this.client = client;
         this.handleProductEvent = handleProductEvent;
         this.handleCheckoutEvent = handleCheckoutEvent;
+        this.handleFeedbackEvent = handleFeedbackEvent;
     }
 };
 HandleExternalEventCreatedUsecase = _ts_decorate([
@@ -50,7 +55,8 @@ HandleExternalEventCreatedUsecase = _ts_decorate([
     _ts_metadata("design:paramtypes", [
         typeof _discord.Client === "undefined" ? Object : _discord.Client,
         typeof _handleproductevent.HandleProductEvent === "undefined" ? Object : _handleproductevent.HandleProductEvent,
-        typeof _handlecheckoutevent.HandleCheckoutEvent === "undefined" ? Object : _handlecheckoutevent.HandleCheckoutEvent
+        typeof _handlecheckoutevent.HandleCheckoutEvent === "undefined" ? Object : _handlecheckoutevent.HandleCheckoutEvent,
+        typeof _handlefeedbackevent.HandleFeedbackEvent === "undefined" ? Object : _handlefeedbackevent.HandleFeedbackEvent
     ])
 ], HandleExternalEventCreatedUsecase);
 

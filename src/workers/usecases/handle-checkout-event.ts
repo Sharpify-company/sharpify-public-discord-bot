@@ -29,6 +29,10 @@ export class HandleCheckoutEvent {
 				orderProps: payloadOrder
 			});
 
+			await this.handleOrderApprovedUsecase.sendPrivateSalesLog({
+				orderProps: payloadOrder
+			});
+
 			return;
 		}
 

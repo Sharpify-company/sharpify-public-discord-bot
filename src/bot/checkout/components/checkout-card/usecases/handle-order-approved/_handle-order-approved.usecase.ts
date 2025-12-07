@@ -18,6 +18,7 @@ import { DiscordUserEntity, OrderEntity } from "@/@shared/db/entities";
 import { get } from "http";
 import { GiveRoleToUserUsecase } from "./give-role-to-user.usecase";
 import { SendPublicSalesLogUsecase } from "./send-public-sales-log.usecase";
+import { SendPrivateSalesLogUsecase } from "./send-private-sales-log.usecase";
 
 @Injectable()
 export class HandleOrderApprovedUsecase {
@@ -25,6 +26,7 @@ export class HandleOrderApprovedUsecase {
 		@Inject(Client) private readonly client: Client,
 		private readonly giveRoleToUserUsecase: GiveRoleToUserUsecase,
 		private readonly sendPublicSalesLogUsecase: SendPublicSalesLogUsecase,
+		private readonly sendPrivateSalesLogUsecase: SendPrivateSalesLogUsecase,
 	) {}
 
 	async giveRoleToUser(input: GiveRoleToUserUsecase.Input) {
@@ -33,6 +35,10 @@ export class HandleOrderApprovedUsecase {
 
 	async sendPublicSalesLog(input: SendPublicSalesLogUsecase.Input) {
 		return this.sendPublicSalesLogUsecase.execute(input);
+	}
+
+	async sendPrivateSalesLog(input: SendPrivateSalesLogUsecase.Input) {
+		return this.sendPrivateSalesLogUsecase.execute(input);
 	}
 
 	async execute({ orderId }: { orderId: string }) {
@@ -49,5 +55,6 @@ export class HandleOrderApprovedUsecase {
 		await discordUser.cart.cancelOrder();
 		await this.giveRoleToUser({ discordUserId: discordUser.id });
 		await this.sendPublicSalesLog({ discordUserId: discordUser.id, orderProps: orderEntity.orderProps });
+		await this.sendPrivateSalesLog({ discordUserId: discordUser.id, orderProps: orderEntity.orderProps });
 	}
 }

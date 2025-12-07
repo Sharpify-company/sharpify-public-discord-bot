@@ -57,7 +57,7 @@ export class SalesPublicLogButtonComponent {
 	private async log(@Context() [interaction]: [ButtonInteraction]) {
 		const store = await getLocalStoreConfig();
 
-		await interaction.update((await this.buildPreferenceConfigure.build({ section: "PUBLIC_LOG" })) as any);
+		await interaction.update((await this.buildPreferenceConfigure.build({ section: "SALES_PUBLIC_LOG" })) as any);
 	}
 
 	async createButton() {

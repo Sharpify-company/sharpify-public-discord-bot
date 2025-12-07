@@ -8,6 +8,7 @@ import { CheckoutModule } from "./checkout/checkout.module";
 import { EmojiService } from "./emoji.service";
 import { RoleSettingsModule } from "./roles-settings/roles-settings.module";
 import { PreferencesModule } from "./preferences/preferences.module";
+import { ManualDeliveryConfirmModule } from "./manual-delivery-confirm/manual-delivery-confirm.module";
 
 @Module({
 	imports: [
@@ -28,7 +29,8 @@ import { PreferencesModule } from "./preferences/preferences.module";
 		ProductsModule,
 		CheckoutModule,
 		RoleSettingsModule,
-		PreferencesModule
+		PreferencesModule,
+		ManualDeliveryConfirmModule
 	],
 	controllers: [],
 	providers: [AppUpdate, AppService, EmojiService],

@@ -41,14 +41,14 @@ import { BuildPreferenceConfigure } from "../_build-preference-configure";
 import { WrapperType } from "@/@shared/types";
 
 @Injectable()
-export class SelectSalesPublicLogChannel {
+export class SelectFeedbackPrivateLogChannel {
 	constructor(
 		@Inject(forwardRef(() => BuildPreferenceConfigure))
 		private readonly buildPreferenceConfigure: WrapperType<BuildPreferenceConfigure>,
 		@Inject(Client) private readonly client: Client,
 	) {}
 
-	@ChannelSelect("select_sales_public_log_channel")
+	@ChannelSelect("select_feedback_private_log_channel")
 	private async handleChannelSelected(
 		@Context() [interaction]: StringSelectContext,
 		@SelectedChannels() selected: ISelectedChannels,
@@ -64,10 +64,10 @@ export class SelectSalesPublicLogChannel {
 
 		const store = await getLocalStoreConfig();
 		const preferences = store.getPreferences();
-		preferences.publicLogSales.channelId = channel.id;
+		preferences.feedbackPrivateLog.channelId = channel.id;
 		await store.savePreferences(preferences);
 
-		await interaction.update((await this.buildPreferenceConfigure.build({ section: "SALES_PUBLIC_LOG" })) as any);
+		await interaction.update((await this.buildPreferenceConfigure.build({ section: "FEEDBACK_PRIVATE_LOG" })) as any);
 	}
 
 	async createSelectChannel() {
@@ -75,15 +75,15 @@ export class SelectSalesPublicLogChannel {
 		const preferences = store.getPreferences();
 
 		const selectMenu = new ChannelSelectMenuBuilder()
-			.setCustomId(`select_sales_public_log_channel`)
-			.setPlaceholder("Selecione qual canal o log publico vai ser mandado...")
+			.setCustomId(`select_feedback_private_log_channel`)
+			.setPlaceholder("Selecione qual canal o log privado vai ser mandado...")
 			.setMaxValues(1)
 			.setMinValues(1);
 
-		const defaultPlaceholder = "Selecione qual canal o log publico vai ser mandado...";
-		if (preferences.publicLogSales.channelId) {
+		const defaultPlaceholder = "Selecione qual canal o log privado vai ser mandado...";
+		if (preferences.feedbackPrivateLog.channelId) {
 			const channel = (await this.client.channels
-				.fetch(preferences.publicLogSales.channelId)
+				.fetch(preferences.feedbackPrivateLog.channelId)
 				.catch(() => null)) as TextChannel;
 			if (channel) {
 				selectMenu.setPlaceholder(`✅ Canal selecionado: #${channel.name}`);

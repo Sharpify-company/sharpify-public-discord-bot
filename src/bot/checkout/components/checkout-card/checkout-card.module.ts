@@ -15,10 +15,11 @@ import { HandleOrderApprovedUsecase, HandleOrderCancelledUsecase } from "./useca
 import { ViewOnWebsiteButtonComponent } from "./components/view-on-website";
 import { OpenDmTutorialButtonComponent } from "./components/open-dm-tutorial-button";
 import { HandleOrderApprovedUsecaseModuleModule } from "./usecases/handle-order-approved/handle-order-approved.module";
+import { HandleOrderFeedbackSentModule } from "./usecases/handle-order-feedback-sent/handle-order-feedback-sent.module";
 
 @Global()
 @Module({
-	imports: [HandleOrderApprovedUsecaseModuleModule],
+	imports: [HandleOrderApprovedUsecaseModuleModule, HandleOrderFeedbackSentModule],
 	controllers: [],
 	providers: [
 		HandleChannelClicked,

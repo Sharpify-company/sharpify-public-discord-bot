@@ -480,6 +480,7 @@ declare namespace ExternalEventsProps {
         readonly PRODUCT_DELETED: "PRODUCT_DELETED";
         readonly ORDER_APPROVED: "ORDER_APPROVED";
         readonly ORDER_CANCELLED: "ORDER_CANCELLED";
+        readonly ORDER_FEEDBACK_RECEIVED: "ORDER_FEEDBACK_RECEIVED";
     };
     type EventNameEnum = keyof typeof EventNameEnum;
     const StatusEnum: {

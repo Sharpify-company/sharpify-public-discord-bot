@@ -46,25 +46,23 @@ import { getLocalStoreConfig, Sharpify } from "@/@shared/sharpify";
 import { BuildPreferenceConfigure } from "../_build-preference-configure";
 
 @Injectable()
-export class SalesPrivateLogButtonComponent {
+export class FeedbackPrivateLogButtonComponent {
 	constructor(
 		@Inject(Client) private readonly client: Client,
 		@Inject(forwardRef(() => BuildPreferenceConfigure))
 		private readonly buildPreferenceConfigure: WrapperType<BuildPreferenceConfigure>,
 	) {}
 
-	@Button("go_to_sales_private_log_settings")
-	private async disablePrivateLog(@Context() [interaction]: [ButtonInteraction]) {
-		const store = await getLocalStoreConfig();
-
-		await interaction.update((await this.buildPreferenceConfigure.build({ section: "SALES_PRIVATE_LOG" })) as any);
+	@Button("go_to_feedback_private_log_settings")
+	private async log(@Context() [interaction]: [ButtonInteraction]) {
+		await interaction.update((await this.buildPreferenceConfigure.build({ section: "FEEDBACK_PRIVATE_LOG" })) as any);
 	}
 
 	async createButton() {
-		const salesPrivateLogButton = new ButtonBuilder()
-			.setCustomId("go_to_sales_private_log_settings")
-			.setLabel("Configurar log de vendas privado")
+		const feedbackPrivateLogButton = new ButtonBuilder()
+			.setCustomId("go_to_feedback_private_log_settings")
+			.setLabel("Configurar log de feedback privado")
 			.setStyle(ButtonStyle.Secondary);
-		return { salesPrivateLogButton };
+		return { feedbackPrivateLogButton };
 	}
 }

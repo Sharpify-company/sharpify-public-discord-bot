@@ -20,17 +20,18 @@ import { DiscordUserEntity, OrderEntity } from "@/@shared/db/entities";
 import { get } from "http";
 import { BotConfig } from "@/config";
 import { OrderProps } from "@/@shared/sharpify/api";
+import { FindEmojiHelper } from "@/@shared/helpers";
 
 const sentMessages = new Set<string>();
 
 @Injectable()
-export class SendPublicSalesLogUsecase {
+export class SendPrivateSalesLogUsecase {
 	constructor(@Inject(Client) private readonly client: Client) {}
 
-	async execute({ discordUserId, orderProps }: SendPublicSalesLogUsecase.Input) {
+	async execute({ discordUserId, orderProps }: SendPrivateSalesLogUsecase.Input) {
 		if (sentMessages.has(orderProps.shortReference)) return;
-
-		const storePreferences = (await getLocalStoreConfig()).getPreferences();
+		const storeEntity = await getLocalStoreConfig();
+		const storePreferences = storeEntity.getPreferences();
 		if (!storePreferences.publicLogSales.enabled) return;
 
 		const guild = await this.client.guilds.fetch(process.env.DISCORD_GUILD_ID!).catch(() => null);
@@ -46,12 +47,16 @@ export class SendPublicSalesLogUsecase {
 
 		const embed = new EmbedBuilder()
 			.setColor(BotConfig.color)
-			.setTitle("🛒 Nova compra feita.")
+			.setTitle("🛒 Nova compra feita. (Log privado)")
 			.setDescription(`Compra feito com successo e com segurança.`);
 
 		embed.addFields([
 			{
 				name: "`🆔` ID do pedido:",
+				value: `\`\`\`#${orderProps.id}\`\`\``,
+			},
+			{
+				name: "`🆔` Referência do pedido:",
 				value: `\`\`\`#${orderProps.shortReference}\`\`\``,
 			},
 			{
@@ -61,6 +66,18 @@ export class SendPublicSalesLogUsecase {
 		]);
 
 		embed.addFields([
+			{
+				name: `Email:`,
+				value: `\`\`\`${orderProps.customer.email}\`\`\``,
+			},
+			{
+				name: `Nome:`,
+				value: `\`\`\`${orderProps.customer.firstName || "Sem Nome"} ${orderProps.customer.lastName || "Sem ultimo nome"}\`\`\``,
+			},
+			{
+				name: `Método de pagamento:`,
+				value: `\`\`\`${orderProps.payment?.gateway?.name || "Sem método de pagamento"}\`\`\``,
+			},
 			{
 				name: "`📅` Pedido feito em:",
 				value: `\`\`\`${new Date(orderProps.createdAt).toLocaleString("pt-br")}\`\`\``,
@@ -75,17 +92,24 @@ export class SendPublicSalesLogUsecase {
 			embed.addFields([
 				{
 					name: "`👤` Comprador:",
-					value: `Muito obrigado  ${member} por comprar em nossa loja!`,
+					value: `${member} ❤️`,
 				},
 			]);
 		}
 
-		await channel.send({ embeds: [embed] }).catch((err) => console.log(err));
+		const viewOnWebsiteButton = new ButtonBuilder()
+			.setLabel(`Visualizar no site`)
+			.setStyle(ButtonStyle.Link)
+			.setURL(`${storeEntity.url}/checkout/${orderProps.id}`);
+
+		await channel
+			.send({ embeds: [embed], components: [new ActionRowBuilder<ButtonBuilder>().addComponents(viewOnWebsiteButton)] })
+			.catch((err) => console.log(err));
 		sentMessages.add(orderProps.shortReference);
 	}
 }
 
-export namespace SendPublicSalesLogUsecase {
+export namespace SendPrivateSalesLogUsecase {
 	export interface Input {
 		discordUserId?: string;
 		orderProps: OrderProps;

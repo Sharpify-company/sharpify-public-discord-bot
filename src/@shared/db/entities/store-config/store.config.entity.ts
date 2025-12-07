@@ -62,13 +62,30 @@ export class StoreConfigEntity extends BaseEntity {
 			privateLogSales: this.preferences?.privateLogSales ?? {
 				enabled: this.preferences?.privateLogSales?.enabled ?? false,
 				onlyDiscordSales: this.preferences?.privateLogSales?.onlyDiscordSales ?? false,
+				channelId: this.preferences?.privateLogSales?.channelId ?? undefined,
 			},
 			publicLogSales: this.preferences?.publicLogSales ?? {
 				enabled: this.preferences?.publicLogSales?.enabled ?? false,
 				onlyDiscordSales: this.preferences?.publicLogSales?.onlyDiscordSales ?? false,
+				channelId: this.preferences?.publicLogSales?.channelId ?? undefined,
 			},
 			failLog: this.preferences?.failLog ?? {
 				enabled: this.preferences?.failLog?.enabled ?? false,
+				channelId: this.preferences?.failLog?.channelId ?? undefined,
+			},
+			confirmDelivery: this.preferences?.confirmDelivery ?? {
+				enabled: this.preferences?.confirmDelivery?.enabled ?? false,
+				channelId: this.preferences?.confirmDelivery?.channelId ?? undefined,
+			},
+			feedbackPublicLog: this.preferences?.feedbackPublicLog ?? {
+				enabled: this.preferences?.feedbackPublicLog?.enabled ?? false,
+				channelId: this.preferences?.feedbackPublicLog?.channelId ?? undefined,
+				onlyDiscordSales: this.preferences?.feedbackPublicLog?.onlyDiscordSales ?? false,
+				minFeedbackStar: this.preferences?.feedbackPublicLog?.minFeedbackStar ?? 4,
+			},
+			feedbackPrivateLog: this.preferences?.feedbackPrivateLog ?? {
+				enabled: this.preferences?.feedbackPrivateLog?.enabled ?? false,
+				channelId: this.preferences?.feedbackPrivateLog?.channelId ?? undefined,
 			},
 		};
 	}
@@ -106,6 +123,20 @@ export namespace StoreConfigEntity {
 			onlyDiscordSales?: boolean;
 		};
 		failLog: {
+			enabled: boolean;
+			channelId?: string;
+		};
+		confirmDelivery: {
+			enabled: boolean;
+			channelId?: string;
+		};
+		feedbackPublicLog: {
+			enabled: boolean;
+			channelId?: string;
+			onlyDiscordSales?: boolean;
+			minFeedbackStar?: number;
+		};
+		feedbackPrivateLog: {
 			enabled: boolean;
 			channelId?: string;
 		};

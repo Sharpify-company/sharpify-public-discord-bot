@@ -41,14 +41,14 @@ import { BuildPreferenceConfigure } from "../_build-preference-configure";
 import { WrapperType } from "@/@shared/types";
 
 @Injectable()
-export class SelectSalesPublicLogChannel {
+export class SelectFeedbackPublicLogChannel {
 	constructor(
 		@Inject(forwardRef(() => BuildPreferenceConfigure))
 		private readonly buildPreferenceConfigure: WrapperType<BuildPreferenceConfigure>,
 		@Inject(Client) private readonly client: Client,
 	) {}
 
-	@ChannelSelect("select_sales_public_log_channel")
+	@ChannelSelect("select_feedback_public_log_channel")
 	private async handleChannelSelected(
 		@Context() [interaction]: StringSelectContext,
 		@SelectedChannels() selected: ISelectedChannels,
@@ -64,10 +64,10 @@ export class SelectSalesPublicLogChannel {
 
 		const store = await getLocalStoreConfig();
 		const preferences = store.getPreferences();
-		preferences.publicLogSales.channelId = channel.id;
+		preferences.feedbackPublicLog.channelId = channel.id;
 		await store.savePreferences(preferences);
 
-		await interaction.update((await this.buildPreferenceConfigure.build({ section: "SALES_PUBLIC_LOG" })) as any);
+		await interaction.update((await this.buildPreferenceConfigure.build({ section: "FEEDBACK_PUBLIC_LOG" })) as any);
 	}
 
 	async createSelectChannel() {
@@ -75,15 +75,15 @@ export class SelectSalesPublicLogChannel {
 		const preferences = store.getPreferences();
 
 		const selectMenu = new ChannelSelectMenuBuilder()
-			.setCustomId(`select_sales_public_log_channel`)
+			.setCustomId(`select_feedback_public_log_channel`)
 			.setPlaceholder("Selecione qual canal o log publico vai ser mandado...")
 			.setMaxValues(1)
 			.setMinValues(1);
 
 		const defaultPlaceholder = "Selecione qual canal o log publico vai ser mandado...";
-		if (preferences.publicLogSales.channelId) {
+		if (preferences.feedbackPublicLog.channelId) {
 			const channel = (await this.client.channels
-				.fetch(preferences.publicLogSales.channelId)
+				.fetch(preferences.feedbackPublicLog.channelId)
 				.catch(() => null)) as TextChannel;
 			if (channel) {
 				selectMenu.setPlaceholder(`✅ Canal selecionado: #${channel.name}`);

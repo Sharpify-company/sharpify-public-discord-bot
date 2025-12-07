@@ -67,7 +67,7 @@ export class SelectSalesPrivateLogChannel {
 		preferences.privateLogSales.channelId = channel.id;
 		await store.savePreferences(preferences);
 
-		await interaction.update((await this.buildPreferenceConfigure.build({ section: "PRIVATE_LOG" })) as any);
+		await interaction.update((await this.buildPreferenceConfigure.build({ section: "SALES_PRIVATE_LOG" })) as any);
 	}
 
 	async createSelectChannel() {

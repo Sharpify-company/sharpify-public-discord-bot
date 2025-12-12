@@ -33,13 +33,13 @@ let SendPrivateSalesLogUsecase = class SendPrivateSalesLogUsecase {
         if (sentMessages.has(orderProps.shortReference)) return;
         const storeEntity = await (0, _sharpify.getLocalStoreConfig)();
         const storePreferences = storeEntity.getPreferences();
-        if (!storePreferences.publicLogSales.enabled) return;
+        if (!storePreferences.privateLogSales.enabled) return;
         const guild = await this.client.guilds.fetch(process.env.DISCORD_GUILD_ID).catch(()=>null);
         if (!guild) return;
         let member = null;
         member = discordUserId ? await guild.members.fetch(discordUserId).catch(()=>null) : null;
-        if (storePreferences.publicLogSales.onlyDiscordSales && !member) return;
-        const channel = await guild.channels.fetch(storePreferences.publicLogSales.channelId).catch(()=>null);
+        if (storePreferences.privateLogSales.onlyDiscordSales && !member) return;
+        const channel = await guild.channels.fetch(storePreferences.privateLogSales.channelId).catch(()=>null);
         if (!channel || channel.type !== _discord.ChannelType.GuildText) return;
         const embed = new _discord.EmbedBuilder().setColor(_config.BotConfig.color).setTitle("🛒 Nova compra feita. (Log privado)").setDescription(`Compra feito com successo e com segurança.`);
         embed.addFields([

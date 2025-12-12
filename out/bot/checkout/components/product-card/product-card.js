@@ -31,8 +31,9 @@ function _ts_metadata(k, v) {
 }
 let ProductCardComponent = class ProductCardComponent {
     getProductEmbed(product) {
-        const emmbed = new _discord.EmbedBuilder().setColor(_memorycreateconfig.MemoryCreateConfig.get(product.id)?.color || _config.BotConfig.color).setTitle("Sistema de compra").setDescription(product.info.discordDescription || new _turndown.default().turndown(product.info.description || "") || "Sem descrição").setImage(product.info.discordMainImage || product.info.mainImage || "");
+        const emmbed = new _discord.EmbedBuilder().setColor(_memorycreateconfig.MemoryCreateConfig.get(product.id)?.color || _config.BotConfig.color).setDescription(product.info.discordDescription || new _turndown.default().turndown(product.info.description || "") || "Sem descrição").setImage(product.info.discordMainImage || product.info.mainImage || "");
         if (product.settings.viewType === "NORMAL") {
+            emmbed.setTitle(product.info.title.length > 256 ? product.info.title.slice(0, 253) + "..." : product.info.title);
             emmbed.addFields({
                 name: "🌐 Produto",
                 value: `\`\`\`${product.info.title}\`\`\``
@@ -45,7 +46,7 @@ let ProductCardComponent = class ProductCardComponent {
                 value: product.readonly.stockQuantityAvailable === null ? `\`\`\`∞ Ilimitado\`\`\`` : `\`\`\`${product.readonly.stockQuantityAvailable} Unidades\`\`\``,
                 inline: true
             });
-        }
+        } else emmbed.setTitle("Sistema de compra");
         return emmbed;
     }
     async getProductCard(product) {

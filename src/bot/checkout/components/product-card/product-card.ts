@@ -24,10 +24,8 @@ export class ProductCardComponent {
 	constructor(private readonly addToCartButtonComponent: AddToCartButtonComponent) {}
 
 	private getProductEmbed(product: ProductProps) {
-
 		const emmbed = new EmbedBuilder()
 			.setColor(MemoryCreateConfig.get(product.id)?.color || BotConfig.color)
-			.setTitle("Sistema de compra")
 			.setDescription(
 				product.info.discordDescription ||
 					new TurndownService().turndown(product.info.description || "") ||
@@ -36,6 +34,7 @@ export class ProductCardComponent {
 			.setImage(product.info.discordMainImage || product.info.mainImage || "");
 
 		if (product.settings.viewType === "NORMAL") {
+			emmbed.setTitle(product.info.title.length > 256 ? product.info.title.slice(0, 253) + "..." : product.info.title);
 			emmbed.addFields(
 				{ name: "🌐 Produto", value: `\`\`\`${product.info.title}\`\`\`` },
 				{
@@ -52,7 +51,8 @@ export class ProductCardComponent {
 					inline: true,
 				},
 			);
-		}
+		} else emmbed.setTitle("Sistema de compra");
+
 		return emmbed;
 	}
 

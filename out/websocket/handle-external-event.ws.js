@@ -28,12 +28,23 @@ let HandleExternalEventWs = class HandleExternalEventWs {
             });
             if (exists) return;
             if (!event.id || !event.contextAggregateId || !event.eventName) return;
-            await _entities.ExternalEventsEntity.createExternalEvent({
-                id: event.id,
-                contextAggregateId: event.contextAggregateId,
-                eventName: event.eventName,
-                payload: event.payload
-            }).save();
+            try {
+                await _entities.ExternalEventsEntity.createExternalEvent({
+                    id: event.id,
+                    contextAggregateId: event.contextAggregateId,
+                    eventName: event.eventName,
+                    payload: event.payload
+                }).save();
+            } catch (err) {
+                const error = err;
+                // Verifica se o erro é de constraint única (SQLite usa o código 'SQLITE_CONSTRAINT')
+                if (error.code === "SQLITE_CONSTRAINT" || error.message.includes("UNIQUE")) {
+                    console.log(`Evento ${event.id} já existe, ignorando...`);
+                } else {
+                    // Se for outro erro, dispara novamente
+                    throw error;
+                }
+            }
         });
     }
     constructor(wsClientService){

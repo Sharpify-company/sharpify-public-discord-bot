@@ -8,9 +8,7 @@ import { Cron } from "@nestjs/schedule";
 
 @Injectable()
 export class HandleExternalEventWs implements OnModuleInit {
-	constructor(
-		private readonly wsClientService: WsClientService,
-	) {}
+	constructor(private readonly wsClientService: WsClientService) {}
 
 	onModuleInit() {
 		this.wsClientService
@@ -21,14 +19,25 @@ export class HandleExternalEventWs implements OnModuleInit {
 				const exists = await ExternalEventsEntity.findOneBy({ id: event.id });
 				if (exists) return;
 
-				if(!event.id || !event.contextAggregateId || !event.eventName) return;
+				if (!event.id || !event.contextAggregateId || !event.eventName) return;
 
-				await ExternalEventsEntity.createExternalEvent({
-					id: event.id,
-					contextAggregateId: event.contextAggregateId,
-					eventName: event.eventName,
-					payload: event.payload,
-				}).save();
+				try {
+					await ExternalEventsEntity.createExternalEvent({
+						id: event.id,
+						contextAggregateId: event.contextAggregateId,
+						eventName: event.eventName,
+						payload: event.payload,
+					}).save();
+				} catch (err) {
+					const error = err as any;
+					// Verifica se o erro é de constraint única (SQLite usa o código 'SQLITE_CONSTRAINT')
+					if (error.code === "SQLITE_CONSTRAINT" || error.message.includes("UNIQUE")) {
+						console.log(`Evento ${event.id} já existe, ignorando...`);
+					} else {
+						// Se for outro erro, dispara novamente
+						throw error;
+					}
+				}
 			});
 	}
 }

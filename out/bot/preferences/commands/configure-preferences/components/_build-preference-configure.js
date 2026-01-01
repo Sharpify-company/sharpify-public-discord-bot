@@ -82,8 +82,8 @@ let BuildPreferenceConfigure = class BuildPreferenceConfigure {
                     type: 1,
                     components: [
                         new _discord.ButtonBuilder().setCustomId("title_feedback").setLabel("⭐ Feedback").setStyle(_discord.ButtonStyle.Primary).setDisabled(true),
-                        feedbackPublicLogButton,
-                        feedbackPrivateLogButton
+                        feedbackPrivateLogButton,
+                        feedbackPublicLogButton
                     ]
                 },
                 {

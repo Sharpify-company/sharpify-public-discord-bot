@@ -150,8 +150,8 @@ export class BuildPreferenceConfigure {
 							.setLabel("⭐ Feedback")
 							.setStyle(ButtonStyle.Primary)
 							.setDisabled(true),
-						feedbackPublicLogButton,
 						feedbackPrivateLogButton,
+						feedbackPublicLogButton,
 					],
 				},
 

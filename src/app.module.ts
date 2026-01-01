@@ -8,12 +8,20 @@ import { ScheduleModule } from "@nestjs/schedule";
 import { WsClientService } from "./app.ws.service";
 import { WebsocketModule } from "./websocket/websocket.module";
 import { LogChannel } from "./log-channel.service";
+import { APP_FILTER } from "@nestjs/core";
 
 @Global()
 @Module({
 	imports: [ScheduleModule.forRoot(), BotModule, WokerModule, WebsocketModule],
 	controllers: [],
-	providers: [WsClientService, LogChannel],
+	providers: [
+		WsClientService,
+		LogChannel,
+		// {
+		// 	provide: APP_FILTER,
+		// 	useClass: DiscordExceptionFilter,
+		// },
+	],
 	exports: [WsClientService, LogChannel],
 })
 export class AppModule {}

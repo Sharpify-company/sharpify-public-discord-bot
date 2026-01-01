@@ -4,6 +4,18 @@ import { TypeormProvider } from "./@shared/db/typeorm";
 import { Sharpify } from "./@shared/sharpify";
 import { StoreConfigEntity } from "./@shared/db/entities";
 
+// --- ADICIONE ISSO AQUI PARA EVITAR CRASH ---
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('🚨 [Anti-Crash] Rejeição de Promise não tratada:', reason);
+    // O simples fato de ouvir esse evento impede o Node de fechar o processo
+});
+
+process.on('uncaughtException', (error) => {
+    console.error('🚨 [Anti-Crash] Erro não capturado:', (error?.name));
+    // Impede o fechamento abrupto
+});
+// -------------------------------------------
+
 async function bootstrap() {
 	await TypeormProvider.init();
 
@@ -21,8 +33,8 @@ async function bootstrap() {
 	if (!storeConfigEntity) await StoreConfigEntity.createStore(getStoreReq.data).save();
 	else await storeConfigEntity.updateProps(getStoreReq.data);
 
-	await NestFactory.createApplicationContext(AppModule);
+	const app = await NestFactory.create(AppModule);
 
-	// await app.listen(process.env.PORT ?? 3000);
+	await app.init();
 }
 bootstrap();

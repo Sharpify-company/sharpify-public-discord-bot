@@ -7,7 +7,7 @@ export class PersonalInfoEmbedded {
 
 	@Column({ name: "personalInfo_firstName", type: "text", nullable: true })
 	firstName!: string;
-	
+
 	@Column({ name: "personalInfo_lastName", type: "text", nullable: true })
 	lastName!: string;
 

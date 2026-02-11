@@ -1,1 +1,1 @@
-export * from './add-to-cart.event';
+export * from "./add-to-cart.event";

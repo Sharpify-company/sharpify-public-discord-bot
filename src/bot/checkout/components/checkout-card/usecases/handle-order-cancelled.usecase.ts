@@ -24,7 +24,7 @@ export class HandleOrderCancelledUsecase {
 		const discordUser = await DiscordUserEntity.findOneBy({ id: discordUserId });
 		if (!discordUser) return;
 
-		const orderChannel = await this.client.channels.fetch(discordUser.cart.channelId!).catch(() => null);
+		const orderChannel = await this.client.channels.fetch(discordUser.cart.channelId).catch(() => null);
 		orderChannel && (await orderChannel.delete().catch(() => null));
 
 		await discordUser.cart.cancelOrder();

@@ -1,7 +1,7 @@
-import { ProductProps } from "@/@shared/sharpify/api"
+import { ProductProps } from "@/@shared/sharpify/api";
 
 export type CheckoutCartItem = {
-    product: ProductProps
-    item: ProductProps.ProductItem
-    quantity: number
-}
+	product: ProductProps;
+	item: ProductProps.ProductItem;
+	quantity: number;
+};

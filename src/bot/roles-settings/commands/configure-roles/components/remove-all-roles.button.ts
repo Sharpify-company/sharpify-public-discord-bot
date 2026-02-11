@@ -58,7 +58,7 @@ export class RemoveAllRolesComponent {
 		const store = await getLocalStoreConfig();
 		await store.updateRoleSettings([]);
 
-		await interaction.update((await this.buildRoleConfigure.build()) as any)
+		await interaction.update((await this.buildRoleConfigure.build()) as any);
 		// interaction.reply({
 		// 	content: "Todos os cargos foram removidos com successo!",
 		// 	flags: ["Ephemeral"],

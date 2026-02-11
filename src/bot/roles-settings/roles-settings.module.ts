@@ -1,9 +1,9 @@
-import { Module } from '@nestjs/common';
-import { ConfigureRolesModule } from './commands/configure-roles/configure-roles.module';
+import { Module } from "@nestjs/common";
+import { ConfigureRolesModule } from "./commands/configure-roles/configure-roles.module";
 
 @Module({
-  imports: [ConfigureRolesModule],
-  controllers: [],
-  providers: [],
+	imports: [ConfigureRolesModule],
+	controllers: [],
+	providers: [],
 })
 export class RoleSettingsModule {}

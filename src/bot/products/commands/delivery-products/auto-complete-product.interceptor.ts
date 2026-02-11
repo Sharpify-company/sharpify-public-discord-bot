@@ -46,7 +46,7 @@ export class ProductAutocompleteInterceptor extends AutocompleteInterceptor {
 					);
 				})
 				.map(({ item, product }) => {
-					let title =
+					const title =
 						product.settings.viewType === "NORMAL"
 							? product.info.title
 							: `${product.info.title} ➡️ ${item.info.title}`;

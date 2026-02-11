@@ -35,7 +35,6 @@ export class BuildFeedbackPrivateLogSection {
 		private readonly goBackButtonComponent: GoBackButtonComponent,
 		@Inject(forwardRef(() => EnableFeedbackPrivateLogButton))
 		private readonly enableFeedbackPrivateLogButton: EnableFeedbackPrivateLogButton,
-		
 
 		@Inject(Client) private readonly client: Client,
 	) {}

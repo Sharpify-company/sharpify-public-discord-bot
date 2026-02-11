@@ -96,9 +96,7 @@ export class ConfirmDeliveryCommand {
 		const emmbed = new EmbedBuilder()
 			.setColor(BotConfig.color)
 			.setTitle("Entrega Confirmada!")
-			.setDescription(
-				`Pedido entregue pelo administrador ${interaction.user} para o cliente ${user}.`,
-			);
+			.setDescription(`Pedido entregue pelo administrador ${interaction.user} para o cliente ${user}.`);
 
 		const productName =
 			orderItem.product.backup.viewType === "NORMAL"

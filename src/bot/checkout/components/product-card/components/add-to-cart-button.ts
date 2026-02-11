@@ -15,9 +15,16 @@ export class AddToCartButtonComponent {
 		const options = product.dynamicItems
 			.map((item) => ({
 				label: `${item.info.title}`.slice(0, 100), // Discord limit: 100 characters
-				description: `💸 Valor: ${formatPrice(item.pricing.price)} | 📦 Estoque ${item.inventory.stockQuantity === null ? "Ilimitado" : `${item.inventory.stockQuantity} unidades`}`.slice(0, 100), // Discord limit: 100 characters
+				description:
+					`💸 Valor: ${formatPrice(item.pricing.price)} | 📦 Estoque ${item.inventory.stockQuantity === null ? "Ilimitado" : `${item.inventory.stockQuantity} unidades`}`.slice(
+						0,
+						100,
+					), // Discord limit: 100 characters
 				value: item.id,
-				emoji: product.readonly.stockQuantityAvailable !== null && product.readonly.stockQuantityAvailable <= 0 ? "❌" : "🛒",
+				emoji:
+					product.readonly.stockQuantityAvailable !== null && product.readonly.stockQuantityAvailable <= 0
+						? "❌"
+						: "🛒",
 			}))
 			.slice(0, 25); // Discord limit: 25 options maximum
 

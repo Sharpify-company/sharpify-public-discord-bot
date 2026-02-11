@@ -37,8 +37,14 @@ import { HandleOrderFeedbackSentModule } from "./usecases/handle-order-feedback-
 		HandleOrderApprovedUsecase,
 		HandleOrderCancelledUsecase,
 		ViewOnWebsiteButtonComponent,
-		OpenDmTutorialButtonComponent
+		OpenDmTutorialButtonComponent,
 	],
-	exports: [CheckoutCardComponent, CartEmmbedComponent, SectionManagerHandler, HandleOrderApprovedUsecase, HandleOrderCancelledUsecase],
+	exports: [
+		CheckoutCardComponent,
+		CartEmmbedComponent,
+		SectionManagerHandler,
+		HandleOrderApprovedUsecase,
+		HandleOrderCancelledUsecase,
+	],
 })
 export class CheckoutCardModule {}

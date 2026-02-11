@@ -49,7 +49,7 @@ export class SelectPaymentMethodComponent {
 	private async handleItemSelected(@Context() [interaction]: StringSelectContext, @SelectedStrings() selected: string[]) {
 		const discordUser = await DiscordUserEntity.findOneBy({ id: interaction.user.id });
 		if (discordUser) {
-			discordUser.cart.gatewayMethod = selected[0]! as any;
+			discordUser.cart.gatewayMethod = selected[0] as any;
 			await discordUser.save();
 		}
 
@@ -73,28 +73,33 @@ export class SelectPaymentMethodComponent {
 			await discordUser?.cart.updateGatewayMethod(defaultGatewayMethod);
 		}
 
-		const options = await Promise.all(
-			storeConfig.paymentGateways.map(async (item, index) => {
-				const result: any = {
-					label: "Metodo desconhecido",
-					description: `Metodo desconhecido.`,
-					value: item.gatewayMethod,
-					default: defaultGatewayMethod === item.gatewayMethod,
-				};
-				if (item.gatewayMethod === "PIX") {
-					const pixEmoji = await FindEmojiHelper({ client: this.client, name: "Sharpify_pix" });
-					result.emoji = { id: pixEmoji?.id };
-					result.label = "Método de pagamento PIX";
-					result.description = `Pague via PIX utilizando nosso gerenciador de pagamentos.`;
-				} else if (item.gatewayMethod === "EFI_PAY_PREFERENCE") {
-					const efiEmoji = await FindEmojiHelper({ client: this.client, name: "Sharpify_efibank" });
-					result.emoji = { id: efiEmoji?.id };
-					result.label = "Link de pagamento EFI Bank";
-					result.description = `Pague via cartão de crédito utilizando nosso gerenciador de pagamentos.`;
-				}
-				return result;
-			}),
-		);
+		const options = (
+			await Promise.all(
+				storeConfig.paymentGateways.map(async (item, index) => {
+					const result: any = {
+						label: "Metodo desconhecido",
+						description: `Metodo desconhecido.`,
+						value: item.gatewayMethod,
+						default: defaultGatewayMethod === item.gatewayMethod,
+					};
+					if (item.gatewayMethod === "PIX") {
+						const pixEmoji = await FindEmojiHelper({ client: this.client, name: "Sharpify_pix" });
+						result.emoji = { id: pixEmoji?.id };
+						result.label = "Método de pagamento PIX";
+						result.description = `Pague via PIX utilizando nosso gerenciador de pagamentos.`;
+					} else if (item.gatewayMethod === "EFI_PAY_PREFERENCE") {
+						const efiEmoji = await FindEmojiHelper({ client: this.client, name: "Sharpify_efibank" });
+						result.emoji = { id: efiEmoji?.id };
+						result.label = "Link de pagamento EFI Bank";
+						result.description = `Pague via cartão de crédito utilizando nosso gerenciador de pagamentos.`;
+					}
+					// Truncate label and description to Discord's 100 character limit
+					result.label = result.label.slice(0, 100);
+					result.description = result.description.slice(0, 100);
+					return result;
+				}),
+			)
+		).slice(0, 25); // Discord limit: 25 options maximum
 
 		const selectMenu = new StringSelectMenuBuilder()
 			.setCustomId(`gateway_method_selected`)

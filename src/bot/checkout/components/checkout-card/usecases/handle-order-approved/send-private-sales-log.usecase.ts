@@ -42,7 +42,9 @@ export class SendPrivateSalesLogUsecase {
 		member = discordUserId ? await guild.members.fetch(discordUserId).catch(() => null) : null;
 		if (storePreferences.privateLogSales.onlyDiscordSales && !member) return;
 
-		const channel = (await guild.channels.fetch(storePreferences.privateLogSales.channelId!).catch(() => null)) as TextChannel;
+		const channel = (await guild.channels
+			.fetch(storePreferences.privateLogSales.channelId!)
+			.catch(() => null)) as TextChannel;
 		if (!channel || channel.type !== ChannelType.GuildText) return;
 
 		const embed = new EmbedBuilder()

@@ -63,7 +63,7 @@ export class OpenDmTutorialButtonComponent {
 
 		await interaction.reply({
 			embeds: [OpenDm],
-            flags: ["Ephemeral"],
+			flags: ["Ephemeral"],
 		});
 	}
 

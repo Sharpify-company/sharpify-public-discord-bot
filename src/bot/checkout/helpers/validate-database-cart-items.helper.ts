@@ -103,7 +103,7 @@ export async function ValidateDatabaseCartItemsHelper({ discordUserId }: { disco
 	}
 
 	const subTotal = user.cart.cartItems.reduce((acc, item) => acc + item.subTotalPrice, 0);
-	let total = user.cart.cartItems.reduce((acc, item) => acc + item.totalPrice, 0);
+	const total = user.cart.cartItems.reduce((acc, item) => acc + item.totalPrice, 0);
 
 	user.cart.subTotalPrice = subTotal;
 	user.cart.totalPrice = total;

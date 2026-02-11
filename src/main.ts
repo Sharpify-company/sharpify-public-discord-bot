@@ -5,14 +5,20 @@ import { Sharpify } from "./@shared/sharpify";
 import { StoreConfigEntity } from "./@shared/db/entities";
 
 // --- ADICIONE ISSO AQUI PARA EVITAR CRASH ---
-process.on('unhandledRejection', (reason, promise) => {
-    console.error('🚨 [Anti-Crash] Rejeição de Promise não tratada:', reason);
-    // O simples fato de ouvir esse evento impede o Node de fechar o processo
+process.on("unhandledRejection", (reason, promise) => {
+	console.error("🚨 [Anti-Crash] Rejeição de Promise não tratada:");
+	console.error("Razão:", reason);
+	if (reason instanceof Error) {
+		console.error("Stack trace:", reason.stack);
+	}
+	// O simples fato de ouvir esse evento impede o Node de fechar o processo
 });
 
-process.on('uncaughtException', (error) => {
-    console.error('🚨 [Anti-Crash] Erro não capturado:', (error?.name));
-    // Impede o fechamento abrupto
+process.on("uncaughtException", (error) => {
+	console.error("🚨 [Anti-Crash] Erro não capturado:", error?.name);
+	console.error("Mensagem:", error?.message);
+	console.error("Stack trace:", error?.stack);
+	// Impede o fechamento abrupto
 });
 // -------------------------------------------
 
@@ -29,7 +35,7 @@ async function bootstrap() {
 		);
 	}
 
-	let storeConfigEntity = await StoreConfigEntity.findOneBy({ id: "DEFAULT" });
+	const storeConfigEntity = await StoreConfigEntity.findOneBy({ id: "DEFAULT" });
 	if (!storeConfigEntity) await StoreConfigEntity.createStore(getStoreReq.data).save();
 	else await storeConfigEntity.updateProps(getStoreReq.data);
 

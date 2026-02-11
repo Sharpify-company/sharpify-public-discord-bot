@@ -73,7 +73,7 @@ export class MinFeedbackStarButton {
 
 		await interaction.reply({
 			content: `Estrela mínima de feedback público atualizada para ${minStar}⭐ com sucesso! Quando um feedback for recebido com pelo menos ${minStar}⭐, ele não registrado em nenhum canal.`,
-            flags: ["Ephemeral"]
+			flags: ["Ephemeral"],
 		});
 	}
 
@@ -83,13 +83,13 @@ export class MinFeedbackStarButton {
 
 		const modal = new ModalBuilder()
 			.setCustomId(`edit_min_feedback_star_public_log_modal`)
-			.setTitle(`Aplicar Estrela Mínima de Feedback. 1⭐ - 5⭐`)
+			.setTitle(`Aplicar Estrela Mínima de Feedback. 1⭐ - 5⭐`);
 
 		const starInput = new TextInputBuilder()
 			.setCustomId("minStar")
 			.setLabel(`Insira o número mínimo de estrelas`)
 			.setStyle(TextInputStyle.Short)
-            .setValue(minFeedbackStar.toString())
+			.setValue(minFeedbackStar.toString())
 			.setMinLength(1)
 			.setMaxLength(50)
 			.setRequired(true);
@@ -102,7 +102,7 @@ export class MinFeedbackStarButton {
 	async createButton() {
 		const minFeedbackStar = (await getLocalStoreConfig()).getPreferences().feedbackPublicLog.minFeedbackStar || 4;
 
-		let minFeedbackStarButton = new ButtonBuilder()
+		const minFeedbackStarButton = new ButtonBuilder()
 			.setCustomId("edit_min_feedback_star_public_log")
 			.setLabel(`Editar estrela mínima | Atual: ${minFeedbackStar}⭐`)
 			.setStyle(ButtonStyle.Secondary);

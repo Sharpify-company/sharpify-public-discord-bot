@@ -48,7 +48,7 @@ export class HandleOrderApprovedUsecase {
 		const discordUser = await DiscordUserEntity.findOneBy({ id: orderEntity.customerId });
 		if (!discordUser) return;
 
-		const orderChannel = await this.client.channels.fetch(discordUser.cart.channelId!).catch(() => null);
+		const orderChannel = await this.client.channels.fetch(discordUser.cart.channelId).catch(() => null);
 		orderChannel && (await orderChannel.delete().catch(() => null));
 
 		await orderEntity.markAsPreparingDelivery();

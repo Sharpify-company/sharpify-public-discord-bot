@@ -40,7 +40,7 @@ export class ListProductsCommand {
 	public async onListProducts(@Context() [interaction]: SlashCommandContext, @Options() { productId }: InputDto) {
 		const product = await Sharpify.api.v1.catalog.product.get({
 			id: productId,
-			includeNonListed: true
+			includeNonListed: true,
 		});
 
 		if (!product.success) {
@@ -51,15 +51,15 @@ export class ListProductsCommand {
 		}
 
 		const { CreateProductConfigButton } = await this.createConfigButtonComponent.createButton({
-			productId: product.data.product.id!,
+			productId: product.data.product.id,
 		});
 		return interaction.reply({
 			embeds: [this.productEmmbed.createEmbbed(product.data.product)],
 			components: [
-        {
-          type: 1,
-          components: [CreateProductConfigButton],
-        },
+				{
+					type: 1,
+					components: [CreateProductConfigButton],
+				},
 				this.selectSetProductOnChannel.createSelectChannel({
 					interaction,
 					product: product.data.product,

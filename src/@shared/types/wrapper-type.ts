@@ -1,1 +1,1 @@
-export type WrapperType<T> = T; 
+export type WrapperType<T> = T;

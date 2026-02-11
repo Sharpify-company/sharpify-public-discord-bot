@@ -13,7 +13,6 @@ const envSchema = z.object({
 	CHECKOUT_CATEGORY_ID: z.string().min(1, "CHECKOUT_CATEGORY_ID is required"),
 	API_TOKEN: z.string().min(1, "API_TOKEN is required"),
 	DEFAULT_COLOR: z.string().optional(),
-	
 
 	NODE_ENV: z.enum(["development", "production", "test"]),
 });

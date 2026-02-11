@@ -37,7 +37,7 @@ export class HandleDeliverToDiscordUserPrivate {
 			.setEmoji("🔗")
 			.setURL(`${url}/checkout/${orderEntity.id}`);
 
-		let fileAttachments: AttachmentBuilder[] = [];
+		const fileAttachments: AttachmentBuilder[] = [];
 		for (const orderItem of orderEntity.orderProps.orderItems) {
 			fields.push({
 				name: `🛒 Produto:`,

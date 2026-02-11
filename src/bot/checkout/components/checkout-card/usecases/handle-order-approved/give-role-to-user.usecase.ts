@@ -19,10 +19,7 @@ import { get } from "http";
 
 @Injectable()
 export class GiveRoleToUserUsecase {
-	constructor(
-		@Inject(Client) private readonly client: Client,
-	) {}
-
+	constructor(@Inject(Client) private readonly client: Client) {}
 
 	async execute({ discordUserId }: GiveRoleToUserUsecase.Input) {
 		const guild = await this.client.guilds.fetch(process.env.DISCORD_GUILD_ID!).catch(() => null);

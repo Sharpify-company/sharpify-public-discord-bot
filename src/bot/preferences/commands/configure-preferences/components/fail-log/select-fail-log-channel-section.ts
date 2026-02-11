@@ -82,9 +82,7 @@ export class SelectFailLogChannel {
 
 		const defaultPlaceholder = "Selecione qual canal o log de falhas vai ser mandado...";
 		if (preferences.failLog.channelId) {
-			const channel = (await this.client.channels
-				.fetch(preferences.failLog.channelId)
-				.catch(() => null)) as TextChannel;
+			const channel = (await this.client.channels.fetch(preferences.failLog.channelId).catch(() => null)) as TextChannel;
 			if (channel) {
 				selectMenu.setPlaceholder(`✅ Canal selecionado: #${channel.name}`);
 			} else selectMenu.setPlaceholder(defaultPlaceholder);

@@ -6,7 +6,6 @@ import { HandleProductEvent } from "./usecases";
 
 @Injectable()
 export class RevalidateStoreConfigWorker {
-
 	@Cron("0 * * * * *")
 	handleCron() {
 		this.execute();
@@ -16,7 +15,7 @@ export class RevalidateStoreConfigWorker {
 		const getStoreReq = await Sharpify.api.v1.management.store.getStore();
 		if (!getStoreReq.success) return console.error("Revalidar configuração da loja falhou:", getStoreReq.errorName);
 
-		let storeConfigEntity = await StoreConfigEntity.findOneBy({ id: "DEFAULT" });
+		const storeConfigEntity = await StoreConfigEntity.findOneBy({ id: "DEFAULT" });
 		if (!storeConfigEntity) await StoreConfigEntity.createStore(getStoreReq.data).save();
 		else await storeConfigEntity.updateProps(getStoreReq.data);
 	}

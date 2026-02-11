@@ -59,15 +59,13 @@ export class CancelOrderButtonComponent {
 
 		const discordUser = await DiscordUserEntity.findOneBy({ id: interaction.user.id });
 		if (!discordUser) return await HandleDiscordMemberNotFound({ interaction });
-		
+
 		await interaction.editReply({
 			content: "✅ | Seu pedido foi cancelado com sucesso.",
 			components: [],
 			embeds: [],
 		});
 		await this.HandleOrderCancelledUsecase.execute({ discordUserId: discordUser.id });
-
-
 	}
 
 	async createButton() {

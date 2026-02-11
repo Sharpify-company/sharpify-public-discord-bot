@@ -57,7 +57,7 @@ export class SelectRole {
 				flags: ["Ephemeral"],
 			});
 		}
-		if(role.permissions === "Administrator") {
+		if (role.permissions === "Administrator") {
 			return interaction.reply({
 				content: "Cargos com permissão de Administrador não podem ser selecionados!",
 				flags: ["Ephemeral"],
@@ -77,7 +77,7 @@ export class SelectRole {
 		await store.updateRoleSettings([...(store.applyRolesSettings || []), { roleId: role.id }]);
 
 		// interaction.message.edit(await this.buildRoleConfigure.build());
-		interaction.update(await this.buildRoleConfigure.build() as any);
+		interaction.update((await this.buildRoleConfigure.build()) as any);
 	}
 
 	createSelectChannel({}: {}) {

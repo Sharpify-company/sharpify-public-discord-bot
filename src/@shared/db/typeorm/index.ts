@@ -6,7 +6,7 @@ export const AppDataSource = new DataSource({
 	database: path.join(process.cwd(), "/database.db"),
 	// synchronize: true,
 	entities: [process.cwd() + "/dist/**/*.entity.{ts,js}", process.cwd() + "/out/**/*.entity.{ts,js}"],
-	migrations: [process.cwd() + "/dist/migrations/*.{ts,js}", process.cwd() + "/out/migrations/*.{ts,js}",],
+	migrations: [process.cwd() + "/dist/migrations/*.{ts,js}", process.cwd() + "/out/migrations/*.{ts,js}"],
 	migrationsTableName: "typeorm_migrations",
 });
 

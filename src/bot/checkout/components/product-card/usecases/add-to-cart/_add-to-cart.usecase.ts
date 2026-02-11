@@ -73,7 +73,7 @@ export class AddToCartUsecase {
 			await this.checkoutCardComponent.editCheckoutCardToChannel({
 				channel,
 				discordUser: user,
-				messageId: user.cart.messageId!,
+				messageId: user.cart.messageId,
 			});
 		}
 

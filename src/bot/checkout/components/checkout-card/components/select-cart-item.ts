@@ -63,18 +63,20 @@ export class SelectCartItemComponent {
 
 		const checkoutCartItems = await getCheckoutCartItemsHelper({ discordUserId });
 
-		const options = checkoutCartItems.map((item) => ({
-			label: formatCheckoutCartItemNameHelper(item).slice(0, 100),
-			description: `💸 Valor: ${formatPrice(item.item.pricing.price)} | 📦 Estoque ${item.item.inventory.stockQuantity === null ? "Ilimitado" : `${item.item.inventory.stockQuantity} unidades`}`,
-			value: `${item.product.id}:${item.item.id}`,
-			emoji: "🛒",
-			default: defaultItemId ? item.item.id === defaultItemId : false,
-		})).slice(0, 24); // Discord limit
+		const options = checkoutCartItems
+			.map((item) => ({
+				label: formatCheckoutCartItemNameHelper(item).slice(0, 100),
+				description: `💸 Valor: ${formatPrice(item.item.pricing.price)} | 📦 Estoque ${item.item.inventory.stockQuantity === null ? "Ilimitado" : `${item.item.inventory.stockQuantity} unidades`}`,
+				value: `${item.product.id}:${item.item.id}`,
+				emoji: "🛒",
+				default: defaultItemId ? item.item.id === defaultItemId : false,
+			}))
+			.slice(0, 24); // Discord limit
 
 		const selectMenu = new StringSelectMenuBuilder()
 			.setCustomId(`cart_item_select`)
 			.setPlaceholder("📦 Edite a quantidade ou remova o item do carrinho")
-			.addOptions(options)
+			.addOptions(options);
 
 		const row = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(selectMenu);
 

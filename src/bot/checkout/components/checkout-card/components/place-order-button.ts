@@ -96,9 +96,9 @@ export class PlaceOrderButtonComponent {
 				gatewayMethod: discordUser.cart.gatewayMethod || "PIX",
 			},
 			customer: {
-				firstName: discordUser.personalInfo.firstName!,
-				lastName: discordUser.personalInfo.lastName!,
-				email: discordUser.personalInfo.email!,
+				firstName: discordUser.personalInfo.firstName,
+				lastName: discordUser.personalInfo.lastName,
+				email: discordUser.personalInfo.email,
 			},
 			products: discordUser.cart.cartItems.map((item) => ({
 				productId: item.productId,
@@ -129,7 +129,7 @@ export class PlaceOrderButtonComponent {
 		await orderEntity.save();
 
 		if (placeOrderResult.data.isApproved) {
-			if(interaction.replied || interaction.deferred) {
+			if (interaction.replied || interaction.deferred) {
 				await interaction.editReply({
 					content: `Pagamento aprovado! Seu pedido #${orderEntity.id} foi confirmado com sucesso.`,
 				});
@@ -166,8 +166,8 @@ export class PlaceOrderButtonComponent {
 
 		const modal = new ModalBuilder().setCustomId(`place_order_modal`).setTitle(`Informações do pagador`);
 
-		const defaultFirstName = discordUser.personalInfo.firstName || interaction.user?.displayName?.split(" ")?.at(0)
-		const defaultLastName = discordUser.personalInfo.lastName || interaction.user?.username
+		const defaultFirstName = discordUser.personalInfo.firstName || interaction.user?.displayName?.split(" ")?.at(0);
+		const defaultLastName = discordUser.personalInfo.lastName || interaction.user?.username;
 
 		const firstNameInput = new TextInputBuilder()
 			.setCustomId("firstNameInput")

@@ -12,14 +12,14 @@ export class AddToCartButtonComponent {
 	constructor(@Inject(Client) private readonly client: Client) {}
 
 	async createDynamicItemsSelect(product: ProductProps) {
-		const options = product.dynamicItems.map((item) => ({
-			label: `${item.info.title}`,
-			description: `💸 Valor: ${formatPrice(item.pricing.price)} | 📦 Estoque ${item.inventory.stockQuantity === null ? "Ilimitado" : `${item.inventory.stockQuantity} unidades`}`,
-			value: item.id,
-			emoji: product.readonly.stockQuantityAvailable !== null && product.readonly.stockQuantityAvailable <= 0 ? "❌" : "🛒",
-		})).slice(0, 24); // O Discord permite no máximo 25 opções
-
-
+		const options = product.dynamicItems
+			.map((item) => ({
+				label: `${item.info.title}`.slice(0, 100), // Discord limit: 100 characters
+				description: `💸 Valor: ${formatPrice(item.pricing.price)} | 📦 Estoque ${item.inventory.stockQuantity === null ? "Ilimitado" : `${item.inventory.stockQuantity} unidades`}`.slice(0, 100), // Discord limit: 100 characters
+				value: item.id,
+				emoji: product.readonly.stockQuantityAvailable !== null && product.readonly.stockQuantityAvailable <= 0 ? "❌" : "🛒",
+			}))
+			.slice(0, 25); // Discord limit: 25 options maximum
 
 		const selectMenu = new StringSelectMenuBuilder()
 			.setCustomId(`add_to_cart_${product.id}`)

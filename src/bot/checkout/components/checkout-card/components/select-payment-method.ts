@@ -73,7 +73,7 @@ export class SelectPaymentMethodComponent {
 			await discordUser?.cart.updateGatewayMethod(defaultGatewayMethod);
 		}
 
-		const options = await Promise.all(
+		const options = (await Promise.all(
 			storeConfig.paymentGateways.map(async (item, index) => {
 				const result: any = {
 					label: "Metodo desconhecido",
@@ -92,9 +92,12 @@ export class SelectPaymentMethodComponent {
 					result.label = "Link de pagamento EFI Bank";
 					result.description = `Pague via cartão de crédito utilizando nosso gerenciador de pagamentos.`;
 				}
+				// Truncate label and description to Discord's 100 character limit
+				result.label = result.label.slice(0, 100);
+				result.description = result.description.slice(0, 100);
 				return result;
 			}),
-		);
+		)).slice(0, 25); // Discord limit: 25 options maximum
 
 		const selectMenu = new StringSelectMenuBuilder()
 			.setCustomId(`gateway_method_selected`)

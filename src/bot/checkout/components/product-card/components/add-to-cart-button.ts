@@ -30,7 +30,7 @@ export class AddToCartButtonComponent {
 
 		// Discord requires at least 1 option
 		if (options.length === 0) {
-			throw new Error("Cannot create select menu with no options");
+			throw new Error(`Cannot create select menu with no options for product ${product.id} (${product.info.title})`);
 		}
 
 		const selectMenu = new StringSelectMenuBuilder()

@@ -57,7 +57,7 @@ export class SelectSetProductOnChannel {
 
 		const product = await Sharpify.api.v1.catalog.product.get({
 			id: productId,
-			includeNonListed: true
+			includeNonListed: true,
 		});
 
 		if (!product.success) {

@@ -49,7 +49,7 @@ export class SelectPaymentMethodComponent {
 	private async handleItemSelected(@Context() [interaction]: StringSelectContext, @SelectedStrings() selected: string[]) {
 		const discordUser = await DiscordUserEntity.findOneBy({ id: interaction.user.id });
 		if (discordUser) {
-			discordUser.cart.gatewayMethod = selected[0]! as any;
+			discordUser.cart.gatewayMethod = selected[0] as any;
 			await discordUser.save();
 		}
 

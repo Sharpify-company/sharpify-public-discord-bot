@@ -30,7 +30,7 @@ import { ManualDeliveryConfirmModule } from "./manual-delivery-confirm/manual-de
 		CheckoutModule,
 		RoleSettingsModule,
 		PreferencesModule,
-		ManualDeliveryConfirmModule
+		ManualDeliveryConfirmModule,
 	],
 	controllers: [],
 	providers: [AppUpdate, AppService, EmojiService],

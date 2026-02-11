@@ -8,7 +8,7 @@ import { SendPrivateSalesLogUsecase } from "./send-private-sales-log.usecase";
 @Module({
 	imports: [],
 	controllers: [],
-	providers: [HandleOrderApprovedUsecase, GiveRoleToUserUsecase, SendPublicSalesLogUsecase, SendPrivateSalesLogUsecase, ],
-	exports: [HandleOrderApprovedUsecase, GiveRoleToUserUsecase, SendPublicSalesLogUsecase, SendPrivateSalesLogUsecase, ],
+	providers: [HandleOrderApprovedUsecase, GiveRoleToUserUsecase, SendPublicSalesLogUsecase, SendPrivateSalesLogUsecase],
+	exports: [HandleOrderApprovedUsecase, GiveRoleToUserUsecase, SendPublicSalesLogUsecase, SendPrivateSalesLogUsecase],
 })
 export class HandleOrderApprovedUsecaseModuleModule {}

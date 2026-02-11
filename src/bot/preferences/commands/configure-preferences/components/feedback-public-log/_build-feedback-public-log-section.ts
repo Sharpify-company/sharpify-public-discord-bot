@@ -42,8 +42,6 @@ export class BuildFeedbackPublicLogSection {
 		@Inject(forwardRef(() => MinFeedbackStarButton))
 		private readonly minFeedbackStarButton: MinFeedbackStarButton,
 
-		
-
 		@Inject(Client) private readonly client: Client,
 	) {}
 	async build(): Promise<string | InteractionReplyOptions | MessagePayload> {
@@ -63,7 +61,12 @@ export class BuildFeedbackPublicLogSection {
 			components: [
 				{
 					type: 1,
-					components: [enableFeedbackPublicLogButton, onlyDiscordSalesPublicLogButton, minFeedbackStarButton, goBackButtonButton],
+					components: [
+						enableFeedbackPublicLogButton,
+						onlyDiscordSalesPublicLogButton,
+						minFeedbackStarButton,
+						goBackButtonButton,
+					],
 				},
 				selectChannel,
 			],

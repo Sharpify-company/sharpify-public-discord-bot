@@ -38,7 +38,7 @@ export class ProductEntity extends BaseEntity {
 		} else {
 			this.channelsLinked.push({ channelId, messageId });
 		}
-		this.save()
+		this.save();
 	}
 }
 

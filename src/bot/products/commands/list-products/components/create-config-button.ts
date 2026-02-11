@@ -73,7 +73,6 @@ export class CreateConfigButtonComponent {
 		@Context() [interaction]: [ButtonInteraction],
 		@ComponentParam("productId") productId: string,
 	) {
-
 		const Config = MemoryCreateConfig.get(productId);
 
 		const modal = new ModalBuilder()

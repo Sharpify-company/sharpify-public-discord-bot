@@ -28,6 +28,11 @@ export class AddToCartButtonComponent {
 			}))
 			.slice(0, 25); // Discord limit: 25 options maximum
 
+		// Discord requires at least 1 option
+		if (options.length === 0) {
+			throw new Error("Cannot create select menu with no options");
+		}
+
 		const selectMenu = new StringSelectMenuBuilder()
 			.setCustomId(`add_to_cart_${product.id}`)
 			.setPlaceholder("Selecione um item...")

@@ -31,6 +31,7 @@ const sentMessages = new Set();
 let SendPrivateSalesLogUsecase = class SendPrivateSalesLogUsecase {
     async execute({ discordUserId, orderProps }) {
         if (sentMessages.has(orderProps.shortReference)) return;
+        sentMessages.add(orderProps.shortReference);
         const storeEntity = await (0, _sharpify.getLocalStoreConfig)();
         const storePreferences = storeEntity.getPreferences();
         if (!storePreferences.privateLogSales.enabled) return;
@@ -95,7 +96,6 @@ let SendPrivateSalesLogUsecase = class SendPrivateSalesLogUsecase {
                 new _discord.ActionRowBuilder().addComponents(viewOnWebsiteButton)
             ]
         }).catch((err)=>console.log(err));
-        sentMessages.add(orderProps.shortReference);
     }
     constructor(client){
         this.client = client;

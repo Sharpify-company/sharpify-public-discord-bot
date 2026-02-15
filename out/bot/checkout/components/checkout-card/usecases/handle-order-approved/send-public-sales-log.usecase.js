@@ -31,6 +31,7 @@ const sentMessages = new Set();
 let SendPublicSalesLogUsecase = class SendPublicSalesLogUsecase {
     async execute({ discordUserId, orderProps }) {
         if (sentMessages.has(orderProps.shortReference)) return;
+        sentMessages.add(orderProps.shortReference);
         const storePreferences = (await (0, _sharpify.getLocalStoreConfig)()).getPreferences();
         if (!storePreferences.publicLogSales.enabled) return;
         const guild = await this.client.guilds.fetch(process.env.DISCORD_GUILD_ID).catch(()=>null);
@@ -74,7 +75,6 @@ let SendPublicSalesLogUsecase = class SendPublicSalesLogUsecase {
                 embed
             ]
         }).catch((err)=>console.log(err));
-        sentMessages.add(orderProps.shortReference);
     }
     constructor(client){
         this.client = client;

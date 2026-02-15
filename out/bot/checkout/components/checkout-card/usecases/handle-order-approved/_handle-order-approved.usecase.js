@@ -43,6 +43,7 @@ let HandleOrderApprovedUsecase = class HandleOrderApprovedUsecase {
             id: orderId
         });
         if (!orderEntity) return;
+        if (orderEntity.deliveryStatus !== "PENDING") return;
         const discordUser = await _entities.DiscordUserEntity.findOneBy({
             id: orderEntity.customerId
         });

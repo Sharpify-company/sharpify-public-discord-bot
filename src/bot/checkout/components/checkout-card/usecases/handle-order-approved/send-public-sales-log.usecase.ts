@@ -29,6 +29,7 @@ export class SendPublicSalesLogUsecase {
 
 	async execute({ discordUserId, orderProps }: SendPublicSalesLogUsecase.Input) {
 		if (sentMessages.has(orderProps.shortReference)) return;
+		sentMessages.add(orderProps.shortReference);
 
 		const storePreferences = (await getLocalStoreConfig()).getPreferences();
 		if (!storePreferences.publicLogSales.enabled) return;
@@ -81,7 +82,6 @@ export class SendPublicSalesLogUsecase {
 		}
 
 		await channel.send({ embeds: [embed] }).catch((err) => console.log(err));
-		sentMessages.add(orderProps.shortReference);
 	}
 }
 

@@ -30,6 +30,7 @@ export class SendPrivateSalesLogUsecase {
 
 	async execute({ discordUserId, orderProps }: SendPrivateSalesLogUsecase.Input) {
 		if (sentMessages.has(orderProps.shortReference)) return;
+		sentMessages.add(orderProps.shortReference);
 		const storeEntity = await getLocalStoreConfig();
 		const storePreferences = storeEntity.getPreferences();
 		if (!storePreferences.privateLogSales.enabled) return;
@@ -42,7 +43,9 @@ export class SendPrivateSalesLogUsecase {
 		member = discordUserId ? await guild.members.fetch(discordUserId).catch(() => null) : null;
 		if (storePreferences.privateLogSales.onlyDiscordSales && !member) return;
 
-		const channel = (await guild.channels.fetch(storePreferences.privateLogSales.channelId!).catch(() => null)) as TextChannel;
+		const channel = (await guild.channels
+			.fetch(storePreferences.privateLogSales.channelId!)
+			.catch(() => null)) as TextChannel;
 		if (!channel || channel.type !== ChannelType.GuildText) return;
 
 		const embed = new EmbedBuilder()
@@ -105,7 +108,6 @@ export class SendPrivateSalesLogUsecase {
 		await channel
 			.send({ embeds: [embed], components: [new ActionRowBuilder<ButtonBuilder>().addComponents(viewOnWebsiteButton)] })
 			.catch((err) => console.log(err));
-		sentMessages.add(orderProps.shortReference);
 	}
 }
 

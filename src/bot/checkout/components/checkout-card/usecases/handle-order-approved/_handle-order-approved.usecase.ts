@@ -44,6 +44,7 @@ export class HandleOrderApprovedUsecase {
 	async execute({ orderId }: { orderId: string }) {
 		const orderEntity = await OrderEntity.findOneBy({ id: orderId });
 		if (!orderEntity) return;
+		if (orderEntity.deliveryStatus !== "PENDING") return;
 
 		const discordUser = await DiscordUserEntity.findOneBy({ id: orderEntity.customerId });
 		if (!discordUser) return;
